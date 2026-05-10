@@ -25,8 +25,8 @@ import { VendorGatewayService } from './modules/vendor/vendor.service';
         name: 'VENDOR_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: 'localhost',
-          port: 3001,
+          host: process.env.VENDOR_SERVICE_HOST || 'localhost',
+          port: Number(process.env.VENDOR_SERVICE_PORT) || 3001,
         },
       },
     ]),
