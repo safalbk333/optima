@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 
 import {
@@ -16,8 +15,8 @@ async function bootstrap() {
         transport: Transport.TCP,
 
         options: {
-          host: process.env.VENDOR_SERVICE_HOST || 'localhost',
-          port: Number(process.env.VENDOR_SERVICE_PORT) || 3001,
+          host: 'localhost',
+          port: Number(process.env.PORT) || 3002,
         },
       },
     );
@@ -25,7 +24,7 @@ async function bootstrap() {
   await app.listen();
 
   console.log(
-    `Vendor Service running on TCP ${process.env.VENDOR_SERVICE_PORT || 3001}`,
+    `Contracts Service running on TCP ${process.env.PORT || 3002}`,
   );
 }
 
