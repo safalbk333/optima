@@ -18,13 +18,4 @@ export class VendorController {
     return this.vendorService.findAll();
   }
 
-  @MessagePattern('vendor.findOne')
-  findOne(@Payload() id: string) {
-    return this.vendorService.findOne(id);
-  }
-
-  @MessagePattern('vendor.create')
-  create(@Payload() data: any) {
-    return this.vendorService.create(data);
-  }
 }

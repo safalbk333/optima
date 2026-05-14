@@ -15,8 +15,8 @@ async function bootstrap() {
         transport: Transport.TCP,
 
         options: {
-          host: 'localhost',
-          port: Number(process.env.PORT) || 3001,
+          host: process.env.VENDOR_SERVICE_HOST || 'localhost',
+          port: Number(process.env.VENDOR_SERVICE_PORT) || 3001,
         },
       },
     );
@@ -24,7 +24,7 @@ async function bootstrap() {
   await app.listen();
 
   console.log(
-    `Vendor Service running on TCP ${process.env.PORT || 3001}`,
+    `Vendor Service running on TCP ${process.env.VENDOR_SERVICE_PORT || 3001}`,
   );
 }
 

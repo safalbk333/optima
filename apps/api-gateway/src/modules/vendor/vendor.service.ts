@@ -6,6 +6,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 
 import { firstValueFrom } from 'rxjs';
+import { VENDOR_PATTERN } from './vendor.pattern';
 
 
 @Injectable()
@@ -18,7 +19,7 @@ export class VendorGatewayService {
   async findAll() {
     return await firstValueFrom(
       this.client.send(
-        'vendor.findAll',
+       VENDOR_PATTERN.FIND_ALL,
         {},
       ),
     );
