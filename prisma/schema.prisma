@@ -8,10 +8,44 @@ datasource db {
 }
 
 model Vendor {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String       @id @default(uuid())
+  vendor_name     String
+  vendor_email    String       @unique
+  vendor_phone    String
+  items           Item[]
+  quotations      Quotation[]
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+}
+
+model Quotation {
+  id           String           @id @default(uuid())
+  vendor_id    String
+  rfq_no       String
+  rfq_title    String
+  category     String
+  issue_date   DateTime
+  due_date     DateTime
+  buyer        String?
+  status       String 
+  items        Item[]           
+  vendor       Vendor            @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
+  created_at   DateTime          @default(now())
+  updated_at   DateTime          @updatedAt
+}
+
+model Item {
+  id           String    @id @default(uuid())
+  vendor_id    String
+  quotation_id String
+  item_name    String
+  item_code    String
+  description  String?
+  quantity     Int
+  unit         String?
+  documents    String?
+  vendor       Vendor    @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
+  quotation    Quotation @relation(fields: [quotation_id], references: [id], onDelete: Cascade)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
 }

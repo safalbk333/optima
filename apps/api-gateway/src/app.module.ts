@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
-
 import { ConfigModule } from '@nestjs/config';
-
 import {
   ClientsModule,
   Transport,
 } from '@nestjs/microservices';
-
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VendorController } from './modules/vendor/vendor.controller';
 import { VendorGatewayService } from './modules/vendor/vendor.service';
+import { QuotationController } from './modules/quotation/quotation.controller';
+import { QuotationGatewayService } from './modules/quotation/quotation.service';
+import { ItemGatewayService } from './modules/item/item.service';
+import { ItemController } from './modules/item/item.controller';
 
 @Module({
   imports: [
@@ -32,8 +33,8 @@ import { VendorGatewayService } from './modules/vendor/vendor.service';
     ]),
   ],
 
-  controllers: [AppController,VendorController],
+  controllers: [AppController,VendorController,QuotationController,ItemController],
 
-  providers: [AppService,VendorGatewayService],
+  providers: [AppService,VendorGatewayService,QuotationGatewayService,ItemGatewayService],
 })
 export class AppModule {}
