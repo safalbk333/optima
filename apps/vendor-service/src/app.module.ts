@@ -8,13 +8,15 @@ import { PrismaModule } from 'libs/database/prisma.module';
 
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 
+import { CategoryModule } from './modules/category/category.module';
 @Module({
   imports: [
-        // ✅ ENV Configuration
+    // ✅ ENV Configuration
         ConfigModule.forRoot({
           isGlobal: true,
         }),
     VendorModule,
+    CategoryModule,
     PrismaModule,
   ],
 

@@ -29,4 +29,16 @@ export class AppController {
   healthCheck() {
     return this.appService.healthCheckForVendorService();
   }
+
+  @Get('contract-service')
+  @ApiOperation({
+    summary: 'Contract-Service Health Check',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Contract-Service is running',
+  })
+  contractHealthCheck() {
+    return this.appService.healthCheckForContractService();
+  }
 }

@@ -1,10 +1,10 @@
 {
   "monorepo": true,
-  "root": "apps/main",
-  "sourceRoot": "apps/main/src",
+  "root": "apps/api-gateway",
+  "sourceRoot": "apps/api-gateway/src",
   "compilerOptions": {
     "webpack": true,
-    "tsConfigPath": "apps/main/tsconfig.app.json"
+    "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
   },
   "projects": {
     "api-gateway": {
@@ -14,15 +14,6 @@
       "sourceRoot": "apps/api-gateway/src",
       "compilerOptions": {
         "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
-      }
-    },
-    "main": {
-      "type": "application",
-      "root": "apps/main",
-      "entryFile": "main",
-      "sourceRoot": "apps/main/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/main/tsconfig.app.json"
       }
     },
     "vendor-service": {
@@ -41,6 +32,15 @@
       "sourceRoot": "apps/auth-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/auth-service/tsconfig.app.json"
+      }
+    },
+    "contracts-service": {
+      "type": "application",
+      "root": "apps/contracts-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/contracts-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/contracts-service/tsconfig.app.json"
       }
     }
   }
