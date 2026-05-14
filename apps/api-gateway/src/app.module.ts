@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
-
 import { ConfigModule } from '@nestjs/config';
-
 import {
   ClientsModule,
   Transport,
 } from '@nestjs/microservices';
-
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VendorController } from './modules/vendor/vendor.controller';
@@ -17,13 +14,17 @@ import { ContractController } from './modules/contract/contract.controller';
 import { ContractGatewayService } from './modules/contract/contract.service';
 import { CategoryController } from './modules/category/category.controller';
 import { CategoryGatewayService } from './modules/category/category.service';
+import { QuotationController } from './modules/quotation/quotation.controller';
+import { QuotationGatewayService } from './modules/quotation/quotation.service';
+import { ItemGatewayService } from './modules/item/item.service';
+import { ItemController } from './modules/item/item.controller';
 
 @Module({
   imports: [
-      // ✅ ENV Configuration
-      ConfigModule.forRoot({
-        isGlobal: true,
-      }),
+    // ✅ ENV Configuration
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
 
     // ✅ TCP Microservice Clients
     ClientsModule.register([
@@ -56,8 +57,20 @@ import { CategoryGatewayService } from './modules/category/category.service';
     ]),
   ],
 
-  controllers: [AppController, VendorController,AuthController, ContractController, CategoryController],
+  controllers: [AppController,
+    VendorController,
+    QuotationController,
+    AuthController,
+    ItemController,
+    ContractController,
+    CategoryController],
 
-  providers: [AppService, VendorGatewayService, AuthService,ContractGatewayService, CategoryGatewayService],
+  providers: [AppService,
+    VendorGatewayService,
+    QuotationGatewayService,
+    ItemGatewayService,
+    AuthService,
+    ContractGatewayService,
+    CategoryGatewayService],
 })
 export class AppModule { }
