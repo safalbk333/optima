@@ -8,16 +8,17 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VendorController } from './modules/vendor/vendor.controller';
 import { VendorGatewayService } from './modules/vendor/vendor.service';
+import { QuotationController } from './modules/quotation/quotation.controller';
+import { QuotationGatewayService } from './modules/quotation/quotation.service';
+import { ItemGatewayService } from './modules/item/item.service';
+import { ItemController } from './modules/item/item.controller';
 import { AuthController } from './modules/auth/auth.controller';
 import { AuthService } from './modules/auth/auth.service';
 import { ContractController } from './modules/contract/contract.controller';
 import { ContractGatewayService } from './modules/contract/contract.service';
 import { CategoryController } from './modules/category/category.controller';
 import { CategoryGatewayService } from './modules/category/category.service';
-import { QuotationController } from './modules/quotation/quotation.controller';
-import { QuotationGatewayService } from './modules/quotation/quotation.service';
-import { ItemGatewayService } from './modules/item/item.service';
-import { ItemController } from './modules/item/item.controller';
+
 
 @Module({
   imports: [
@@ -45,6 +46,14 @@ ConfigModule.forRoot({
         options: {
           host: process.env.AUTH_SERVICE_HOST || '0.0.0.0',
           port: Number(process.env.AUTH_SERVICE_PORT) || 3002,
+        },
+      },
+      {
+        name: 'CONTRACTS_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 3002,
         },
       },
       {

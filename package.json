@@ -10,7 +10,28 @@
     "start:gateway": "nest start api-gateway",
     "start:gateway:dev": "nest start api-gateway --watch",
     "start:vendor": "nest start vendor-service",
-    "start:vendor:dev": "nest start vendor-service --watch"
+    "start:vendor:dev": "nest start vendor-service --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
+  },
+  "jest": {
+    "moduleFileExtensions": ["js", "json", "ts"],
+    "rootDir": ".",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "moduleNameMapper": {
+    "^libs/(.*)$": "<rootDir>/libs/$1"
+  },
+    "collectCoverageFrom": ["**/*.(t|j)s"],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node",
+    "start:auth": "nest start auth-service",
+    "start:auth:dev": "nest start auth-service --watch",
+    "start:contracts": "nest start contracts-service",
+    "start:contracts:dev": "nest start contracts-service --watch"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
