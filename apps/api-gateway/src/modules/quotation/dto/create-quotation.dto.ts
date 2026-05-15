@@ -13,12 +13,6 @@ export class CreateQuotationDto {
   @IsString()
   vendorId: string;
 
-  @ApiPropertyOptional({
-    description: 'RFQ number of the vendor',
-  })
-  @IsString()
-  rfqNo: string;
-
   @ApiProperty({
     description: 'RFQ title of the vendor',
   })

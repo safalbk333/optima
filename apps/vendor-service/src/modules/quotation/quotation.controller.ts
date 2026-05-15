@@ -18,8 +18,15 @@ export class QuotationController {
   }
 
   @MessagePattern('quotation.findAll')
-  findAll() {
-    return this.quotationService.findAll();
+  findAll(
+     @Payload() payload: {
+      limit?: number;
+      page?: number;
+      search?:string;
+      status?: string;
+    },
+  ) {
+    return this.quotationService.findAll(payload);
   }
 
   @MessagePattern('quotation.findOne')

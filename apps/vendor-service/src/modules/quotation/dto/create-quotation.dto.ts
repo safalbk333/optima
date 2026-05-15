@@ -8,9 +8,6 @@ export class CreateQuotationDto {
     vendorId: string;
 
     @IsString()
-    rfqNo?: string;
-
-    @IsString()
     rfqTitle: string;
 
     @IsString()

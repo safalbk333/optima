@@ -22,11 +22,11 @@ export class QuotationGatewayService {
     );
   }
   
-  async findAll() {
+  async findAll(payload: any) {
     return await firstValueFrom(
       this.client.send(
         QUOTATION_PATTERN.FIND_ALL,
-        {},
+        payload,
       ),
     );
   }
