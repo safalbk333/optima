@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
-
 import { ConfigModule } from '@nestjs/config';
-
 import {
   ClientsModule,
   Transport,
 } from '@nestjs/microservices';
-
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VendorController } from './modules/vendor/vendor.controller';
 import { VendorGatewayService } from './modules/vendor/vendor.service';
+import { QuotationController } from './modules/quotation/quotation.controller';
+import { QuotationGatewayService } from './modules/quotation/quotation.service';
+import { ItemGatewayService } from './modules/item/item.service';
+import { ItemController } from './modules/item/item.controller';
 import { AuthController } from './modules/auth/auth.controller';
 import { AuthService } from './modules/auth/auth.service';
 
@@ -44,8 +45,9 @@ import { AuthService } from './modules/auth/auth.service';
     ]),
   ],
 
-  controllers: [AppController, VendorController, AuthController],
+  controllers: [AppController,VendorController,QuotationController,ItemController,AuthController],
 
-  providers: [AppService, VendorGatewayService, AuthService],
+  providers: [AppService,VendorGatewayService,QuotationGatewayService,ItemGatewayService,AuthService],
+ 
 })
 export class AppModule { }

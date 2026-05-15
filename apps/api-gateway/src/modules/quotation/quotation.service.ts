@@ -4,28 +4,29 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { QUOTATION_PATTERN } from './quotation.pattern';
 
 @Injectable()
-export class VendorGatewayService {
+export class QuotationGatewayService {
   constructor(
     @Inject('VENDOR_SERVICE')
     private readonly client: ClientProxy,
   ) {}
 
-  async findAll() {
-    return await firstValueFrom(
-      this.client.send(
-        'vendor.findAll',
-        {},
-      ),
-    );
-  }
-
   async create(data: any) {
     return await firstValueFrom(
       this.client.send(
-        'vendor.create',
+        QUOTATION_PATTERN.CREATE,
         data,
+      ),
+    );
+  }
+  
+  async findAll(payload: any) {
+    return await firstValueFrom(
+      this.client.send(
+        QUOTATION_PATTERN.FIND_ALL,
+        payload,
       ),
     );
   }
@@ -33,7 +34,7 @@ export class VendorGatewayService {
   async findOne(id: string) {
     return await firstValueFrom(
       this.client.send(
-        'vendor.findOne',
+        QUOTATION_PATTERN.FIND_ONE,
         { id },
       ),
     );
