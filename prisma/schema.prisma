@@ -14,6 +14,7 @@ model Vendor {
   vendor_phone    String
   items           Item[]
   quotations      Quotation[]
+  contracts       Contract[]   
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
 }
