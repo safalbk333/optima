@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
 
   const port = Number(process.env.PORT) || 3002;
-  const host = process.env.HOST || 'localhost';
+  const host = process.env.HOST || '0.0.0.0';
 
 
   const app =
