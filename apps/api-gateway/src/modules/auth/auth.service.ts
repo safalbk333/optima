@@ -7,6 +7,7 @@ import { ClientProxy } from '@nestjs/microservices';
 
 import { firstValueFrom } from 'rxjs';
 import { ClientTokenDto } from './dto/client-token.dto';
+import { ClientCodeExchangeDto } from './dto/client-code-exchange.dto';
 
 @Injectable()
 export class AuthService {
@@ -33,5 +34,15 @@ export class AuthService {
       ),
     );
   }
+
+  async exchangeCode(dto: ClientCodeExchangeDto) {
+    return firstValueFrom(
+      this.authClient.send(
+        { cmd: 'exchange-code' },
+        dto,
+      ),
+    );
+  }
+
 
 }

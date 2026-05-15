@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { ClientTokenDto } from './dto/client-token.dto';
+import { ClientCodeExchangeDto } from './dto/client-code-exchange.dto';
 
 
 @ApiTags('Auth-Service')
@@ -29,5 +30,15 @@ export class AuthController {
     @Body() dto: ClientTokenDto,
   ) {
     return this.authService.getClientToken(dto);
+  }
+
+   @Post('exchange')
+  async exchange(
+    @Body() dto: ClientCodeExchangeDto,
+  ) {
+    
+    return this.authService.exchangeCode(
+      dto,
+    );
   }
 }
