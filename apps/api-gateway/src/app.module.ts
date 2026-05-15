@@ -19,12 +19,14 @@ import { ContractGatewayService } from './modules/contract/contract.service';
 import { CategoryController } from './modules/category/category.controller';
 import { CategoryGatewayService } from './modules/category/category.service';
 
+
 @Module({
   imports: [
-      // ✅ ENV Configuration
-      ConfigModule.forRoot({
-        isGlobal: true,
-      }),
+    // ✅ ENV Configuration
+ConfigModule.forRoot({
+  isGlobal: true,
+  envFilePath: `apps/api-gateway/.env.${process.env.NODE_ENV || 'development'}`,
+}),
 
     // ✅ TCP Microservice Clients
     ClientsModule.register([
@@ -32,7 +34,7 @@ import { CategoryGatewayService } from './modules/category/category.service';
         name: 'VENDOR_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: process.env.VENDOR_SERVICE_HOST || 'localhost',
+          host: process.env.VENDOR_SERVICE_HOST || '0.0.0.0',
           port: Number(process.env.VENDOR_SERVICE_PORT) || 3001,
         },
       },
@@ -40,6 +42,14 @@ import { CategoryGatewayService } from './modules/category/category.service';
     ClientsModule.register([
       {
         name: 'AUTH_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: process.env.AUTH_SERVICE_HOST || '0.0.0.0',
+          port: Number(process.env.AUTH_SERVICE_PORT) || 3002,
+        },
+      },
+      {
+        name: 'CONTRACTS_SERVICE',
         transport: Transport.TCP,
         options: {
           host: 'localhost',
@@ -57,8 +67,20 @@ import { CategoryGatewayService } from './modules/category/category.service';
     ]),
   ],
 
-  controllers: [AppController, VendorController,QuotationController,ItemController,AuthController, ContractController, CategoryController],
+  controllers: [AppController,
+    VendorController,
+    QuotationController,
+    AuthController,
+    ItemController,
+    ContractController,
+    CategoryController],
 
-  providers: [AppService, VendorGatewayService,QuotationGatewayService,ItemGatewayService, AuthService,ContractGatewayService, CategoryGatewayService],
+  providers: [AppService,
+    VendorGatewayService,
+    QuotationGatewayService,
+    ItemGatewayService,
+    AuthService,
+    ContractGatewayService,
+    CategoryGatewayService],
 })
 export class AppModule { }

@@ -1,4 +1,44 @@
 services:
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./apps/api-gateway/.env.production
+    environment:
+      NODE_ENV: production
+    restart: always
+
+  vendor-service:
+    build:
+      context: .
+      dockerfile: apps/vendor-service/Dockerfile
+    container_name: vendor-service
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./apps/vendor-service/.env.production
+    environment:
+      NODE_ENV: production
+    restart: always
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/auth-service/Dockerfile
+    container_name: auth-service
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./apps/auth-service/.env.production
+    environment:
+      NODE_ENV: production
+    restart: always
+
+
   postgres:
     image: postgres:16
     container_name: optima_postgres

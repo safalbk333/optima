@@ -6,6 +6,8 @@ import { formatResponse } from './common/response/format-response';
 import { ResponseOptions } from './common/response/response.interface';
 import { RpcException } from '@nestjs/microservices';
 import { AppLogger } from './common/logger/app.logger';
+import axios from 'axios';
+import { ClientCodeExchangeDto } from './dto/client-code-exchange.dto';
 
 @Injectable()
 export class AuthServiceService {
@@ -17,8 +19,11 @@ export class AuthServiceService {
 
   async getClientToken(dto: ClientTokenDto) {
     try {
-      const { clientId, clientSecret } = dto;
 
+      const clientId = 
+        dto.clientId;
+      const clientSecret =
+        dto.clientSecret;
       const realmName =
         process.env.REALMNAME;
 
@@ -82,5 +87,50 @@ export class AuthServiceService {
         `Failed to generate client token: ${error.message}`,
       );
     }
+  }
+
+   async exchangeCode(dto: ClientCodeExchangeDto) {
+    const code = dto.code;
+    const tokenUrl =
+      'http://localhost:8080/realms/optima/protocol/openid-connect/token';
+
+    const params = new URLSearchParams();
+
+    params.append(
+      'grant_type',
+      'authorization_code',
+    );
+
+    params.append(
+      'client_id',
+      'optima-backend',
+    );
+
+    params.append(
+      'client_secret',
+      'ElWmS1h7Ffnm0trGiqYgQMnal12iN9Hf',
+    );
+
+    params.append(
+      'redirect_uri',
+      'http://localhost:5173/callback',
+    );
+
+    params.append('code', code);
+ this.logger.log(
+        `code exchange for code: ${code}`,
+      );
+    const response = await axios.post(
+      tokenUrl,
+      params,
+      {
+        headers: {
+          'Content-Type':
+            'application/x-www-form-urlencoded',
+        },
+      },
+    );
+
+    return response.data;
   }
 }
