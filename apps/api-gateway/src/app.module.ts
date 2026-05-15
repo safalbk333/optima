@@ -12,6 +12,8 @@ import { QuotationController } from './modules/quotation/quotation.controller';
 import { QuotationGatewayService } from './modules/quotation/quotation.service';
 import { ItemGatewayService } from './modules/item/item.service';
 import { ItemController } from './modules/item/item.controller';
+import { AuthController } from './modules/auth/auth.controller';
+import { AuthService } from './modules/auth/auth.service';
 
 @Module({
   imports: [
@@ -31,10 +33,21 @@ import { ItemController } from './modules/item/item.controller';
         },
       },
     ]),
+    ClientsModule.register([
+      {
+        name: 'AUTH_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 3002,
+        },
+      },
+    ]),
   ],
 
-  controllers: [AppController,VendorController,QuotationController,ItemController],
+  controllers: [AppController,VendorController,QuotationController,ItemController,AuthController],
 
-  providers: [AppService,VendorGatewayService,QuotationGatewayService,ItemGatewayService],
+  providers: [AppService,VendorGatewayService,QuotationGatewayService,ItemGatewayService,AuthService],
+ 
 })
-export class AppModule {}
+export class AppModule { }

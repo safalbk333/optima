@@ -6,8 +6,14 @@ import { PrismaModule } from 'libs/database/prisma.module';
 import { QuotationModule } from './modules/quotation/quotation.module';
 import { ItemModule } from './modules/item/item.module';
 
+import { ConfigModule } from '@nestjs/config/dist/config.module';
+
 @Module({
   imports: [
+        // ✅ ENV Configuration
+        ConfigModule.forRoot({
+          isGlobal: true,
+        }),
     VendorModule,
     PrismaModule,
     QuotationModule,

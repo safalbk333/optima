@@ -23,7 +23,9 @@
   },
     "collectCoverageFrom": ["**/*.(t|j)s"],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "start:auth": "nest start auth-service",
+    "start:auth:dev": "nest start auth-service --watch"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -33,10 +35,12 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.0.0",
     "@prisma/client": "^5.22.0",
+    "axios": "^1.16.0",
+    "class-transformer": "^0.5.1",
     "class-validator": "^0.14.4",
     "prisma": "^5.22.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1",
+    "rxjs": "^7.8.2",
     "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
