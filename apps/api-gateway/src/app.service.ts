@@ -12,12 +12,23 @@ export class AppService {
   constructor(
     @Inject('VENDOR_SERVICE')
     private readonly vendorClient: ClientProxy,
+    @Inject('CONTRACTS_SERVICE')
+    private readonly contractClient: ClientProxy,
   ) {}
 
   async healthCheckForVendorService() {
     return await firstValueFrom(
       this.vendorClient.send(
         'health.vendor',
+        {},
+      ),
+    );
+  }
+
+  async healthCheckForContractService() {
+    return await firstValueFrom(
+      this.contractClient.send(
+        'health.contract',
         {},
       ),
     );

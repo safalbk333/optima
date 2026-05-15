@@ -14,15 +14,19 @@ import { ItemGatewayService } from './modules/item/item.service';
 import { ItemController } from './modules/item/item.controller';
 import { AuthController } from './modules/auth/auth.controller';
 import { AuthService } from './modules/auth/auth.service';
+import { ContractController } from './modules/contract/contract.controller';
+import { ContractGatewayService } from './modules/contract/contract.service';
+import { CategoryController } from './modules/category/category.controller';
+import { CategoryGatewayService } from './modules/category/category.service';
 
 @Module({
   imports: [
-    // ✅ ENV Configuration
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+      // ✅ ENV Configuration
+      ConfigModule.forRoot({
+        isGlobal: true,
+      }),
 
-    // ✅ TCP Microservice Client
+    // ✅ TCP Microservice Clients
     ClientsModule.register([
       {
         name: 'VENDOR_SERVICE',
@@ -42,12 +46,19 @@ import { AuthService } from './modules/auth/auth.service';
           port: 3002,
         },
       },
+      {
+        name: 'CONTRACTS_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 3002,
+        },
+      },
     ]),
   ],
 
-  controllers: [AppController,VendorController,QuotationController,ItemController,AuthController],
+  controllers: [AppController, VendorController,QuotationController,ItemController,AuthController, ContractController, CategoryController],
 
-  providers: [AppService,VendorGatewayService,QuotationGatewayService,ItemGatewayService,AuthService],
- 
+  providers: [AppService, VendorGatewayService,QuotationGatewayService,ItemGatewayService, AuthService,ContractGatewayService, CategoryGatewayService],
 })
 export class AppModule { }

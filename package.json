@@ -25,7 +25,9 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "start:auth": "nest start auth-service",
-    "start:auth:dev": "nest start auth-service --watch"
+    "start:auth:dev": "nest start auth-service --watch",
+    "start:contracts": "nest start contracts-service",
+    "start:contracts:dev": "nest start contracts-service --watch"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
