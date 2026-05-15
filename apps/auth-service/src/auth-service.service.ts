@@ -11,7 +11,7 @@ import { ClientCodeExchangeDto } from './dto/client-code-exchange.dto';
 
 @Injectable()
 export class AuthServiceService {
-    private readonly logger =
+  private readonly logger =
     new AppLogger(AuthService.name);
   getHello(): string {
     return 'Hello World!';
@@ -20,7 +20,7 @@ export class AuthServiceService {
   async getClientToken(dto: ClientTokenDto) {
     try {
 
-      const clientId = 
+      const clientId =
         dto.clientId;
       const clientSecret =
         dto.clientSecret;
@@ -89,10 +89,18 @@ export class AuthServiceService {
     }
   }
 
-   async exchangeCode(dto: ClientCodeExchangeDto) {
+  async exchangeCode(dto: ClientCodeExchangeDto) {
+
+    const realmName =
+      process.env.REALMNAME;
+
+    const keycloakUrl =
+      process.env.KEYCLOAK_URL;
+    const frontendRedirectUrl =
+      process.env.FRONTEND_REDIRECT_URL;
     const code = dto.code;
     const tokenUrl =
-      'http://localhost:8080/realms/optima/protocol/openid-connect/token';
+      `${keycloakUrl}/realms/${realmName}/protocol/openid-connect/token`;
 
     const params = new URLSearchParams();
 
@@ -113,13 +121,13 @@ export class AuthServiceService {
 
     params.append(
       'redirect_uri',
-      'http://localhost:5173/callback',
+      frontendRedirectUrl,
     );
 
     params.append('code', code);
- this.logger.log(
-        `code exchange for code: ${code}`,
-      );
+    this.logger.log(
+      `code exchange for code: ${code}`,
+    );
     const response = await axios.post(
       tokenUrl,
       params,
