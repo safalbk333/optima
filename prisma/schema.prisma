@@ -27,7 +27,7 @@ model Quotation {
   issue_date   DateTime
   due_date     DateTime
   buyer        String?
-  status       String 
+  status       Int 
   items        Item[]           
   vendor       Vendor            @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
   created_at   DateTime          @default(now())
