@@ -5,9 +5,12 @@ import { ConfigModule } from '@nestjs/config/dist/config.module';
 
 @Module({
   imports: [ // ✅ ENV Configuration
-          ConfigModule.forRoot({
-            isGlobal: true,
-          }),],
+    ConfigModule.forRoot({
+  isGlobal: true,
+  envFilePath: `apps/auth-service/.env.${process.env.NODE_ENV || 'development'}`,
+}),
+        
+        ],
   controllers: [AuthServiceController],
   providers: [AuthServiceService],
 })
