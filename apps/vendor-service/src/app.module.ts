@@ -11,10 +11,10 @@ import { ItemModule } from './modules/item/item.module';
 import { CategoryModule } from './modules/category/category.module';
 @Module({
   imports: [
-    // ✅ ENV Configuration
-        ConfigModule.forRoot({
-          isGlobal: true,
-        }),
+    ConfigModule.forRoot({
+  isGlobal: true,
+  envFilePath: `apps/vendor-service/.env.${process.env.NODE_ENV || 'development'}`,
+}),
     VendorModule,
     CategoryModule,
     PrismaModule,

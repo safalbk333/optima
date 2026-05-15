@@ -22,9 +22,10 @@ import { ItemController } from './modules/item/item.controller';
 @Module({
   imports: [
     // ✅ ENV Configuration
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+ConfigModule.forRoot({
+  isGlobal: true,
+  envFilePath: `apps/api-gateway/.env.${process.env.NODE_ENV || 'development'}`,
+}),
 
     // ✅ TCP Microservice Clients
     ClientsModule.register([
@@ -32,7 +33,7 @@ import { ItemController } from './modules/item/item.controller';
         name: 'VENDOR_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: process.env.VENDOR_SERVICE_HOST || 'localhost',
+          host: process.env.VENDOR_SERVICE_HOST || '0.0.0.0',
           port: Number(process.env.VENDOR_SERVICE_PORT) || 3001,
         },
       },
@@ -42,8 +43,8 @@ import { ItemController } from './modules/item/item.controller';
         name: 'AUTH_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: 'localhost',
-          port: 3002,
+          host: process.env.AUTH_SERVICE_HOST || '0.0.0.0',
+          port: Number(process.env.AUTH_SERVICE_PORT) || 3002,
         },
       },
       {
