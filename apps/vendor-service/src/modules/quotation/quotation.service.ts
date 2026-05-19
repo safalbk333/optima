@@ -1,6 +1,7 @@
 import {
   Injectable,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from 'libs/database/prisma-service';
 import { CreateQuotationDto } from './dto/create-quotation.dto';
@@ -9,33 +10,41 @@ import Quotation_status from '../constant/enum';
 
 @Injectable()
 export class QuotationService {
+  private readonly logger: Logger;
   constructor(
     private readonly prisma: PrismaService,
-  ) { }
+  ) {
+    this.logger = new Logger(QuotationService.name);
+  }
 
   async create(createQuotationDto: CreateQuotationDto) {
-    const rfqNo = await this.generateRfqNo();
-    const statusKey = createQuotationDto.status.toUpperCase() as keyof typeof Quotation_status;
+    try {
+      const rfqNo = await this.generateRfqNo();
+      const statusKey = createQuotationDto.status.toUpperCase() as keyof typeof Quotation_status;
 
-    // Get corresponding numeric value
-    const statusValue = Quotation_status[statusKey];
+      // Get corresponding numeric value
+      const statusValue = Quotation_status[statusKey];
 
-    // Optional validation
-    if (!statusValue) {
-      throw new Error('Invalid quotation status');
+      // Optional validation
+      if (!statusValue) {
+        throw new Error('Invalid quotation status');
+      }
+      return this.prisma.quotation.create({
+        data: {
+          vendor_id: createQuotationDto.vendorId,
+          rfq_no: rfqNo,
+          rfq_title: createQuotationDto.rfqTitle,
+          category: createQuotationDto.category,
+          issue_date: createQuotationDto.issueDate,
+          due_date: createQuotationDto.dueDate,
+          buyer: createQuotationDto.buyer,
+          status: statusValue,
+        },
+      });
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
     }
-    return this.prisma.quotation.create({
-      data: {
-        vendor_id: createQuotationDto.vendorId,
-        rfq_no: rfqNo,
-        rfq_title: createQuotationDto.rfqTitle,
-        category: createQuotationDto.category,
-        issue_date: createQuotationDto.issueDate,
-        due_date: createQuotationDto.dueDate,
-        buyer: createQuotationDto.buyer,
-        status: statusValue,
-      },
-    });
   }
 
   async findAll(payload: {
@@ -44,73 +53,83 @@ export class QuotationService {
     search?: string;
     status?: string;
   }) {
-    let page =
-      !isNaN(Number(payload?.page)) && Number(payload?.page) > 0
-        ? Number(payload.page)
-        : 1;
+    try {
+      let page =
+        !isNaN(Number(payload?.page)) && Number(payload?.page) > 0
+          ? Number(payload.page)
+          : 1;
 
-    const limit =
-      !isNaN(Number(payload?.limit)) && Number(payload?.limit) > 0
-        ? Number(payload.limit)
-        : 10;
+      const limit =
+        !isNaN(Number(payload?.limit)) && Number(payload?.limit) > 0
+          ? Number(payload.limit)
+          : 10;
 
-    const offset = (page - 1) * limit;
-    const whereClause: any = {};
+      const offset = (page - 1) * limit;
+      const whereClause: any = {};
 
-    if (payload.search) {
-      whereClause.OR = [
-        {
-          rfq_no: {
-            contains: payload.search,
-            mode: 'insensitive',
+      if (payload.search) {
+        whereClause.OR = [
+          {
+            rfq_no: {
+              contains: payload.search,
+              mode: 'insensitive',
+            },
           },
-        },
-        {
-          rfq_title: {
-            contains: payload.search,
-            mode: 'insensitive',
+          {
+            rfq_title: {
+              contains: payload.search,
+              mode: 'insensitive',
+            },
           },
-        },
-      ];
-    }
-
-    if (payload.status) {
-      const statusKey = payload.status.toUpperCase() as keyof typeof Quotation_status;
-
-      const statusValue = Quotation_status[statusKey];
-
-      if (!statusValue) {
-        throw new Error('Invalid quotation status');
+        ];
       }
 
-      whereClause.status = statusValue;
-    }
+      if (payload.status) {
+        const statusKey = payload.status.toUpperCase() as keyof typeof Quotation_status;
 
-    const quotations = await this.prisma.quotation.findMany({
-      where: whereClause,
-      skip: offset,
-      take: limit,
-    });
-    if (!quotations) {
-      throw new NotFoundException(
-        'No quotations found',
-      );
+        const statusValue = Quotation_status[statusKey];
+
+        if (!statusValue) {
+          throw new Error('Invalid quotation status');
+        }
+
+        whereClause.status = statusValue;
+      }
+
+      const quotations = await this.prisma.quotation.findMany({
+        where: whereClause,
+        skip: offset,
+        take: limit,
+      });
+      if (!quotations) {
+        throw new NotFoundException(
+          'No quotations found',
+        );
+      }
+      return quotations;
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
     }
-    return quotations;
   }
 
   async findOne(quotation_id: string) {
-    const quotation =
-      await this.prisma.quotation.findUnique({
-        where: { id: quotation_id },
-      });
+    try {
+      const quotation =
+        await this.prisma.quotation.findUnique({
+          where: { id: quotation_id },
+        });
 
-    if (!quotation) {
-      throw new NotFoundException(
-        'Quotation not found',
-      );
+      if (!quotation) {
+        throw new NotFoundException(
+          'Quotation not found',
+        );
+      }
+      return quotation;
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
     }
-    return quotation;
   }
 
   async generateRfqNo(): Promise<string> {
