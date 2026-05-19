@@ -1,5 +1,6 @@
 import {
   Inject,
+  Logger,
   Injectable,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
@@ -8,35 +9,53 @@ import { ITEM_PATTERN } from './item.pattern';
 
 @Injectable()
 export class ItemGatewayService {
+  private readonly logger: Logger;
   constructor(
     @Inject('VENDOR_SERVICE')
     private readonly client: ClientProxy,
-  ) {}
+  ) {
+    this.logger = new Logger(ItemGatewayService.name);
+  }
 
   async create(data: any) {
-    return await firstValueFrom(
-      this.client.send(
-        ITEM_PATTERN.CREATE,
-        data,
-      ),
-    );
+    try{
+      return await firstValueFrom(
+        this.client.send(
+          ITEM_PATTERN.CREATE,
+          data,
+        ),
+      );
+    }catch(error){
+      this.logger.error(error.message, error);
+      throw error;
+    }
   }
 
   async findAll() {
-    return await firstValueFrom(
-      this.client.send(
-        ITEM_PATTERN.FIND_ALL,
-        {},
-      ),
-    );
+    try{
+      return await firstValueFrom(
+        this.client.send(
+          ITEM_PATTERN.FIND_ALL,
+          {},
+        ),
+      );
+    }catch(error){
+      this.logger.error(error.message, error);
+      throw error;
+    }
   }
 
   async findOne(id: string) {
-    return await firstValueFrom(
-      this.client.send(
-        ITEM_PATTERN.FIND_ONE,
-        { id },
-      ),
-    );
+    try{
+      return await firstValueFrom(
+        this.client.send(
+          ITEM_PATTERN.FIND_ONE,
+          { id },
+        ),
+      );
+    }catch(error){
+      this.logger.error(error.message, error);
+      throw error;
+    }
   }
 }

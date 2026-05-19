@@ -1,35 +1,37 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { PrismaService } from '.././../../../../libs/database/prisma-service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from ".././../../../../libs/database/prisma-service";
+import { CreateCategoryDto } from "./dto/create-category.dto";
+import { UpdateCategoryDto } from "./dto/update-category.dto";
+import { ResponseHelper } from "libs/common/utils/helper/response.helper";
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-  // ✅ Get all active (non-deleted) categories
   async findAll() {
-    return this.prisma.category.findMany({
-      where: { isDeleted: false },
-    });
-  }
-
-  // ✅ Get a single category by ID
-  async findOne(id: string) {
-    const category =
-      await this.prisma.category.findUnique({
-        where: { categoryId: id },
+    try {
+      const categories = await this.prisma.category.findMany({
+        where: {
+          isDeleted: false,
+        },
       });
 
-    if (!category || category.isDeleted) {
-      throw new NotFoundException(
-        'Category not found',
+      return ResponseHelper.success(
+        categories,
+        "Categories fetched successfully",
       );
+    } catch (error) {
+      return ResponseHelper.error("Failed to fetch categories", error.message);
+    }
+  }
+  // ✅ Get a single category by ID
+  async findOne(id: string) {
+    const category = await this.prisma.category.findUnique({
+      where: { categoryId: id },
+    });
+
+    if (!category || category.isDeleted) {
+      throw new NotFoundException("Category not found");
     }
 
     return category;
@@ -45,19 +47,13 @@ export class CategoryService {
   }
 
   // ✅ Update a category
-  async update(
-    id: string,
-    data: UpdateCategoryDto,
-  ) {
-    const category =
-      await this.prisma.category.findUnique({
-        where: { categoryId: id },
-      });
+  async update(id: string, data: UpdateCategoryDto) {
+    const category = await this.prisma.category.findUnique({
+      where: { categoryId: id },
+    });
 
     if (!category || category.isDeleted) {
-      throw new NotFoundException(
-        'Category not found',
-      );
+      throw new NotFoundException("Category not found");
     }
 
     return this.prisma.category.update({
@@ -68,15 +64,12 @@ export class CategoryService {
 
   // ✅ Soft delete a category
   async delete(id: string) {
-    const category =
-      await this.prisma.category.findUnique({
-        where: { categoryId: id },
-      });
+    const category = await this.prisma.category.findUnique({
+      where: { categoryId: id },
+    });
 
     if (!category || category.isDeleted) {
-      throw new NotFoundException(
-        'Category not found',
-      );
+      throw new NotFoundException("Category not found");
     }
 
     return this.prisma.category.update({
