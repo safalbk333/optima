@@ -5,6 +5,7 @@ import {
 import { PrismaService } from '.././../../../../libs/database/prisma-service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
 @Injectable()
 export class CategoryService {
@@ -12,13 +13,26 @@ export class CategoryService {
     private readonly prisma: PrismaService,
   ) { }
 
-  // ✅ Get all active (non-deleted) categories
-  async findAll() {
-    return this.prisma.category.findMany({
-      where: { isDeleted: false },
+async findAll() {
+  try {
+    const categories = await this.prisma.category.findMany({
+      where: {
+        isDeleted: false,
+      },
     });
+
+    return ResponseHelper.success(
+      categories,
+      'Categories fetched successfully',
+    );
+  } catch (error) {
+    return ResponseHelper.error(
+      'Failed to fetch categories',
+      error.message,
+    );
   }
 
+}
   // ✅ Get a single category by ID
   async findOne(id: string) {
     const category =
