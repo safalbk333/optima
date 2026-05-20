@@ -18,6 +18,9 @@ import { ContractController } from './modules/contract/contract.controller';
 import { ContractGatewayService } from './modules/contract/contract.service';
 import { CategoryController } from './modules/category/category.controller';
 import { CategoryGatewayService } from './modules/category/category.service';
+import { KeycloakController } from './modules/authentication/keycloak/keycloak.controller';
+import { PermissionsController } from './modules/authentication/permissions/permissions.controller';
+import { GroupRolesController } from './modules/authentication/roles/roles.controller';
 
 
 @Module({
@@ -45,7 +48,7 @@ ConfigModule.forRoot({
         transport: Transport.TCP,
         options: {
           host: process.env.AUTH_SERVICE_HOST || '0.0.0.0',
-          port: Number(process.env.AUTH_SERVICE_PORT) || 3002,
+          port: Number(process.env.AUTH_SERVICE_PORT) || 3004,
         },
       },
       {
@@ -53,17 +56,10 @@ ConfigModule.forRoot({
         transport: Transport.TCP,
         options: {
           host: 'localhost',
-          port: 3002,
+          port: 3004,
         },
       },
-      {
-        name: 'CONTRACTS_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 3002,
-        },
-      },
+      
     ]),
   ],
 
@@ -73,7 +69,11 @@ ConfigModule.forRoot({
     AuthController,
     ItemController,
     ContractController,
-    CategoryController],
+    CategoryController,
+    KeycloakController,
+    PermissionsController,
+    GroupRolesController
+  ],
 
   providers: [AppService,
     VendorGatewayService,
@@ -81,6 +81,7 @@ ConfigModule.forRoot({
     ItemGatewayService,
     AuthService,
     ContractGatewayService,
-    CategoryGatewayService],
+    CategoryGatewayService,
+   ],
 })
 export class AppModule { }

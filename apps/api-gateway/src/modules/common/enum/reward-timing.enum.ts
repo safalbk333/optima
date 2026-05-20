@@ -1,0 +1,6 @@
+export enum RewardTimingEnum {
+  IMMEDIATE = 'IMMEDIATE',
+  LATER_3_MONTHS = '3 MONTHS',
+  LATER_6_MONTHS = '6 MONTHS',
+  LATER_9_MONTHS = '9 MONTHS',
+}

@@ -5,12 +5,13 @@
   "scripts": {
     "build": "nest build",
     "start:prod": "node dist/main",
-    "start:contracts": "nest start contracts-service",
-    "start:contracts:dev": "nest start contracts-service --watch",
+
     "start:gateway": "nest start api-gateway",
     "start:gateway:dev": "nest start api-gateway --watch",
     "start:vendor": "nest start vendor-service",
     "start:vendor:dev": "nest start vendor-service --watch",
+    "start:contracts": "nest start contracts-service",
+    "start:contracts:dev": "nest start contracts-service --watch",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage"
@@ -47,7 +48,8 @@
     "prisma": "^5.22.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.2",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

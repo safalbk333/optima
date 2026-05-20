@@ -16,7 +16,7 @@ async function bootstrap() {
 
   // ✅ ENV Variables
   const port =
-    configService.get<number>('PORT') || 3000;
+    configService.get<number>('PORT') || 3004;
 
   const appName =
     configService.get<string>('APP_NAME');

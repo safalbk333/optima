@@ -5,6 +5,7 @@ import {
   Put,
   Param,
   Body,
+  UseGuards,
 } from '@nestjs/common';
 
 import {
@@ -16,6 +17,7 @@ import {
 import { ContractGatewayService } from './contract.service';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { UpdateContractDto } from './dto/update-contract.dto';
+import { JwtAuthGuard, PermissionsGuard } from '../guards';
 
 @ApiTags('Contracts-Service')
 @Controller('contract')
@@ -25,6 +27,8 @@ export class ContractController {
   ) {}
 
   @Get()
+    @UseGuards(JwtAuthGuard ,PermissionsGuard)
+
   @ApiOperation({
     summary: 'Get all contracts',
   })

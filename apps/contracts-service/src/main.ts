@@ -16,7 +16,7 @@ async function bootstrap() {
 
         options: {
           host: 'localhost',
-          port: Number(process.env.PORT) || 3002,
+          port: Number(process.env.PORT) || 3004,
         },
       },
     );
@@ -24,7 +24,7 @@ async function bootstrap() {
   await app.listen();
 
   console.log(
-    `Contracts Service running on TCP ${process.env.PORT || 3002}`,
+    `Contracts Service running on TCP ${process.env.PORT || 3004}`,
   );
 }
 

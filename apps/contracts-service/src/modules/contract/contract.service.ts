@@ -2,7 +2,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '.././../../../../libs/database/prisma-service';
+
+import { PrismaService } from '../../../../libs/database/prisma-service';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { UpdateContractDto } from './dto/update-contract.dto';
 import { AppLogger } from '../../common/logger/app.logger';
@@ -15,13 +16,19 @@ export class ContractService {
 
   constructor(
     private readonly prisma: PrismaService,
-  ) { }
+  ) {}
 
   async findAll() {
     try {
       this.logger.log(ContractProperties.service.findAll.start);
-      const arrContracts = await this.prisma.contract.findMany();
-      this.logger.log(`${ContractProperties.service.findAll.success}: ${arrContracts.length}`);
+
+      const arrContracts =
+        await this.prisma.contract.findMany();
+
+      this.logger.log(
+        `${ContractProperties.service.findAll.success}: ${arrContracts.length}`,
+      );
+
       return ResponseHelper.success(
         arrContracts,
         'Contracts fetched successfully',
@@ -31,6 +38,7 @@ export class ContractService {
         ContractProperties.service.findAll.error,
         error.stack,
       );
+
       return ResponseHelper.error(
         'Failed to fetch contracts',
         error.message,
@@ -40,7 +48,10 @@ export class ContractService {
 
   async findOne(strId: string) {
     try {
-      this.logger.log(`${ContractProperties.service.findOne.start}: ${strId}`);
+      this.logger.log(
+        `${ContractProperties.service.findOne.start}: ${strId}`,
+      );
+
       const objContract =
         await this.prisma.contract.findUnique({
           where: { id: strId },
@@ -52,7 +63,10 @@ export class ContractService {
         );
       }
 
-      this.logger.log(`${ContractProperties.service.findOne.success}: ${strId}`);
+      this.logger.log(
+        `${ContractProperties.service.findOne.success}: ${strId}`,
+      );
+
       return ResponseHelper.success(
         objContract,
         'Contract fetched successfully',
@@ -62,17 +76,29 @@ export class ContractService {
         `${ContractProperties.service.findOne.error}: ${strId}`,
         error.stack,
       );
-      throw error;
+
+      return ResponseHelper.error(
+        'Failed to fetch contract',
+        error.message,
+      );
     }
   }
 
   async create(objData: CreateContractDto) {
     try {
-      this.logger.log(ContractProperties.service.create.start);
-      const objContract = await this.prisma.contract.create({
-        data: objData,
-      });
-      this.logger.log(`${ContractProperties.service.create.success}: ${objContract.id}`);
+      this.logger.log(
+        ContractProperties.service.create.start,
+      );
+
+      const objContract =
+        await this.prisma.contract.create({
+          data: objData,
+        });
+
+      this.logger.log(
+        `${ContractProperties.service.create.success}: ${objContract.id}`,
+      );
+
       return ResponseHelper.success(
         objContract,
         'Contract created successfully',
@@ -82,6 +108,7 @@ export class ContractService {
         ContractProperties.service.create.error,
         error.stack,
       );
+
       return ResponseHelper.error(
         'Failed to create contract',
         error.message,
@@ -94,7 +121,10 @@ export class ContractService {
     objData: UpdateContractDto,
   ) {
     try {
-      this.logger.log(`${ContractProperties.service.update.start}: ${strId}`);
+      this.logger.log(
+        `${ContractProperties.service.update.start}: ${strId}`,
+      );
+
       const objContract =
         await this.prisma.contract.findUnique({
           where: { id: strId },
@@ -106,11 +136,16 @@ export class ContractService {
         );
       }
 
-      const objUpdatedContract = await this.prisma.contract.update({
-        where: { id: strId },
-        data: objData,
-      });
-      this.logger.log(`${ContractProperties.service.update.success}: ${strId}`);
+      const objUpdatedContract =
+        await this.prisma.contract.update({
+          where: { id: strId },
+          data: objData,
+        });
+
+      this.logger.log(
+        `${ContractProperties.service.update.success}: ${strId}`,
+      );
+
       return ResponseHelper.success(
         objUpdatedContract,
         'Contract updated successfully',
@@ -120,7 +155,11 @@ export class ContractService {
         `${ContractProperties.service.update.error}: ${strId}`,
         error.stack,
       );
-      throw error;
+
+      return ResponseHelper.error(
+        'Failed to update contract',
+        error.message,
+      );
     }
   }
 }
