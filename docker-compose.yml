@@ -25,6 +25,7 @@ services:
     environment:
       NODE_ENV: production
     restart: always
+
   auth-service:
     build:
       context: .
@@ -37,6 +38,7 @@ services:
     environment:
       NODE_ENV: production
     restart: always
+
   contracts-service:
     build:
       context: .
@@ -50,16 +52,18 @@ services:
       NODE_ENV: production
     restart: always
 
-
   postgres:
     image: postgres:16
     container_name: optima_postgres
     restart: unless-stopped
 
+    env_file:
+      - ./apps/api-gateway/.env.production
+
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: optima_app
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
 
     ports:
       - "5432:5432"
@@ -72,10 +76,13 @@ services:
     container_name: keycloak_postgres
     restart: unless-stopped
 
+    env_file:
+      - ./apps/auth-service/.env.production
+
     environment:
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: keycloakpassword
-      POSTGRES_DB: optima_keycloak_db
+      POSTGRES_USER: ${KC_DB_USERNAME}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
+      POSTGRES_DB: ${KC_DB_URL_DATABASE}
 
     ports:
       - "5433:5432"
@@ -90,17 +97,20 @@ services:
 
     command: start-dev
 
+    env_file:
+      - ./apps/auth-service/.env.production
+
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: keycloak-postgres
       KC_DB_URL_PORT: 5432
-      KC_DB_URL_DATABASE: optima_keycloak_db
+      KC_DB_URL_DATABASE: ${KC_DB_URL_DATABASE}
 
-      KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: keycloakpassword
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
 
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
 
     ports:
       - "8080:8080"
