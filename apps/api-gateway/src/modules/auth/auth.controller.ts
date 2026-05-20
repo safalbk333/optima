@@ -6,7 +6,7 @@ import { ClientCodeExchangeDto } from './dto/client-code-exchange.dto';
 
 
 @ApiTags('Auth-Service')
-@Controller('auth')
+@Controller('bkauth')
 export class AuthController {
 
   constructor(private readonly authService: AuthService) {
