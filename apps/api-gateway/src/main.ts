@@ -16,7 +16,7 @@ async function bootstrap() {
 
   // ✅ ENV Variables
   const port =
-    configService.get<number>('PORT') || 3004;
+    configService.get<number>('PORT') || 3000;
 
   const appName =
     configService.get<string>('APP_NAME');
@@ -52,11 +52,11 @@ async function bootstrap() {
   await app.listen(port);
 
   console.log(
-    `API Gateway running on: http://localhost:${port}`,
+    `API Gateway running on: http://0.0.0.0:${port}`,
   );
 
   console.log(
-    `Swagger running on: http://localhost:${port}/api`,
+    `Swagger running on: http://0.0.0.0:${port}/api`,
   );
 }
 

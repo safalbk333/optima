@@ -37,6 +37,18 @@ services:
     environment:
       NODE_ENV: production
     restart: always
+  contracts-service:
+    build:
+      context: .
+      dockerfile: apps/contracts-service/Dockerfile
+    container_name: contracts-service
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./apps/contracts-service/.env.production
+    environment:
+      NODE_ENV: production
+    restart: always
 
 
   postgres:

@@ -3,7 +3,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { PrismaService } from '../../../../libs/database/prisma-service';
+import { PrismaService } from 'libs/database/prisma-service';
+
 import { CreateContractDto } from './dto/create-contract.dto';
 import { UpdateContractDto } from './dto/update-contract.dto';
 import { AppLogger } from '../../common/logger/app.logger';
