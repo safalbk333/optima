@@ -1,35 +1,36 @@
 import {
   Injectable,
   NotFoundException,
-  Logger,
 } from '@nestjs/common';
 import { PrismaService } from 'libs/database/prisma-service';
 import { CreateQuotationDto } from './dto/create-quotation.dto';
 import Quotation_status from '../constant/enum';
+import { AppLogger } from '../../common/logger/app.logger';
+import { QuotationProperties } from '../../common/properties/quotation.properties';
+import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
 
 @Injectable()
 export class QuotationService {
-  private readonly logger: Logger;
+  private readonly logger = new AppLogger(QuotationService.name);
+
   constructor(
     private readonly prisma: PrismaService,
-  ) {
-    this.logger = new Logger(QuotationService.name);
-  }
+  ) {}
 
   async create(createQuotationDto: CreateQuotationDto) {
     try {
+      this.logger.log(QuotationProperties.service.create.start);
       const rfqNo = await this.generateRfqNo();
       const statusKey = createQuotationDto.status.toUpperCase() as keyof typeof Quotation_status;
 
-      // Get corresponding numeric value
       const statusValue = Quotation_status[statusKey];
 
-      // Optional validation
       if (!statusValue) {
+        this.logger.error(QuotationProperties.service.create.invalidStatus);
         throw new Error('Invalid quotation status');
       }
-      return this.prisma.quotation.create({
+      const quotation = await this.prisma.quotation.create({
         data: {
           vendor_id: createQuotationDto.vendorId,
           rfq_no: rfqNo,
@@ -41,9 +42,20 @@ export class QuotationService {
           status: statusValue,
         },
       });
+      this.logger.log(`${QuotationProperties.service.create.success}: ${quotation.id}`);
+      return ResponseHelper.success(
+        quotation,
+        'Quotation created successfully',
+      );
     } catch (error) {
-      this.logger.error(error.message, error);
-      throw error;
+      this.logger.error(
+        QuotationProperties.service.create.error,
+        error.stack,
+      );
+      return ResponseHelper.error(
+        'Failed to create quotation',
+        error.message,
+      );
     }
   }
 
@@ -54,6 +66,7 @@ export class QuotationService {
     status?: string;
   }) {
     try {
+      this.logger.log(QuotationProperties.service.findAll.start);
       let page =
         !isNaN(Number(payload?.page)) && Number(payload?.page) > 0
           ? Number(payload.page)
@@ -106,15 +119,26 @@ export class QuotationService {
           'No quotations found',
         );
       }
-      return quotations;
+      this.logger.log(QuotationProperties.service.findAll.success);
+      return ResponseHelper.success(
+        quotations,
+        'Quotations fetched successfully',
+      );
     } catch (error) {
-      this.logger.error(error.message, error);
-      throw error;
+      this.logger.error(
+        QuotationProperties.service.findAll.error,
+        error.stack,
+      );
+      return ResponseHelper.error(
+        'Failed to fetch quotations',
+        error.message,
+      );
     }
   }
 
   async findOne(quotation_id: string) {
     try {
+      this.logger.log(`${QuotationProperties.service.findOne.start}: ${quotation_id}`);
       const quotation =
         await this.prisma.quotation.findUnique({
           where: { id: quotation_id },
@@ -125,38 +149,55 @@ export class QuotationService {
           'Quotation not found',
         );
       }
-      return quotation;
+      this.logger.log(`${QuotationProperties.service.findOne.success}: ${quotation_id}`);
+      return ResponseHelper.success(
+        quotation,
+        'Quotation fetched successfully',
+      );
     } catch (error) {
-      this.logger.error(error.message, error);
+      this.logger.error(
+        `${QuotationProperties.service.findOne.error}: ${quotation_id}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
   async generateRfqNo(): Promise<string> {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now
-      .toLocaleString('en-US', { month: 'short' })
-      .toUpperCase();
+    try {
+      this.logger.log(QuotationProperties.service.generateRfqNo.start);
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now
+        .toLocaleString('en-US', { month: 'short' })
+        .toUpperCase();
 
-    // Get last created quotation
-    const lastQuotation = await this.prisma.quotation.findFirst({
-      orderBy: {
-        created_at: 'desc',
-      },
-      select: {
-        rfq_no: true,
-      },
-    });
+      const lastQuotation = await this.prisma.quotation.findFirst({
+        orderBy: {
+          created_at: 'desc',
+        },
+        select: {
+          rfq_no: true,
+        },
+      });
 
-    let nextNumber = 1;
+      let nextNumber = 1;
 
-    if (lastQuotation?.rfq_no) {
-      const parts = lastQuotation.rfq_no.split('-');
-      const lastSequence = parseInt(parts[3], 10);
-      nextNumber = lastSequence + 1;
+      if (lastQuotation?.rfq_no) {
+        const parts = lastQuotation.rfq_no.split('-');
+        const lastSequence = parseInt(parts[3], 10);
+        nextNumber = lastSequence + 1;
+      }
+      const sequence = String(nextNumber).padStart(3, '0');
+      const rfqNo = `RFQ-${year}-${month}-${sequence}`;
+      this.logger.log(`${QuotationProperties.service.generateRfqNo.success}: ${rfqNo}`);
+      return rfqNo;
+    } catch (error) {
+      this.logger.error(
+        QuotationProperties.service.generateRfqNo.error,
+        error.stack,
+      );
+      throw error;
     }
-    const sequence = String(nextNumber).padStart(3, '0');
-    return `RFQ-${year}-${month}-${sequence}`;
   }
 }

@@ -5,8 +5,8 @@
   "scripts": {
     "build": "nest build",
     "start:prod": "node dist/main",
-
-
+    "start:contracts": "nest start contracts-service",
+    "start:contracts:dev": "nest start contracts-service --watch",
     "start:gateway": "nest start api-gateway",
     "start:gateway:dev": "nest start api-gateway --watch",
     "start:vendor": "nest start vendor-service",
@@ -23,8 +23,8 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "moduleNameMapper": {
-    "^libs/(.*)$": "<rootDir>/libs/$1"
-  },
+      "^libs/(.*)$": "<rootDir>/libs/$1"
+    },
     "collectCoverageFrom": ["**/*.(t|j)s"],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",

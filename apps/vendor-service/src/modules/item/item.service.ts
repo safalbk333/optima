@@ -1,24 +1,26 @@
 import {
   Injectable,
   NotFoundException,
-  Logger,
 } from '@nestjs/common';
 import { PrismaService } from 'libs/database/prisma-service';
 import { CreateItemDto } from './dto/create-item.dto';
+import { AppLogger } from '../../common/logger/app.logger';
+import { ItemProperties } from '../../common/properties/item.properties';
+import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
 
 @Injectable()
 export class ItemService {
-  private readonly logger: Logger;
+  private readonly logger = new AppLogger(ItemService.name);
+
   constructor(
     private readonly prisma: PrismaService,
-  ) {
-    this.logger = new Logger(ItemService.name);
-  }
+  ) {}
 
   async create(createItemDto: CreateItemDto) {
     try {
-      return this.prisma.item.create({
+      this.logger.log(ItemProperties.service.create.start);
+      const item = await this.prisma.item.create({
         data: {
           vendor_id: createItemDto.vendorId,
           quotation_id: createItemDto.quotationId,
@@ -30,22 +32,46 @@ export class ItemService {
           documents: createItemDto.document,
         },
       });
+      this.logger.log(`${ItemProperties.service.create.success}: ${item.id}`);
+      return ResponseHelper.success(
+        item,
+        'Item created successfully',
+      );
     } catch (error) {
-      this.logger.error(error.message, error);
-      throw error;
+      this.logger.error(
+        ItemProperties.service.create.error,
+        error.stack,
+      );
+      return ResponseHelper.error(
+        'Failed to create item',
+        error.message,
+      );
     }
   }
   async findAll() {
     try {
-      return this.prisma.item.findMany();
+      this.logger.log(ItemProperties.service.findAll.start);
+      const items = await this.prisma.item.findMany();
+      this.logger.log(ItemProperties.service.findAll.success);
+      return ResponseHelper.success(
+        items,
+        'Items fetched successfully',
+      );
     } catch (error) {
-      this.logger.error(error.message, error);
-      throw error;
+      this.logger.error(
+        ItemProperties.service.findAll.error,
+        error.stack,
+      );
+      return ResponseHelper.error(
+        'Failed to fetch items',
+        error.message,
+      );
     }
   }
 
   async findOne(id: string) {
     try {
+      this.logger.log(`${ItemProperties.service.findOne.start}: ${id}`);
       const item =
         await this.prisma.item.findUnique({
           where: { id },
@@ -56,9 +82,16 @@ export class ItemService {
           'Item not found',
         );
       }
-      return item;
+      this.logger.log(`${ItemProperties.service.findOne.success}: ${id}`);
+      return ResponseHelper.success(
+        item,
+        'Item fetched successfully',
+      );
     } catch (error) {
-      this.logger.error(error.message, error);
+      this.logger.error(
+        `${ItemProperties.service.findOne.error}: ${id}`,
+        error.stack,
+      );
       throw error;
     }
   }
