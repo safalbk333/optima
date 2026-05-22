@@ -22,6 +22,7 @@ import { KeycloakController } from './modules/authentication/keycloak/keycloak.c
 import { PermissionsController } from './modules/authentication/permissions/permissions.controller';
 import { GroupRolesController } from './modules/authentication/roles/roles.controller';
 
+console.log('NODE_ENV =>', process.env.NODE_ENV);
 
 @Module({
   imports: [
@@ -55,8 +56,8 @@ ConfigModule.forRoot({
         name: 'CONTRACTS_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: '0.0.0.0',
-          port: 3004,
+          host: process.env.CONTRACTS_SERVICE_HOST || '0.0.0.0',
+          port: Number(process.env.CONTRACTS_SERVICE_PORT) || 3003,
         },
       },
       
@@ -84,4 +85,26 @@ ConfigModule.forRoot({
     CategoryGatewayService,
    ],
 })
-export class AppModule { }
+export class AppModule {
+  constructor() {
+
+        // ✅ Log loaded env values
+    console.log('================ ENV VALUES ================');
+
+    console.log('VENDOR_SERVICE_HOST =>', process.env.VENDOR_SERVICE_HOST);
+    console.log('VENDOR_SERVICE_PORT =>', process.env.VENDOR_SERVICE_PORT);
+
+    console.log('AUTH_SERVICE_HOST =>', process.env.AUTH_SERVICE_HOST);
+    console.log('AUTH_SERVICE_PORT =>', process.env.AUTH_SERVICE_PORT);
+
+    console.log(
+      'CONTRACTS_SERVICE_HOST =>',
+      process.env.CONTRACTS_SERVICE_HOST,
+    );
+    console.log(
+      'CONTRACTS_SERVICE_PORT =>',
+      process.env.CONTRACTS_SERVICE_PORT,
+    );
+
+  }
+ }

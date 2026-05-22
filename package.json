@@ -5,7 +5,8 @@
   "scripts": {
     "build": "nest build",
     "start:prod": "node dist/main",
-
+    "start:auth": "nest start auth-service",
+    "start:auth:dev": "nest start auth-service --watch",
     "start:gateway": "nest start api-gateway",
     "start:gateway:dev": "nest start api-gateway --watch",
     "start:vendor": "nest start vendor-service",

@@ -37,7 +37,15 @@ export class PermissionsGuard implements CanActivate {
 
   
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    if (process.env.DEV_MODE) return true;
+
+    
+    this.logger.debug( `Checking dev mode ${process.env.DEV_MODE}`);
+  
+
+    const isDevMode = process.env.DEV_MODE?.toLowerCase() === 'true';
+    if (isDevMode) {
+      return true;
+    }
     // Check if endpoint is marked as public
     const isPublic =
       this.reflector.get<boolean>(PUBLIC_KEY, context.getHandler()) ||
@@ -91,7 +99,7 @@ export class PermissionsGuard implements CanActivate {
     }
 
     const payload = user.payload;
-    const realmName = payload.realm || process.env.REALMNAME;
+    const realmName =  process.env.REALMNAME;
     if (!realmName) {
       this.logger.error('Realm name is missing and not set in environment');
       throw new UnauthorizedException('Realm configuration error');

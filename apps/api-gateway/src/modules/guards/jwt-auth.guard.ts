@@ -33,11 +33,14 @@ export class JwtAuthGuard implements CanActivate {
       if (authHeader?.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         try {
+              this.logger.log(`jwt-auth.guards-token seperated: ${token}`);
+
           const decoded = jwt.decode(token) as CustomJwtPayload | null;
           if (decoded && typeof decoded === 'object') {
             request.user = { payload: decoded };
           }
         } catch {
+          this.logger.warn('Failed to decode JWT in DEV_MODE, proceeding without user context');
           /* ignore invalid token in dev */
         }
       }
@@ -65,7 +68,7 @@ export class JwtAuthGuard implements CanActivate {
     // Attach payload for downstream guards
     request.user = { payload: decodedToken.payload };
 
-    const realmName = decodedToken.payload.realm || process.env.REALMNAME;
+    const realmName =  process.env.REALMNAME;
     const jwksUri = `${
       process.env.KEYCLOAK_URL
     }/realms/${realmName}/protocol/openid-connect/certs`;
