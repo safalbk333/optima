@@ -52,11 +52,11 @@ async function bootstrap() {
   await app.listen(port);
 
   console.log(
-    `API Gateway running on: http://localhost:${port}`,
+    `API Gateway running on: http://0.0.0.0:${port}`,
   );
 
   console.log(
-    `Swagger running on: http://localhost:${port}/api`,
+    `Swagger running on: http://0.0.0.0:${port}/api`,
   );
 }
 

@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 
 import { ContractModule } from './modules/contract/contract.module';
 
-import { PrismaModule } from '../../../libs/database/prisma.module';
+import { PrismaModule } from 'libs/database/prisma.module';
 
 @Module({
   imports: [

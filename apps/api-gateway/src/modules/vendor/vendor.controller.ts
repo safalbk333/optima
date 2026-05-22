@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiOperation,
@@ -34,6 +35,7 @@ export class VendorController {
   }
 
   @Get()
+
   @ApiOperation({
     summary: 'Get all vendors',
   })

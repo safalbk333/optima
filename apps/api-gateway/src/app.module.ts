@@ -22,6 +22,10 @@ import { ShipmentController } from './modules/shipment/shipment.controller';
 import { ShipmentGatewayService } from './modules/shipment/shipment.service';
 import { GoodsReceivedController } from './modules/goods-received/goods-reveived.controller';
 import { GoodsReceivedGatewayService } from './modules/goods-received/goods-received.service';
+import { KeycloakController } from './modules/authentication/keycloak/keycloak.controller';
+import { PermissionsController } from './modules/authentication/permissions/permissions.controller';
+import { GroupRolesController } from './modules/authentication/roles/roles.controller';
+
 
 @Module({
   imports: [
@@ -56,25 +60,18 @@ ConfigModule.forRoot({
         transport: Transport.TCP,
         options: {
           host: process.env.AUTH_SERVICE_HOST || '0.0.0.0',
-          port: Number(process.env.AUTH_SERVICE_PORT) || 3002,
+          port: Number(process.env.AUTH_SERVICE_PORT) || 3004,
         },
       },
       {
         name: 'CONTRACTS_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: 'localhost',
-          port: 3002,
+          host: '0.0.0.0',
+          port: 3004,
         },
       },
-      {
-        name: 'CONTRACTS_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 3002,
-        },
-      },
+      
     ]),
   ],
 
@@ -88,6 +85,9 @@ ConfigModule.forRoot({
     CategoryController,
     ShipmentController,
     GoodsReceivedController,
+    KeycloakController,
+    PermissionsController,
+    GroupRolesController
   ],
 
   providers: [
