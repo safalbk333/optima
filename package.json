@@ -11,6 +11,8 @@
     "start:gateway:dev": "nest start api-gateway --watch",
     "start:vendor": "nest start vendor-service",
     "start:vendor:dev": "nest start vendor-service --watch",
+    "start:shipment": "nest start shipment-service",
+    "start:shipment:dev": "nest start shipment-service --watch",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage"
@@ -31,7 +33,9 @@
     "start:auth": "nest start auth-service",
     "start:auth:dev": "nest start auth-service --watch",
     "start:contracts": "nest start contracts-service",
-    "start:contracts:dev": "nest start contracts-service --watch"
+    "start:contracts:dev": "nest start contracts-service --watch",
+    "start:shipment": "nest start shipment-service",
+    "start:shipment:dev": "nest start shipment-service --watch"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

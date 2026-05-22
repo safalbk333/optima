@@ -2,13 +2,11 @@ import {
   Controller,
   Get,
 } from '@nestjs/common';
-
 import {
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-
 import { AppService } from './app.service';
 
 @ApiTags('Health Check')
@@ -40,5 +38,17 @@ export class AppController {
   })
   contractHealthCheck() {
     return this.appService.healthCheckForContractService();
+  }
+
+   @Get('shipment-service')
+  @ApiOperation({
+    summary: 'Shipment-Service Health Check',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Shipment-Service is running',
+  })
+  shipmentHealthCheck() {
+    return this.appService.healthCheckForShipmentService();
   }
 }

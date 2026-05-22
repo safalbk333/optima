@@ -14,6 +14,8 @@ export class AppService {
     private readonly vendorClient: ClientProxy,
     @Inject('CONTRACTS_SERVICE')
     private readonly contractClient: ClientProxy,
+    @Inject('SHIPMENT_SERVICE')
+    private readonly shipmentClient: ClientProxy,
   ) {}
 
   async healthCheckForVendorService() {
@@ -29,6 +31,15 @@ export class AppService {
     return await firstValueFrom(
       this.contractClient.send(
         'health.contract',
+        {},
+      ),
+    );
+  }
+
+async healthCheckForShipmentService() {
+    return await firstValueFrom(
+      this.shipmentClient.send(
+        'health.shipment',
         {},
       ),
     );

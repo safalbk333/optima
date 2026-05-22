@@ -18,7 +18,10 @@ import { ContractController } from './modules/contract/contract.controller';
 import { ContractGatewayService } from './modules/contract/contract.service';
 import { CategoryController } from './modules/category/category.controller';
 import { CategoryGatewayService } from './modules/category/category.service';
-
+import { ShipmentController } from './modules/shipment/shipment.controller';
+import { ShipmentGatewayService } from './modules/shipment/shipment.service';
+import { GoodsReceivedController } from './modules/goods-received/goods-reveived.controller';
+import { GoodsReceivedGatewayService } from './modules/goods-received/goods-received.service';
 
 @Module({
   imports: [
@@ -36,6 +39,14 @@ ConfigModule.forRoot({
         options: {
           host: process.env.VENDOR_SERVICE_HOST || '0.0.0.0',
           port: Number(process.env.VENDOR_SERVICE_PORT) || 3001,
+        },
+      },
+      {
+        name: 'SHIPMENT_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: process.env.SHIPMENT_SERVICE_HOST || 'localhost',
+          port: Number(process.env.SHIPMENT_SERVICE_PORT) || 3003,
         },
       },
     ]),
@@ -67,20 +78,28 @@ ConfigModule.forRoot({
     ]),
   ],
 
-  controllers: [AppController,
+  controllers: [
+    AppController,
     VendorController,
     QuotationController,
     AuthController,
     ItemController,
     ContractController,
-    CategoryController],
+    CategoryController,
+    ShipmentController,
+    GoodsReceivedController,
+  ],
 
-  providers: [AppService,
+  providers: [
+    AppService,
     VendorGatewayService,
     QuotationGatewayService,
     ItemGatewayService,
     AuthService,
     ContractGatewayService,
-    CategoryGatewayService],
+    CategoryGatewayService,
+    ShipmentGatewayService,
+    GoodsReceivedGatewayService,
+  ],
 })
 export class AppModule { }
