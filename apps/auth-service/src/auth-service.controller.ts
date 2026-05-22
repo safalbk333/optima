@@ -21,20 +21,6 @@ export class AuthServiceController {
     return this.authServiceService.getHello();
   }
 
-  @MessagePattern({ cmd: 'get-client-token' })
-  async getClientToken(
-    @Payload() dto: ClientTokenDto,
-  ) {
-    return this.authServiceService.getClientToken(dto);
-  }
-
-  @MessagePattern({ cmd: 'exchange-code' })
-  async exchangeCode(
-    @Payload() dto: ClientCodeExchangeDto,
-  ) {
-    return this.authServiceService.exchangeCode(dto);
-  }
-
-
+ 
 
 }

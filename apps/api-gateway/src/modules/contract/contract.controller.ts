@@ -9,26 +9,38 @@ import {
 } from '@nestjs/common';
 
 import {
+  ApiBearerAuth,
   ApiOperation,
   ApiResponse,
+  ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
 
 import { ContractGatewayService } from './contract.service';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { UpdateContractDto } from './dto/update-contract.dto';
-import { JwtAuthGuard, PermissionsGuard } from '../guards';
+
+import {
+  JwtAuthGuard,
+  PermissionsGuard,
+  Permissions,
+  HOME_READ,
+
+} from '../guards';
 
 @ApiTags('Contracts-Service')
 @Controller('contract')
 export class ContractController {
   constructor(
     private readonly contractService: ContractGatewayService,
-  ) {}
+  ) { }
 
   @Get()
-    @UseGuards(JwtAuthGuard ,PermissionsGuard)
-
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(
+    HOME_READ,
+  )
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get all contracts',
   })

@@ -6,9 +6,14 @@ import { AppService } from './app.service';
 import { ContractModule } from './modules/contract/contract.module';
 
 import { PrismaModule } from 'libs/database/prisma.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+        ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `apps/contracts-service/.env.${process.env.NODE_ENV || 'development'}`,
+    }),
     ContractModule,
     PrismaModule,
   ],
