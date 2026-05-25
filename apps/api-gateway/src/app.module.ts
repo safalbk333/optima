@@ -38,7 +38,7 @@ ConfigModule.forRoot({
         name: 'VENDOR_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: process.env.VENDOR_SERVICE_HOST || '0.0.0.0',
+          host: process.env.VENDOR_SERVICE_HOST || 'localhost',
           port: Number(process.env.VENDOR_SERVICE_PORT) || 3001,
         },
       },
@@ -48,7 +48,7 @@ ConfigModule.forRoot({
         name: 'AUTH_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: process.env.AUTH_SERVICE_HOST || '0.0.0.0',
+          host: process.env.AUTH_SERVICE_HOST || 'localhost',
           port: Number(process.env.AUTH_SERVICE_PORT) || 3004,
         },
       },
@@ -56,7 +56,7 @@ ConfigModule.forRoot({
         name: 'CONTRACTS_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: process.env.CONTRACTS_SERVICE_HOST || '0.0.0.0',
+          host: process.env.CONTRACTS_SERVICE_HOST || 'localhost',
           port: Number(process.env.CONTRACTS_SERVICE_PORT) || 3003,
         },
       },
