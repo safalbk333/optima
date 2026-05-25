@@ -12,9 +12,12 @@ model Vendor {
   vendor_name     String
   vendor_email    String       @unique
   vendor_phone    String
+
   items           Item[]
   quotations      Quotation[]
-  contracts       Contract[]   
+  contracts       Contract[]
+  shipments       Shipment[]
+
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
 }
@@ -44,7 +47,7 @@ model Category {
 }
 
 model Quotation {
-  id           String           @id @default(uuid())
+  id           String    @id @default(uuid())
   vendor_id    String
   rfq_no       String
   rfq_title    String
@@ -52,25 +55,72 @@ model Quotation {
   issue_date   DateTime
   due_date     DateTime
   buyer        String?
-  status       Int 
-  items        Item[]           
-  vendor       Vendor            @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
-  created_at   DateTime          @default(now())
-  updated_at   DateTime          @updatedAt
+  status       Int
+  items        Item[]
+  vendor       Vendor @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 }
 
 model Item {
-  id           String    @id @default(uuid())
-  vendor_id    String
-  quotation_id String
-  item_name    String
-  item_code    String
-  description  String?
-  quantity     Int
-  unit         String?
-  documents    String?
-  vendor       Vendor    @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
-  quotation    Quotation @relation(fields: [quotation_id], references: [id], onDelete: Cascade)
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
+  id             String    @id @default(uuid())
+  vendor_id      String
+  quotation_id   String
+  item_name      String
+  item_code      String
+  description    String?
+  quantity       Int
+  unit           String?
+  documents      String?
+  vendor         Vendor    @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
+  quotation      Quotation @relation(fields: [quotation_id], references: [id], onDelete: Cascade)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+}
+
+model Shipment {
+  id                   String    @id @default(uuid())
+  po_no                String
+  vendor_id            String
+  asn_id               String    @unique
+  dispatch_date        DateTime
+  delivery_date        DateTime
+  logistics_provider   String
+  tracking_no          String
+  quantity             Int
+  status               Int
+  notes                String?
+  documents            String?
+  vendor               Vendor @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
+  tracking             ShipmentTracking @relation(fields: [tracking_no], references: [id])
+  grns                 GRN[]
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+}
+
+
+model ShipmentTracking {
+  id                       String    @id @default(uuid())
+  order_id                 String
+  courier_person_name      String
+  courier_person_phone     String
+  shipments                Shipment[]
+  created_at               DateTime  @default(now())
+  updated_at               DateTime  @updatedAt
+}
+
+model GRN {
+  id                  String    @id @default(uuid())
+  po_no               String
+  receiver            String
+  asn_id              String
+  received_date       DateTime
+  warehouse_name      String
+  received_quantity   Int
+  accepted_quantity   Int
+  rejected_quantity   Int
+  status              Int
+  shipment            Shipment @relation(fields: [asn_id], references: [asn_id], onDelete: Cascade)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
 }

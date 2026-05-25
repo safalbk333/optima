@@ -18,6 +18,10 @@ import { ContractController } from './modules/contract/contract.controller';
 import { ContractGatewayService } from './modules/contract/contract.service';
 import { CategoryController } from './modules/category/category.controller';
 import { CategoryGatewayService } from './modules/category/category.service';
+import { ShipmentController } from './modules/shipment/shipment.controller';
+import { ShipmentGatewayService } from './modules/shipment/shipment.service';
+import { GoodsReceivedController } from './modules/goods-received/goods-reveived.controller';
+import { GoodsReceivedGatewayService } from './modules/goods-received/goods-received.service';
 import { KeycloakController } from './modules/authentication/keycloak/keycloak.controller';
 import { PermissionsController } from './modules/authentication/permissions/permissions.controller';
 import { GroupRolesController } from './modules/authentication/roles/roles.controller';
@@ -42,6 +46,14 @@ ConfigModule.forRoot({
           port: Number(process.env.VENDOR_SERVICE_PORT) || 3001,
         },
       },
+      {
+        name: 'SHIPMENT_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: process.env.SHIPMENT_SERVICE_HOST || 'localhost',
+          port: Number(process.env.SHIPMENT_SERVICE_PORT) || 3003,
+        },
+      },
     ]),
     ClientsModule.register([
       {
@@ -64,26 +76,32 @@ ConfigModule.forRoot({
     ]),
   ],
 
-  controllers: [AppController,
+  controllers: [
+    AppController,
     VendorController,
     QuotationController,
     AuthController,
     ItemController,
     ContractController,
     CategoryController,
+    ShipmentController,
+    GoodsReceivedController,
     KeycloakController,
     PermissionsController,
     GroupRolesController
   ],
 
-  providers: [AppService,
+  providers: [
+    AppService,
     VendorGatewayService,
     QuotationGatewayService,
     ItemGatewayService,
     AuthService,
     ContractGatewayService,
     CategoryGatewayService,
-   ],
+    ShipmentGatewayService,
+    GoodsReceivedGatewayService,
+  ],
 })
 export class AppModule {
   constructor() {

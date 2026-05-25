@@ -42,6 +42,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/contracts-service/tsconfig.app.json"
       }
+    },
+    "shipment-service": {
+      "type": "application",
+      "root": "apps/shipment-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/shipment-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/shipment-service/tsconfig.app.json"
+      }
     }
   }
 }
