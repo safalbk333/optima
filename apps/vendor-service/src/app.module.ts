@@ -4,12 +4,10 @@ import { AppService } from './app.service';
 import { VendorModule } from './modules/vendor/vendor.module';
 import { PrismaModule } from 'libs/database/prisma.module';
 import { QuotationModule } from './modules/quotation/quotation.module';
-import { ItemModule } from './modules/item/item.module';
 
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 
 
-import { CategoryModule } from './modules/category/category.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,10 +15,8 @@ import { CategoryModule } from './modules/category/category.module';
   envFilePath: `apps/vendor-service/.env.${process.env.NODE_ENV || 'development'}`,
 }),
     VendorModule,
-    CategoryModule,
     PrismaModule,
     QuotationModule,
-    ItemModule,
   ],
 
   controllers: [AppController],
