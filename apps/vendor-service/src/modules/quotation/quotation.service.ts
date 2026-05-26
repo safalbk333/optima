@@ -18,46 +18,81 @@ export class QuotationService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async create(createQuotationDto: CreateQuotationDto) {
-    try {
-      this.logger.log(QuotationProperties.service.create.start);
-      const rfqNo = await this.generateRfqNo();
-      const statusKey = createQuotationDto.status.toUpperCase() as keyof typeof Quotation_status;
+ async create(createQuotationDto: CreateQuotationDto) {
+  try {
+    this.logger.log(
+      QuotationProperties.service.create.start,
+    );
 
-      const statusValue = Quotation_status[statusKey];
+   
 
-      if (!statusValue) {
-        this.logger.error(QuotationProperties.service.create.invalidStatus);
-        throw new Error('Invalid quotation status');
-      }
-      const quotation = await this.prisma.quotation.create({
-        data: {
-          vendor_id: createQuotationDto.vendorId,
-          rfq_no: rfqNo,
-          rfq_title: createQuotationDto.rfqTitle,
-          category: createQuotationDto.category,
-          issue_date: createQuotationDto.issueDate,
-          due_date: createQuotationDto.dueDate,
-          buyer: createQuotationDto.buyer,
-          status: statusValue,
+const quotation =
+  await this.prisma.tbl_quotation.create({
+    data: {
+      vendor: {
+        connect: {
+          pk_chr_vendor_id:
+            createQuotationDto.vendorId,
         },
-      });
-      this.logger.log(`${QuotationProperties.service.create.success}: ${quotation.id}`);
-      return ResponseHelper.success(
-        quotation,
-        'Quotation created successfully',
-      );
-    } catch (error) {
-      this.logger.error(
-        QuotationProperties.service.create.error,
-        error.stack,
-      );
-      return ResponseHelper.error(
-        'Failed to create quotation',
-        error.message,
-      );
-    }
+      },
+
+      rfq: {
+        connect: {
+          pk_chr_rfq_id:
+            createQuotationDto.rfqId,
+        },
+      },
+
+      ...(createQuotationDto.category && {
+        category: {
+          connect: {
+            pk_chr_category_id:
+              createQuotationDto.category,
+          },
+        },
+      }),
+
+      ...(createQuotationDto.buyer && {
+        buyer: {
+          connect: {
+            pk_chr_user_id:
+              createQuotationDto.buyer,
+          },
+        },
+      }),
+
+      chr_status: createQuotationDto.status.toUpperCase(),
+
+      dt_issue_date: new Date(
+        createQuotationDto.issueDate,
+      ),
+
+      dt_due_date: new Date(
+        createQuotationDto.dueDate,
+      ),
+    },
+  });
+
+    this.logger.log(
+      `${QuotationProperties.service.create.success}: ${quotation.pk_chr_quotation_id}`,
+    );
+
+    return ResponseHelper.success(
+      quotation,
+      'Quotation created successfully',
+    );
+  } catch (error) {
+    this.logger.error(
+      QuotationProperties.service.create.error,
+      error.stack,
+    );
+
+    return ResponseHelper.error(
+      'Failed to create quotation',
+      error.message,
+    );
   }
+}
 
   async findAll(payload: {
     limit?: number;
@@ -109,7 +144,7 @@ export class QuotationService {
         whereClause.status = statusValue;
       }
 
-      const quotations = await this.prisma.quotation.findMany({
+      const quotations = await this.prisma.tbl_quotation.findMany({
         where: whereClause,
         skip: offset,
         take: limit,
@@ -135,69 +170,101 @@ export class QuotationService {
       );
     }
   }
+async findOne(quotation_id: string) {
+  try {
+    this.logger.log(
+      `${QuotationProperties.service.findOne.start}: ${quotation_id}`,
+    );
 
-  async findOne(quotation_id: string) {
-    try {
-      this.logger.log(`${QuotationProperties.service.findOne.start}: ${quotation_id}`);
-      const quotation =
-        await this.prisma.quotation.findUnique({
-          where: { id: quotation_id },
-        });
-
-      if (!quotation) {
-        throw new NotFoundException(
-          'Quotation not found',
-        );
-      }
-      this.logger.log(`${QuotationProperties.service.findOne.success}: ${quotation_id}`);
-      return ResponseHelper.success(
-        quotation,
-        'Quotation fetched successfully',
-      );
-    } catch (error) {
-      this.logger.error(
-        `${QuotationProperties.service.findOne.error}: ${quotation_id}`,
-        error.stack,
-      );
-      throw error;
-    }
-  }
-
-  async generateRfqNo(): Promise<string> {
-    try {
-      this.logger.log(QuotationProperties.service.generateRfqNo.start);
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now
-        .toLocaleString('en-US', { month: 'short' })
-        .toUpperCase();
-
-      const lastQuotation = await this.prisma.quotation.findFirst({
-        orderBy: {
-          created_at: 'desc',
-        },
-        select: {
-          rfq_no: true,
+    const quotation =
+      await this.prisma.tbl_quotation.findUnique({
+        where: {
+          pk_chr_quotation_id: quotation_id,
         },
       });
 
-      let nextNumber = 1;
-
-      if (lastQuotation?.rfq_no) {
-        const parts = lastQuotation.rfq_no.split('-');
-        const lastSequence = parseInt(parts[3], 10);
-        nextNumber = lastSequence + 1;
-      }
-      const sequence = String(nextNumber).padStart(3, '0');
-      const rfqNo = `RFQ-${year}-${month}-${sequence}`;
-      this.logger.log(`${QuotationProperties.service.generateRfqNo.success}: ${rfqNo}`);
-      return rfqNo;
-    } catch (error) {
-      this.logger.error(
-        QuotationProperties.service.generateRfqNo.error,
-        error.stack,
+    if (!quotation) {
+      throw new NotFoundException(
+        'Quotation not found',
       );
-      throw error;
     }
+
+    this.logger.log(
+      `${QuotationProperties.service.findOne.success}: ${quotation_id}`,
+    );
+
+    return ResponseHelper.success(
+      quotation,
+      'Quotation fetched successfully',
+    );
+  } catch (error) {
+    this.logger.error(
+      `${QuotationProperties.service.findOne.error}: ${quotation_id}`,
+      error.stack,
+    );
+
+    throw error;
   }
+}
+async generateRfqNo(): Promise<string> {
+  try {
+    this.logger.log(
+      QuotationProperties.service.generateRfqNo.start,
+    );
+
+    const now = new Date();
+
+    const year = now.getFullYear();
+
+    const month = now
+      .toLocaleString('en-US', {
+        month: 'short',
+      })
+      .toUpperCase();
+
+    const lastQuotation =
+      await this.prisma.tbl_request_for_quotation.findFirst({
+        orderBy: {
+          tim_created: 'desc',
+        },
+        select: {
+          pk_chr_rfq_id: true,
+        },
+      });
+
+    let nextNumber = 1;
+
+    if (lastQuotation?.pk_chr_rfq_id) {
+      const parts =
+        lastQuotation.pk_chr_rfq_id.split('-');
+
+      const lastSequence = parseInt(
+        parts[3],
+        10,
+      );
+
+      nextNumber = lastSequence + 1;
+    }
+
+    const sequence = String(nextNumber).padStart(
+      3,
+      '0',
+    );
+
+    const rfqNo = `RFQ-${year}-${month}-${sequence}`;
+
+    this.logger.log(
+      `${QuotationProperties.service.generateRfqNo.success}: ${rfqNo}`,
+    );
+
+    return rfqNo;
+  } catch (error) {
+    this.logger.error(
+      QuotationProperties.service.generateRfqNo.error,
+      error.stack,
+    );
+
+    throw error;
+  }
+}
 }

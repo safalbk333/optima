@@ -20,7 +20,7 @@ export class VendorService {
   async findAll() {
     try {
       this.logger.log(VendorProperties.service.findAll.start);
-      const vendors = await this.prisma.vendor.findMany();
+      const vendors = await this.prisma.tbl_vendor.findMany();
       this.logger.log(VendorProperties.service.findAll.success);
       return ResponseHelper.success(
         vendors,
@@ -38,57 +38,44 @@ export class VendorService {
     }
   }
 
-  async findOne(vendor_id: string) {
-    try {
-      this.logger.log(`${VendorProperties.service.findOne.start}: ${vendor_id}`);
-      const vendor =
-      await this.prisma.vendor.findUnique({
-        where: { id:vendor_id },
-      });
+async findOne(vendor_id: string) {
+  const vendor =
+    await this.prisma.tbl_vendor.findUnique({
+      where: {
+        pk_chr_vendor_id: vendor_id,
+      },
+    });
 
-    if (!vendor) {
-      throw new NotFoundException(
-        'Vendor not found',
-      );
-    }
-    this.logger.log(`${VendorProperties.service.findOne.success}: ${vendor_id}`);
-    return ResponseHelper.success(
-      vendor,
-      'Vendor fetched successfully',
+  if (!vendor) {
+    throw new NotFoundException(
+      'Vendor not found',
     );
-    } catch (error) {
-      this.logger.error(
-        `${VendorProperties.service.findOne.error}: ${vendor_id}`,
-        error.stack,
-      );
-      throw error;
-    }
   }
 
-  async create(createVendorDto: CreateVendorDto) {
-    try {
-      this.logger.log(VendorProperties.service.create.start);
-      const vendor = await this.prisma.vendor.create({
-        data: {
-          vendor_name: createVendorDto.name,
-          vendor_email: createVendorDto.email,
-          vendor_phone: createVendorDto.phone,
-        },
-      });
-      this.logger.log(`${VendorProperties.service.create.success}: ${vendor.id}`);
-      return ResponseHelper.success(
-        vendor,
-        'Vendor created successfully',
-      );
-    } catch (error) {
-      this.logger.error(
-        VendorProperties.service.create.error,
-        error.stack,
-      );
-      return ResponseHelper.error(
-        'Failed to create vendor',
-        error.message,
-      );
-    }
-  }
+  return ResponseHelper.success(
+    vendor,
+    'Vendor fetched successfully',
+  );
+}
+
+async create(createVendorDto: CreateVendorDto) {
+  const vendor =
+    await this.prisma.tbl_vendor.create({
+      data: {
+        chr_vendor_name:
+          createVendorDto.name,
+
+        chr_vendor_email:
+          createVendorDto.email,
+
+        chr_vendor_phone:
+          createVendorDto.phone,
+      },
+    });
+
+  return ResponseHelper.success(
+    vendor,
+    'Vendor created successfully',
+  );
+}
 }
