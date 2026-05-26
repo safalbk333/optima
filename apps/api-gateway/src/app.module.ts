@@ -27,6 +27,8 @@ import { PermissionsController } from './modules/authentication/permissions/perm
 import { GroupRolesController } from './modules/authentication/roles/roles.controller';
 import { PurchaseRequestController } from './modules/purchase-request/purchase-request.controller';
 import { PurchaseRequestGatewayService } from './modules/purchase-request/purchase-request.service';
+import { EoiController } from './modules/eoi/eoi.controller';
+import { EoiGatewayService } from './modules/eoi/eoi.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
 
@@ -105,6 +107,7 @@ ConfigModule.forRoot({
     PermissionsController,
     GroupRolesController,
     PurchaseRequestController,
+    EoiController,
   ],
 
   providers: [
@@ -118,6 +121,7 @@ ConfigModule.forRoot({
     ShipmentGatewayService,
     GoodsReceivedGatewayService,
     PurchaseRequestGatewayService,
+    EoiGatewayService,
   ],
 })
 export class AppModule {
