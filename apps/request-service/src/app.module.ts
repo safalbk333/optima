@@ -1,0 +1,22 @@
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { PrismaModule } from 'libs/database/prisma.module';
+import { ConfigModule } from '@nestjs/config/dist/config.module';
+import { PurchaseRequestModule } from './modules/purchase-request/purchase-request.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `apps/request-service/.env.${process.env.NODE_ENV || 'development'}`,
+    }),
+    PrismaModule,
+    PurchaseRequestModule,
+  ],
+
+  controllers: [AppController],
+
+  providers: [AppService],
+})
+export class AppModule {}

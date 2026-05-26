@@ -25,6 +25,8 @@ import { GoodsReceivedGatewayService } from './modules/goods-received/goods-rece
 import { KeycloakController } from './modules/authentication/keycloak/keycloak.controller';
 import { PermissionsController } from './modules/authentication/permissions/permissions.controller';
 import { GroupRolesController } from './modules/authentication/roles/roles.controller';
+import { PurchaseRequestController } from './modules/purchase-request/purchase-request.controller';
+import { PurchaseRequestGatewayService } from './modules/purchase-request/purchase-request.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
 
@@ -47,6 +49,22 @@ ConfigModule.forRoot({
         },
       },
       {
+        name: 'MASTER_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: process.env.MASTER_SERVICE_HOST || 'localhost',
+          port: Number(process.env.MASTER_SERVICE_PORT) || 3006,
+        },
+      },
+      {
+        name: 'REQUEST_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: process.env.REQUEST_SERVICE_HOST || 'localhost',
+          port: Number(process.env.REQUEST_SERVICE_PORT) || 3007,
+        },
+      },
+      {
         name: 'SHIPMENT_SERVICE',
         transport: Transport.TCP,
         options: {
@@ -54,8 +72,6 @@ ConfigModule.forRoot({
           port: Number(process.env.SHIPMENT_SERVICE_PORT) || 3003,
         },
       },
-    ]),
-    ClientsModule.register([
       {
         name: 'AUTH_SERVICE',
         transport: Transport.TCP,
@@ -69,10 +85,9 @@ ConfigModule.forRoot({
         transport: Transport.TCP,
         options: {
           host: process.env.CONTRACTS_SERVICE_HOST || 'localhost',
-          port: Number(process.env.CONTRACTS_SERVICE_PORT) || 3003,
+          port: Number(process.env.CONTRACTS_SERVICE_PORT) || 3005,
         },
       },
-      
     ]),
   ],
 
@@ -88,7 +103,8 @@ ConfigModule.forRoot({
     GoodsReceivedController,
     KeycloakController,
     PermissionsController,
-    GroupRolesController
+    GroupRolesController,
+    PurchaseRequestController,
   ],
 
   providers: [
@@ -101,6 +117,7 @@ ConfigModule.forRoot({
     CategoryGatewayService,
     ShipmentGatewayService,
     GoodsReceivedGatewayService,
+    PurchaseRequestGatewayService,
   ],
 })
 export class AppModule {
@@ -111,6 +128,12 @@ export class AppModule {
 
     console.log('VENDOR_SERVICE_HOST =>', process.env.VENDOR_SERVICE_HOST);
     console.log('VENDOR_SERVICE_PORT =>', process.env.VENDOR_SERVICE_PORT);
+
+    console.log('MASTER_SERVICE_HOST =>', process.env.MASTER_SERVICE_HOST);
+    console.log('MASTER_SERVICE_PORT =>', process.env.MASTER_SERVICE_PORT);
+
+    console.log('REQUEST_SERVICE_HOST =>', process.env.REQUEST_SERVICE_HOST);
+    console.log('REQUEST_SERVICE_PORT =>', process.env.REQUEST_SERVICE_PORT);
 
     console.log('AUTH_SERVICE_HOST =>', process.env.AUTH_SERVICE_HOST);
     console.log('AUTH_SERVICE_PORT =>', process.env.AUTH_SERVICE_PORT);

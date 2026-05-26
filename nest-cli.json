@@ -51,6 +51,24 @@
       "compilerOptions": {
         "tsConfigPath": "apps/shipment-service/tsconfig.app.json"
       }
+    },
+    "master-service": {
+      "type": "application",
+      "root": "apps/master-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/master-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/master-service/tsconfig.app.json"
+      }
+    },
+    "request-service": {
+      "type": "application",
+      "root": "apps/request-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/request-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/request-service/tsconfig.app.json"
+      }
     }
   }
 }
