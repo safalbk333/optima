@@ -3,7 +3,20 @@ import {
   IsString,
   IsOptional,
   IsNumber,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class PurchaseRequestItemDto {
+  @ApiProperty({ example: 'item-id-123', description: 'Item ID' })
+  @IsString()
+  fk_chr_item_id: string;
+
+  @ApiProperty({ example: 10, description: 'Quantity' })
+  @IsNumber()
+  int_quantity: number;
+}
 
 export class CreatePurchaseRequestDto {
   @ApiProperty({ example: 'PR-2024-001', description: 'Purchase request number' })
@@ -55,4 +68,14 @@ export class CreatePurchaseRequestDto {
   @IsOptional()
   @IsString()
   fk_chr_created_id?: string;
+
+  @ApiProperty({ 
+    type: [PurchaseRequestItemDto], 
+    description: 'Array of items with item ID and quantity',
+    example: [{ fk_chr_item_id: 'item-id-123', int_quantity: 10 }]
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PurchaseRequestItemDto)
+  items: PurchaseRequestItemDto[];
 }

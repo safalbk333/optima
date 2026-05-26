@@ -2,7 +2,18 @@ import {
   IsString,
   IsOptional,
   IsNumber,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class PurchaseRequestItemDto {
+  @IsString()
+  fk_chr_item_id: string;
+
+  @IsNumber()
+  int_quantity: number;
+}
 
 export class UpdatePurchaseRequestDto {
   @IsOptional()
@@ -40,4 +51,10 @@ export class UpdatePurchaseRequestDto {
   @IsOptional()
   @IsString()
   fk_chr_modified_id?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PurchaseRequestItemDto)
+  items?: PurchaseRequestItemDto[];
 }

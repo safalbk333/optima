@@ -140,6 +140,13 @@ export class PurchaseRequestService {
           fk_chr_department_id: objData.fk_chr_department_id,
           fk_chr_category_id: objData.fk_chr_category_id,
           fk_chr_created_id: objData.fk_chr_created_id,
+          pr_item_mappings: {
+            create: objData.items.map(item => ({
+              fk_chr_item_id: item.fk_chr_item_id,
+              chr_item_description: '',
+              int_quantity: item.int_quantity,
+            })),
+          },
         },
         include: {
           current_status: true,
@@ -153,6 +160,11 @@ export class PurchaseRequestService {
           },
           department: true,
           category: true,
+          pr_item_mappings: {
+            include: {
+              item: true,
+            },
+          },
         },
       });
       
@@ -181,11 +193,23 @@ export class PurchaseRequestService {
         throw new NotFoundException("Purchase request not found");
       }
 
+      const { items, ...updateData } = objData;
+
       const updatedPurchaseRequest = await this.prisma.tbl_purchase_request.update({
         where: { pk_chr_request_id: strId },
         data: {
-          ...objData,
+          ...updateData,
           tim_modified: new Date(),
+          ...(items && {
+            pr_item_mappings: {
+              deleteMany: {},
+              create: items.map(item => ({
+                fk_chr_item_id: item.fk_chr_item_id,
+                chr_item_description: '',
+                int_quantity: item.int_quantity,
+              })),
+            },
+          }),
         },
         include: {
           current_status: true,
@@ -199,6 +223,11 @@ export class PurchaseRequestService {
           },
           department: true,
           category: true,
+          pr_item_mappings: {
+            include: {
+              item: true,
+            },
+          },
         },
       });
       
