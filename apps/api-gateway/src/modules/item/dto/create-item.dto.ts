@@ -11,47 +11,47 @@ export class CreateItemDto {
     description: 'ID of the vendor',
   })
   @IsString()
-  vendorId: string;
+  strVendorId: string;
 
   @ApiPropertyOptional({
     description: 'ID of the quotation',
   })
   @IsString()
-  quotationId: string;
+  strQuotationId: string;
 
   @ApiProperty({
     description: 'Item name',
   })
   @IsString()
-  itemName: string;
+  strItemName: string;
 
   @ApiProperty({
     description: 'Item code',
   })
   @IsString()
-  itemCode: string;
+  strItemCode: string;
 
   @ApiProperty({
     description: 'Item description',
   })
   @IsString()
-  description: string;
+  strDescription: string;
 
   @ApiProperty({
     description: 'Quantity of item',
   })
   @IsNumber()
-  quantity: number;
+  intQuantity: number;
 
   @ApiProperty({
     description: 'Unit of the item',
   })
   @IsString()
-  unit: string;
+  strUnit: string;
 
   @ApiProperty({
     description: 'Detail document of item',
   })
   @IsString()
-  documents: string;
+  strDocuments: string;
 }

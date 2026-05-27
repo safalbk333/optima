@@ -13,12 +13,12 @@ export class UpdateCategoryDto {
   })
   @IsOptional()
   @IsString()
-  categoryName?: string;
+  strCategoryName?: string;
 
   @ApiPropertyOptional({
     description: 'Whether the category is active',
   })
   @IsOptional()
   @IsBoolean()
-  isActive?: boolean;
+  blnIsActive?: boolean;
 }

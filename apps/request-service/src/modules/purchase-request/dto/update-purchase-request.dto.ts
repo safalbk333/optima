@@ -9,52 +9,52 @@ import { Type } from 'class-transformer';
 
 export class PurchaseRequestItemDto {
   @IsString()
-  fk_chr_item_id: string;
+  strItemId: string;
 
   @IsNumber()
-  int_quantity: number;
+  intQuantity: number;
 }
 
 export class UpdatePurchaseRequestDto {
   @IsOptional()
   @IsString()
-  chr_title?: string;
+  strTitle?: string;
 
   @IsOptional()
   @IsString()
-  txt_description?: string;
+  strDescription?: string;
 
   @IsOptional()
   @IsString()
-  fk_chr_current_status_id?: string;
+  strCurrentStatusId?: string;
 
   @IsOptional()
   @IsString()
-  fk_chr_priority_id?: string;
+  strPriorityId?: string;
 
   @IsOptional()
   @IsNumber()
-  flt_estimated_value?: number;
+  intEstimatedValue?: number;
 
   @IsOptional()
   @IsString()
-  chr_currency?: string;
+  strCurrency?: string;
 
   @IsOptional()
   @IsString()
-  fk_chr_department_id?: string;
+  strDepartmentId?: string;
 
   @IsOptional()
   @IsString()
-  fk_chr_category_id?: string;
+  strCategoryId?: string;
 
   @IsOptional()
   @IsString()
-  fk_chr_modified_id?: string;
+  strModifiedId?: string;
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PurchaseRequestItemDto)
-  items?: PurchaseRequestItemDto[];
+  arrItems?: PurchaseRequestItemDto[];
 }

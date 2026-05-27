@@ -129,22 +129,22 @@ export class PurchaseRequestService {
       this.logger.log(PurchaseRequestProperties.service.create.start);
       const purchaseRequest = await this.prisma.tbl_purchase_request.create({
         data: {
-          chr_request_number: objData.chr_request_number,
-          chr_title: objData.chr_title,
-          txt_description: objData.txt_description,
-          fk_chr_current_status_id: objData.fk_chr_current_status_id,
-          fk_chr_priority_id: objData.fk_chr_priority_id,
-          flt_estimated_value: objData.flt_estimated_value,
-          chr_currency: objData.chr_currency || 'USD',
-          fk_chr_requested_by_id: objData.fk_chr_requested_by_id,
-          fk_chr_department_id: objData.fk_chr_department_id,
-          fk_chr_category_id: objData.fk_chr_category_id,
-          fk_chr_created_id: objData.fk_chr_created_id,
+          chr_request_number: objData.strRequestNumber,
+          chr_title: objData.strTitle,
+          txt_description: objData.strDescription,
+          fk_chr_current_status_id: objData.strCurrentStatusId,
+          fk_chr_priority_id: objData.strPriorityId,
+          flt_estimated_value: objData.intEstimatedValue,
+          chr_currency: objData.strCurrency || 'USD',
+          fk_chr_requested_by_id: objData.strRequestedById,
+          fk_chr_department_id: objData.strDepartmentId,
+          fk_chr_category_id: objData.strCategoryId,
+          fk_chr_created_id: objData.strCreatedId,
           pr_item_mappings: {
-            create: objData.items.map(item => ({
-              fk_chr_item_id: item.fk_chr_item_id,
+            create: objData.arrItems.map(item => ({
+              fk_chr_item_id: item.strItemId,
               chr_item_description: '',
-              int_quantity: item.int_quantity,
+              int_quantity: item.intQuantity,
             })),
           },
         },
@@ -193,20 +193,20 @@ export class PurchaseRequestService {
         throw new NotFoundException("Purchase request not found");
       }
 
-      const { items, ...updateData } = objData;
+      const { arrItems, ...updateData } = objData;
 
       const updatedPurchaseRequest = await this.prisma.tbl_purchase_request.update({
         where: { pk_chr_request_id: strId },
         data: {
           ...updateData,
           tim_modified: new Date(),
-          ...(items && {
+          ...(arrItems && {
             pr_item_mappings: {
               deleteMany: {},
-              create: items.map(item => ({
-                fk_chr_item_id: item.fk_chr_item_id,
+              create: arrItems.map(item => ({
+                fk_chr_item_id: item.strItemId,
                 chr_item_description: '',
-                int_quantity: item.int_quantity,
+                int_quantity: item.intQuantity,
               })),
             },
           }),

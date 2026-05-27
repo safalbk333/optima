@@ -5,6 +5,7 @@ import { PrismaModule } from 'libs/database/prisma.module';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { PurchaseRequestModule } from './modules/purchase-request/purchase-request.module';
 import { EoiModule } from './modules/eoi/eoi.module';
+import { RequestForQuotationModule } from './modules/request-for-quotation/request-for-quotation.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { EoiModule } from './modules/eoi/eoi.module';
     PrismaModule,
     PurchaseRequestModule,
     EoiModule,
+    RequestForQuotationModule,
   ],
 
   controllers: [AppController],

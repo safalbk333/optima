@@ -7,9 +7,9 @@ import {
 export class UpdateCategoryDto {
   @IsOptional()
   @IsString()
-  categoryName?: string;
+  strCategoryName?: string;
 
   @IsOptional()
   @IsBoolean()
-  isActive?: boolean;
+  blnIsActive?: boolean;
 }
