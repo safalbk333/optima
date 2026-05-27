@@ -1,0 +1,8 @@
+export enum EoiStatus {
+  DRAFT = 'DRAFT',
+  SENT = 'SENT',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  WITHDRAWN = 'WITHDRAWN',
+  EXPIRED = 'EXPIRED',
+}

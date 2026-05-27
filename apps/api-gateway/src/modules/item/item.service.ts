@@ -11,7 +11,7 @@ import { ITEM_PATTERN } from './item.pattern';
 export class ItemGatewayService {
   private readonly logger: Logger;
   constructor(
-    @Inject('VENDOR_SERVICE')
+    @Inject('MASTER_SERVICE')
     private readonly client: ClientProxy,
   ) {
     this.logger = new Logger(ItemGatewayService.name);

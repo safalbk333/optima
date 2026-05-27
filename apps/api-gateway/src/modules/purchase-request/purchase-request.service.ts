@@ -6,21 +6,21 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 
 import { firstValueFrom } from 'rxjs';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CATEGORY_PATTERN } from './category.pattern';
+import { CreatePurchaseRequestDto } from './dto/create-purchase-request.dto';
+import { UpdatePurchaseRequestDto } from './dto/update-purchase-request.dto';
+import { PURCHASE_REQUEST_PATTERN } from './purchase-request.pattern';
 
 @Injectable()
-export class CategoryGatewayService {
+export class PurchaseRequestGatewayService {
   constructor(
-    @Inject('MASTER_SERVICE')
+    @Inject('REQUEST_SERVICE')
     private readonly client: ClientProxy,
   ) {}
 
   async findAll() {
     return await firstValueFrom(
       this.client.send(
-        CATEGORY_PATTERN.FIND_ALL,
+        PURCHASE_REQUEST_PATTERN.FIND_ALL,
         {},
       ),
     );
@@ -29,16 +29,16 @@ export class CategoryGatewayService {
   async findOne(id: string) {
     return await firstValueFrom(
       this.client.send(
-        CATEGORY_PATTERN.FIND_ONE,
+        PURCHASE_REQUEST_PATTERN.FIND_ONE,
         id,
       ),
     );
   }
 
-  async create(data: CreateCategoryDto) {
+  async create(data: CreatePurchaseRequestDto) {
     return await firstValueFrom(
       this.client.send(
-        CATEGORY_PATTERN.CREATE,
+        PURCHASE_REQUEST_PATTERN.CREATE,
         data,
       ),
     );
@@ -46,11 +46,11 @@ export class CategoryGatewayService {
 
   async update(
     id: string,
-    data: UpdateCategoryDto,
+    data: UpdatePurchaseRequestDto,
   ) {
     return await firstValueFrom(
       this.client.send(
-        CATEGORY_PATTERN.UPDATE,
+        PURCHASE_REQUEST_PATTERN.UPDATE,
         { id, data },
       ),
     );
@@ -59,7 +59,7 @@ export class CategoryGatewayService {
   async delete(id: string) {
     return await firstValueFrom(
       this.client.send(
-        CATEGORY_PATTERN.DELETE,
+        PURCHASE_REQUEST_PATTERN.DELETE,
         id,
       ),
     );

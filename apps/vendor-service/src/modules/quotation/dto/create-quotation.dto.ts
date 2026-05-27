@@ -1,27 +1,30 @@
 import {
-    IsString,
-    IsNumber,
+  IsString,
+  IsOptional,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateQuotationDto {
-    @IsString()
-    vendorId: string;
+  @IsString()
+  vendorId: string;
 
-    @IsString()
-    rfqTitle: string;
+  @IsString()
+  rfqId: string;
 
-    @IsString()
-    category: string;
+  @IsOptional()
+  @IsString()
+  category?: string;
 
-    @IsString()
-    issueDate: string;
+  @IsOptional()
+  @IsString()
+  buyer?: string;
 
-    @IsString()
-    dueDate: string;
+  @IsDateString()
+  issueDate: string;
 
-    @IsString()
-    buyer: string;
+  @IsDateString()
+  dueDate: string;
 
-    @IsString()
-    status: string;
+  @IsString()
+  status: string;
 }
