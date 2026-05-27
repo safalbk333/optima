@@ -105,3 +105,13 @@ for local developement
 
 before production
     node scripts/env.js production
+
+
+api-gateway	        3000
+vendor-service	    3001
+auth-service	    3002
+contracts-service	3003
+shipment-service	3004
+master-service	    3005
+request-service	    3006
+user-service        3007
