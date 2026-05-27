@@ -17,7 +17,7 @@ async function bootstrap() {
 
         options: {
           host: process.env.HOST || '0.0.0.0',
-          port: Number(process.env.PORT) || 3006,
+          port: Number(process.env.PORT) || 3005,
         },
       },
     );
@@ -25,7 +25,7 @@ async function bootstrap() {
   await app.listen();
 
   console.log(
-    `Master Service running on TCP ${process.env.PORT || 3006}`,
+    `Master Service running on TCP ${process.env.PORT || 3005}`,
   );
 
 }

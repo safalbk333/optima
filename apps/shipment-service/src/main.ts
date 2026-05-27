@@ -14,14 +14,14 @@ async function bootstrap() {
         transport: Transport.TCP,
         options: {
           host: process.env.HOST || 'localhost',
-          port: Number(process.env.PORT) || 3003,
+          port: Number(process.env.PORT) || 3004,
         },
       },
     );
     
   await app.listen();
   console.log(
-    `Shipment Service running on TCP ${process.env.PORT || 3003}`,
+    `Shipment Service running on TCP ${process.env.PORT || 3004}`,
   );
 }
 
