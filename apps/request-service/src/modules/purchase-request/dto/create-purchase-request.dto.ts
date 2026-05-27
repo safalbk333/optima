@@ -9,54 +9,54 @@ import { Type } from 'class-transformer';
 
 export class PurchaseRequestItemDto {
   @IsString()
-  fk_chr_item_id: string;
+  strItemId: string;
 
   @IsNumber()
-  int_quantity: number;
+  intQuantity: number;
 }
 
 export class CreatePurchaseRequestDto {
   @IsString()
-  chr_request_number: string;
+  strRequestNumber: string;
 
   @IsString()
-  chr_title: string;
+  strTitle: string;
 
   @IsOptional()
   @IsString()
-  txt_description?: string;
+  strDescription?: string;
 
   @IsString()
-  fk_chr_current_status_id: string;
+  strCurrentStatusId: string;
 
   @IsString()
-  fk_chr_priority_id: string;
+  strPriorityId: string;
 
   @IsOptional()
   @IsNumber()
-  flt_estimated_value?: number;
+  intEstimatedValue?: number;
 
   @IsOptional()
   @IsString()
-  chr_currency?: string;
+  strCurrency?: string;
 
   @IsString()
-  fk_chr_requested_by_id: string;
-
-  @IsOptional()
-  @IsString()
-  fk_chr_department_id?: string;
+  strRequestedById: string;
 
   @IsOptional()
   @IsString()
-  fk_chr_category_id?: string;
+  strDepartmentId?: string;
 
   @IsOptional()
   @IsString()
-  fk_chr_created_id?: string;
+  strCategoryId?: string;
+
+  @IsOptional()
+  @IsString()
+  strCreatedId?: string;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PurchaseRequestItemDto)
-  items: PurchaseRequestItemDto[];
+  arrItems: PurchaseRequestItemDto[];
 }

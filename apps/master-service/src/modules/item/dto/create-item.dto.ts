@@ -5,23 +5,23 @@ import {
 
 export class CreateItemDto {
     @IsString()
-    itemName: string;
+    strItemName: string;
 
     @IsString()
-    itemCode: string;
-
-    @IsOptional()
-    @IsString()
-    description?: string;
-
-    @IsString()
-    categoryId: string;
+    strItemCode: string;
 
     @IsOptional()
     @IsString()
-    unit?: string;
+    strDescription?: string;
+
+    @IsString()
+    strCategoryId: string;
 
     @IsOptional()
     @IsString()
-    documents?: string;
+    strUnit?: string;
+
+    @IsOptional()
+    @IsString()
+    strDocuments?: string;
 }

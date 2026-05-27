@@ -22,12 +22,12 @@ export class ItemService {
       this.logger.log(ItemProperties.service.create.start);
       const item = await this.prisma.tbl_item.create({
         data: {
-          chr_item_name: createItemDto.itemName,
-          chr_item_code: createItemDto.itemCode,
-          txt_description: createItemDto.description,
-          fk_chr_category_id: createItemDto.categoryId,
-          chr_unit: createItemDto.unit,
-          chr_documents: createItemDto.documents,
+          chr_item_name: createItemDto.strItemName,
+          chr_item_code: createItemDto.strItemCode,
+          txt_description: createItemDto.strDescription,
+          fk_chr_category_id: createItemDto.strCategoryId,
+          chr_unit: createItemDto.strUnit,
+          chr_documents: createItemDto.strDocuments,
         },
       });
       this.logger.log(`${ItemProperties.service.create.success}: ${item.pk_chr_item_id}`);

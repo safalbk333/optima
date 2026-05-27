@@ -62,7 +62,7 @@ export class CategoryService {
       this.logger.log(CategoryProperties.service.create.start);
       const objCategory = await this.prisma.tbl_category.create({
         data: {
-          chr_category_name: objData.categoryName,
+          chr_category_name: objData.strCategoryName,
         },
       });
       this.logger.log(`${CategoryProperties.service.create.success}: ${objCategory.pk_chr_category_id}`);
@@ -88,11 +88,11 @@ export class CategoryService {
       }
 
       const updateData: any = {};
-      if (objData.categoryName !== undefined) {
-        updateData.chr_category_name = objData.categoryName;
+      if (objData.strCategoryName !== undefined) {
+        updateData.chr_category_name = objData.strCategoryName;
       }
-      if (objData.isActive !== undefined) {
-        updateData.bln_is_active = objData.isActive;
+      if (objData.blnIsActive !== undefined) {
+        updateData.bln_is_active = objData.blnIsActive;
       }
 
       const objUpdatedCategory = await this.prisma.tbl_category.update({

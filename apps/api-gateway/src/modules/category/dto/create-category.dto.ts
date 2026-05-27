@@ -6,5 +6,5 @@ export class CreateCategoryDto {
     description: 'Name of the category',
   })
   @IsString()
-  categoryName: string;
+  strCategoryName: string;
 }
