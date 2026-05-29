@@ -4,6 +4,8 @@ import {
   Get,
   Param,
   Post,
+  Put,
+  Delete,
   Query,
 } from '@nestjs/common';
 import {
@@ -23,52 +25,19 @@ export class QuotationController {
   ) { }
 
   @Post()
-  @ApiOperation({
-    summary: 'Create a new quotation',
-  })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Quotation created successfully',
-  })
+  @ApiOperation({ summary: 'Create a new quotation' })
+  @ApiResponse({ status: 200, description: 'Quotation created successfully' })
   create(@Body() data: CreateQuotationDto) {
     return this.quotationService.create(data);
   }
 
   @Get()
-  @ApiOperation({
-    summary: 'Get all quotations',
-  })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Quotation list fetched successfully',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description: 'Number of quotations per page',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Page number',
-  })
-  @ApiQuery({
-    name: 'status',
-    required: false,
-    type: String,
-    enum: ['PENDING', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'REJECTED'],
-    description: 'Filter by quotation status',
-  })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    description: 'Search for quotations (RFQ number, RFQ title)',
-  })
+  @ApiOperation({ summary: 'Get all quotations' })
+  @ApiResponse({ status: 200, description: 'Quotation list fetched successfully' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of quotations per page' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
+  @ApiQuery({ name: 'status', required: false, type: String, description: 'Filter by quotation status' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search for quotations' })
   findAll(
     @Query('limit') limit: number = 10,
     @Query('page') page: number = 1,
@@ -85,15 +54,26 @@ export class QuotationController {
   }
 
   @Get(':id')
-  @ApiOperation({
-    summary: 'Get quotation by id',
-  })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Quotation fetched successfully',
-  })
+  @ApiOperation({ summary: 'Get quotation by id' })
+  @ApiResponse({ status: 200, description: 'Quotation fetched successfully' })
   findOne(@Param('id') id: string) {
     return this.quotationService.findOne(id);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update quotation' })
+  @ApiResponse({ status: 200, description: 'Quotation updated successfully' })
+  update(
+    @Param('id') id: string,
+    @Body() data: any,
+  ) {
+    return this.quotationService.update(id, data);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete quotation' })
+  @ApiResponse({ status: 200, description: 'Quotation deleted successfully' })
+  delete(@Param('id') id: string) {
+    return this.quotationService.delete(id);
   }
 }

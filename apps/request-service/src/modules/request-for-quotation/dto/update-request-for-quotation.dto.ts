@@ -2,7 +2,19 @@ import {
   IsString,
   IsOptional,
   IsDateString,
+  IsArray,
+  IsNumber,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class RfqItemDto {
+  @IsString()
+  strItemId: string;
+
+  @IsNumber()
+  intQuantity: number;
+}
 
 export class UpdateRequestForQuotationDto {
   @IsOptional()
@@ -36,4 +48,10 @@ export class UpdateRequestForQuotationDto {
   @IsOptional()
   @IsString()
   strModifiedId?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => RfqItemDto)
+  arrItems?: RfqItemDto[];
 }

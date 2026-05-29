@@ -6,6 +6,9 @@ import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { PurchaseRequestModule } from './modules/purchase-request/purchase-request.module';
 import { EoiModule } from './modules/eoi/eoi.module';
 import { RequestForQuotationModule } from './modules/request-for-quotation/request-for-quotation.module';
+import { QuotationModule } from './modules/quotation/quotation.module';
+import { PurchaseOrderModule } from './modules/purchase-order/purchase-order.module';
+import { GoodsReceiptModule } from './modules/goods-receipt/goods-receipt.module';
 
 @Module({
   imports: [
@@ -17,6 +20,9 @@ import { RequestForQuotationModule } from './modules/request-for-quotation/reque
     PurchaseRequestModule,
     EoiModule,
     RequestForQuotationModule,
+    QuotationModule,
+    PurchaseOrderModule,
+    GoodsReceiptModule,
   ],
 
   controllers: [AppController],

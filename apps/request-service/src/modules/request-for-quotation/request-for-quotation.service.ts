@@ -41,6 +41,11 @@ export class RequestForQuotationService {
               },
             },
           },
+          rfq_item_mappings: {
+            include: {
+              item: true,
+            },
+          },
         },
         orderBy: {
           tim_created: 'desc',
@@ -110,6 +115,11 @@ export class RequestForQuotationService {
               },
             },
           },
+          rfq_item_mappings: {
+            include: {
+              item: true,
+            },
+          },
         },
       });
 
@@ -134,18 +144,28 @@ export class RequestForQuotationService {
   async create(objData: CreateRequestForQuotationDto) {
     try {
       this.logger.log(RequestForQuotationProperties.service.create.start);
+      const { arrItems, ...rfqData } = objData;
       const rfq = await this.prisma.tbl_request_for_quotation.create({
         data: {
-          chr_rfq_code: objData.strRfqCode,
-          chr_rfq_title: objData.strRfqTitle,
-          fk_chr_request_id: objData.strRequestId,
-          fk_chr_eoi_id: objData.strEoiId,
-          chr_status: objData.strStatus || 'DRAFT',
-          dt_issue_date: new Date(objData.strIssueDate),
-          dt_due_date: new Date(objData.strDueDate),
-          dt_submission_deadline: new Date(objData.strSubmissionDeadline),
-          txt_notes: objData.strNotes,
-          fk_chr_created_id: objData.strCreatedId,
+          chr_rfq_code: rfqData.strRfqCode,
+          chr_rfq_title: rfqData.strRfqTitle,
+          fk_chr_request_id: rfqData.strRequestId,
+          fk_chr_eoi_id: rfqData.strEoiId,
+          chr_status: rfqData.strStatus || 'DRAFT',
+          dt_issue_date: new Date(rfqData.strIssueDate),
+          dt_due_date: new Date(rfqData.strDueDate),
+          dt_submission_deadline: new Date(rfqData.strSubmissionDeadline),
+          txt_notes: rfqData.strNotes,
+          fk_chr_created_id: rfqData.strCreatedId,
+          ...(arrItems && arrItems.length > 0 && {
+            rfq_item_mappings: {
+              create: arrItems.map(item => ({
+                fk_chr_item_id: item.strItemId,
+                chr_item_description: '',
+                int_quantity: item.intQuantity,
+              })),
+            },
+          }),
         },
         include: {
           request: {
@@ -160,6 +180,11 @@ export class RequestForQuotationService {
               pk_chr_eoi_id: true,
               chr_eoi_code: true,
               chr_eoi_title: true,
+            },
+          },
+          rfq_item_mappings: {
+            include: {
+              item: true,
             },
           },
         },
@@ -190,23 +215,36 @@ export class RequestForQuotationService {
         throw new NotFoundException("RFQ not found");
       }
 
+      const { arrItems, ...restData } = objData;
+
       const updateData: any = {
-        chr_rfq_title: objData.strRfqTitle,
-        fk_chr_eoi_id: objData.strEoiId,
-        chr_status: objData.strStatus,
-        txt_notes: objData.strNotes,
-        fk_chr_modified_id: objData.strModifiedId,
+        chr_rfq_title: restData.strRfqTitle,
+        fk_chr_eoi_id: restData.strEoiId,
+        chr_status: restData.strStatus,
+        txt_notes: restData.strNotes,
+        fk_chr_modified_id: restData.strModifiedId,
         tim_modified: new Date(),
       };
 
-      if (objData.strIssueDate) {
-        updateData.dt_issue_date = new Date(objData.strIssueDate);
+      if (restData.strIssueDate) {
+        updateData.dt_issue_date = new Date(restData.strIssueDate);
       }
-      if (objData.strDueDate) {
-        updateData.dt_due_date = new Date(objData.strDueDate);
+      if (restData.strDueDate) {
+        updateData.dt_due_date = new Date(restData.strDueDate);
       }
-      if (objData.strSubmissionDeadline) {
-        updateData.dt_submission_deadline = new Date(objData.strSubmissionDeadline);
+      if (restData.strSubmissionDeadline) {
+        updateData.dt_submission_deadline = new Date(restData.strSubmissionDeadline);
+      }
+
+      if (arrItems) {
+        updateData.rfq_item_mappings = {
+          deleteMany: {},
+          create: arrItems.map(item => ({
+            fk_chr_item_id: item.strItemId,
+            chr_item_description: '',
+            int_quantity: item.intQuantity,
+          })),
+        };
       }
 
       const updatedRfq = await this.prisma.tbl_request_for_quotation.update({
@@ -225,6 +263,11 @@ export class RequestForQuotationService {
               pk_chr_eoi_id: true,
               chr_eoi_code: true,
               chr_eoi_title: true,
+            },
+          },
+          rfq_item_mappings: {
+            include: {
+              item: true,
             },
           },
         },

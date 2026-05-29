@@ -5,23 +5,23 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { QUOTATION_PATTERN } from './quotation.pattern';
+import { PURCHASE_ORDER_PATTERN } from './purchase-order.pattern';
 
 @Injectable()
-export class QuotationGatewayService {
+export class PurchaseOrderGatewayService {
   private readonly logger: Logger;
   constructor(
     @Inject('REQUEST_SERVICE')
     private readonly client: ClientProxy,
   ) {
-    this.logger = new Logger(QuotationGatewayService.name);
+    this.logger = new Logger(PurchaseOrderGatewayService.name);
   }
 
   async create(data: any) {
     try{
       return await firstValueFrom(
         this.client.send(
-          QUOTATION_PATTERN.CREATE,
+          PURCHASE_ORDER_PATTERN.CREATE,
           data,
         ),
       );
@@ -35,7 +35,7 @@ export class QuotationGatewayService {
     try{
       return await firstValueFrom(
         this.client.send(
-          QUOTATION_PATTERN.FIND_ALL,
+          PURCHASE_ORDER_PATTERN.FIND_ALL,
           payload,
         ),
       );
@@ -49,7 +49,7 @@ export class QuotationGatewayService {
     try{
       return await firstValueFrom(
         this.client.send(
-          QUOTATION_PATTERN.FIND_ONE,
+          PURCHASE_ORDER_PATTERN.FIND_ONE,
           id,
         ),
       );
@@ -63,7 +63,7 @@ export class QuotationGatewayService {
     try{
       return await firstValueFrom(
         this.client.send(
-          QUOTATION_PATTERN.UPDATE,
+          PURCHASE_ORDER_PATTERN.UPDATE,
           { id, data },
         ),
       );
@@ -77,7 +77,7 @@ export class QuotationGatewayService {
     try{
       return await firstValueFrom(
         this.client.send(
-          QUOTATION_PATTERN.DELETE,
+          PURCHASE_ORDER_PATTERN.DELETE,
           id,
         ),
       );

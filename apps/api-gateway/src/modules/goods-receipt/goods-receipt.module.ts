@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { QuotationController } from './quotation.controller';
-import { QuotationGatewayService } from './quotation.service';
+import { GoodsReceiptController } from './goods-receipt.controller';
+import { GoodsReceiptGatewayService } from './goods-receipt.service';
 
 @Module({
   imports: [
@@ -16,8 +16,8 @@ import { QuotationGatewayService } from './quotation.service';
       },
     ]),
   ],
-  controllers: [QuotationController],
-  providers: [QuotationGatewayService],
-  exports: [QuotationGatewayService],
+  controllers: [GoodsReceiptController],
+  providers: [GoodsReceiptGatewayService],
+  exports: [GoodsReceiptGatewayService],
 })
-export class QuotationModule {}
+export class GoodsReceiptModule {}
