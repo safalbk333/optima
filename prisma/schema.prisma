@@ -1122,3 +1122,54 @@ model tbl_notification {
   @@index([tim_created])
   @@map("tbl_notification")
 }
+
+// ============================================================
+// USER SERVICE RBAC MODELS
+// ============================================================
+
+enum UserSource {
+  MANUAL
+  AD
+}
+
+model User {
+  id             String     @id @default(uuid())
+  keycloakUserId String     @unique
+  optimaId       String     @unique
+  email          String     @unique
+  firstName      String
+  middleName     String?
+  lastName       String
+  isActive       Boolean    @default(true)
+  source         UserSource
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([optimaId])
+  @@index([email])
+}
+
+model Role {
+  id             String   @id @default(uuid())
+  keycloakRoleId String   @unique
+  name           String   @unique
+  description    String?
+  createdAt      DateTime @default(now())
+}
+
+model PermissionGroup {
+  id             String   @id @default(uuid())
+  keycloakRoleId String   @unique
+  name           String   @unique
+  description    String?
+  createdAt      DateTime @default(now())
+}
+
+model Permission {
+  id             String   @id @default(uuid())
+  keycloakRoleId String   @unique
+  name           String   @unique
+  description    String?
+  module         String?
+  createdAt      DateTime @default(now())
+}

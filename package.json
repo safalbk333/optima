@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "nest build",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/apps/optima-backend/main",
     "start:auth": "nest start auth-service",
     "start:auth:dev": "nest start auth-service --watch",
     "start:gateway": "nest start api-gateway",
@@ -19,12 +19,18 @@
     "start:shipment:dev": "nest start shipment-service --watch",
     "start:contracts": "nest start contracts-service",
     "start:contracts:dev": "nest start contracts-service --watch",
+    "start:user": "nest start user-service",
+    "start:user:dev": "nest start user-service --watch",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage"
   },
   "jest": {
-    "moduleFileExtensions": ["js", "json", "ts"],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
     "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
@@ -33,7 +39,9 @@
     "moduleNameMapper": {
       "^libs/(.*)$": "<rootDir>/libs/$1"
     },
-    "collectCoverageFrom": ["**/*.(t|j)s"],
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "start:auth": "nest start auth-service",
@@ -41,7 +49,13 @@
     "start:contracts": "nest start contracts-service",
     "start:contracts:dev": "nest start contracts-service --watch",
     "start:shipment": "nest start shipment-service",
-    "start:shipment:dev": "nest start shipment-service --watch"
+    "start:shipment:dev": "nest start shipment-service --watch",
+    "start:user": "nest start user-service",
+    "start:user:dev": "nest start user-service --watch",
+    
+    "roots": [
+      "<rootDir>/apps/"
+    ]
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
