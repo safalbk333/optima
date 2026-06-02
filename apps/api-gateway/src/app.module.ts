@@ -31,6 +31,10 @@ import { EoiController } from './modules/eoi/eoi.controller';
 import { EoiGatewayService } from './modules/eoi/eoi.service';
 import { RequestForQuotationController } from './modules/request-for-quotation/request-for-quotation.controller';
 import { RequestForQuotationGatewayService } from './modules/request-for-quotation/request-for-quotation.service';
+import { PurchaseOrderController } from './modules/purchase-order/purchase-order.controller';
+import { PurchaseOrderGatewayService } from './modules/purchase-order/purchase-order.service';
+import { GoodsReceiptController } from './modules/goods-receipt/goods-receipt.controller';
+import { GoodsReceiptGatewayService } from './modules/goods-receipt/goods-receipt.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
 
@@ -110,7 +114,9 @@ ConfigModule.forRoot({
     GroupRolesController,
     PurchaseRequestController,
     EoiController,
-    RequestForQuotationController
+    RequestForQuotationController,
+    PurchaseOrderController,
+    GoodsReceiptController
   ],
 
   providers: [
@@ -125,7 +131,9 @@ ConfigModule.forRoot({
     GoodsReceivedGatewayService,
     PurchaseRequestGatewayService,
     EoiGatewayService,
-    RequestForQuotationGatewayService
+    RequestForQuotationGatewayService,
+    PurchaseOrderGatewayService,
+    GoodsReceiptGatewayService
   ],
 })
 export class AppModule {

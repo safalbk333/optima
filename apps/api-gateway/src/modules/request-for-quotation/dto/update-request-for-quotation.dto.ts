@@ -3,7 +3,21 @@ import {
   IsString,
   IsOptional,
   IsDateString,
+  IsArray,
+  IsNumber,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class RfqItemDto {
+  @ApiProperty({ example: 'item-id-123', description: 'Item ID' })
+  @IsString()
+  strItemId: string;
+
+  @ApiProperty({ example: 10, description: 'Quantity' })
+  @IsNumber()
+  intQuantity: number;
+}
 
 export class UpdateRequestForQuotationDto {
   @ApiProperty({ example: 'Updated RFQ Title', description: 'RFQ title', required: false })
@@ -45,4 +59,11 @@ export class UpdateRequestForQuotationDto {
   @IsOptional()
   @IsString()
   strModifiedId?: string;
+
+  @ApiProperty({ type: [RfqItemDto], description: 'List of RFQ items', required: false })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => RfqItemDto)
+  arrItems?: RfqItemDto[];
 }
