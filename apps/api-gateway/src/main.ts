@@ -8,11 +8,17 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+app.enableCors({
+    origin: [
+      'http://localhost:3000',
+      'https://outpour-unnamable-oink.ngrok-free.dev',
+    ],
+    credentials: true,
+  });
 
   const configService =
     app.get(ConfigService);
 
-  app.enableCors();
 
   // ✅ ENV Variables
   const port =
