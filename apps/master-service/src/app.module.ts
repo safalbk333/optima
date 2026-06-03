@@ -5,6 +5,7 @@ import { PrismaModule } from 'libs/database/prisma.module';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ItemModule } from './modules/item/item.module';
+import { DepartmentModule } from './modules/department/department.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ItemModule } from './modules/item/item.module';
     PrismaModule,
     CategoryModule,
     ItemModule,
+    DepartmentModule,
   ],
 
   controllers: [AppController],

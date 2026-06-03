@@ -35,9 +35,11 @@ import { PurchaseOrderController } from './modules/purchase-order/purchase-order
 import { PurchaseOrderGatewayService } from './modules/purchase-order/purchase-order.service';
 import { GoodsReceiptController } from './modules/goods-receipt/goods-receipt.controller';
 import { GoodsReceiptGatewayService } from './modules/goods-receipt/goods-receipt.service';
-
+import { DepartmentController } from './modules/department/department.controller';
+import { DepartmentGatewayService } from './modules/department/department.service';
+ 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
-
+ 
 @Module({
   imports: [
     // ✅ ENV Configuration
@@ -45,7 +47,7 @@ ConfigModule.forRoot({
   isGlobal: true,
   envFilePath: `apps/api-gateway/.env.${process.env.NODE_ENV || 'development'}`,
 }),
-
+ 
     // ✅ TCP Microservice Clients
     ClientsModule.register([
       {
@@ -61,7 +63,7 @@ ConfigModule.forRoot({
         transport: Transport.TCP,
         options: {
           host: process.env.MASTER_SERVICE_HOST || 'localhost',
-          port: Number(process.env.MASTER_SERVICE_PORT) || 3006,
+          port: Number(process.env.MASTER_SERVICE_PORT) || 3005,
         },
       },
       {
@@ -69,7 +71,7 @@ ConfigModule.forRoot({
         transport: Transport.TCP,
         options: {
           host: process.env.REQUEST_SERVICE_HOST || 'localhost',
-          port: Number(process.env.REQUEST_SERVICE_PORT) || 3007,
+          port: Number(process.env.REQUEST_SERVICE_PORT) || 3006,
         },
       },
       {
@@ -98,7 +100,7 @@ ConfigModule.forRoot({
       },
     ]),
   ],
-
+ 
   controllers: [
     AppController,
     VendorController,
@@ -116,9 +118,10 @@ ConfigModule.forRoot({
     EoiController,
     RequestForQuotationController,
     PurchaseOrderController,
-    GoodsReceiptController
+    GoodsReceiptController,
+    DepartmentController,
   ],
-
+ 
   providers: [
     AppService,
     VendorGatewayService,
@@ -133,27 +136,28 @@ ConfigModule.forRoot({
     EoiGatewayService,
     RequestForQuotationGatewayService,
     PurchaseOrderGatewayService,
-    GoodsReceiptGatewayService
+    GoodsReceiptGatewayService,
+    DepartmentGatewayService,
   ],
 })
 export class AppModule {
   constructor() {
-
+ 
         // ✅ Log loaded env values
     console.log('================ ENV VALUES ================');
-
+ 
     console.log('VENDOR_SERVICE_HOST =>', process.env.VENDOR_SERVICE_HOST);
     console.log('VENDOR_SERVICE_PORT =>', process.env.VENDOR_SERVICE_PORT);
-
+ 
     console.log('MASTER_SERVICE_HOST =>', process.env.MASTER_SERVICE_HOST);
     console.log('MASTER_SERVICE_PORT =>', process.env.MASTER_SERVICE_PORT);
-
+ 
     console.log('REQUEST_SERVICE_HOST =>', process.env.REQUEST_SERVICE_HOST);
     console.log('REQUEST_SERVICE_PORT =>', process.env.REQUEST_SERVICE_PORT);
-
+ 
     console.log('AUTH_SERVICE_HOST =>', process.env.AUTH_SERVICE_HOST);
     console.log('AUTH_SERVICE_PORT =>', process.env.AUTH_SERVICE_PORT);
-
+ 
     console.log(
       'CONTRACTS_SERVICE_HOST =>',
       process.env.CONTRACTS_SERVICE_HOST,
@@ -162,6 +166,6 @@ export class AppModule {
       'CONTRACTS_SERVICE_PORT =>',
       process.env.CONTRACTS_SERVICE_PORT,
     );
-
+ 
   }
  }
