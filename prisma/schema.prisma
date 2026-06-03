@@ -418,6 +418,7 @@ model tbl_vendor {
   created_by          tbl_user?                    @relation("vendor_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?                    @relation("vendor_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   vendor_items        tbl_vendor_items[]
+  shipments          tbl_shipment[]
   company             tbl_company?                 @relation("vendor_company", fields: [fk_chr_company_id], references: [pk_chr_company_id])
 
   @@map("tbl_vendor")
@@ -829,6 +830,10 @@ model tbl_quotation_item {
   @@map("tbl_quotation_item")
 }
 
+// ========================================================================================
+// PHASE 6: Purchase Order, Shipment, Shipment Tracking, Goods Receipt, and Invoice Tables
+// ========================================================================================
+
 model tbl_purchase_order {
   pk_chr_purchase_order_id String               @id @default(uuid())
   fk_chr_request_id        String
@@ -859,6 +864,36 @@ model tbl_purchase_order {
   @@map("tbl_purchase_order")
 }
 
+model tbl_shipment {
+  pk_chr_shipment_id       String    @id @default(uuid())
+  fk_po_number             String
+  fk_chr_vendor_id         String
+  chr_asn_id               String    @unique
+  dt_dispatch_date         DateTime
+  dt_delivery_date         DateTime
+  chr_logistics_provider   String
+  fk_chr_tracking_no       String
+  int_quantity             Int
+  int_status               Int
+  chr_notes                String?
+  chr_documents            String?
+  vendor                   tbl_vendor  @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Cascade)
+  tracking                 tbl_shipment_tracking @relation(fields: [fk_chr_tracking_no], references: [pk_chr_shipment_tracking_id])
+  goods_receipts           tbl_goods_receipt[]
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
+}
+
+model tbl_shipment_tracking {
+  pk_chr_shipment_tracking_id   String    @id @default(uuid())
+  chr_order_id                  String
+  chr_courier_person_name       String
+  chr_courier_person_phone      String
+  shipments                     tbl_shipment[]
+  created_at                    DateTime  @default(now())
+  updated_at                    DateTime  @updatedAt
+}
+
 model tbl_goods_receipt {
   pk_chr_goods_receipt_id  String                   @id @default(uuid())
   chr_grn_code             String                   @unique
@@ -882,6 +917,7 @@ model tbl_goods_receipt {
   vendor                   tbl_vendor               @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
   goods_receipt_items      tbl_goods_receipt_item[]
   invoices                 tbl_invoice[]
+  shipments                tbl_shipment[]
 
   @@index([fk_chr_purchase_order_id])
   @@index([fk_chr_request_id])

@@ -35,11 +35,14 @@ import { PurchaseOrderController } from './modules/purchase-order/purchase-order
 import { PurchaseOrderGatewayService } from './modules/purchase-order/purchase-order.service';
 import { GoodsReceiptController } from './modules/goods-receipt/goods-receipt.controller';
 import { GoodsReceiptGatewayService } from './modules/goods-receipt/goods-receipt.service';
+import { DepartmentController } from './modules/department/department.controller';
+import { DepartmentGatewayService } from './modules/department/department.service';
+ 
 import { TemplateController } from './modules/template/template.controller';
 import { TemplateGatewayService } from './modules/template/template.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
-
+ 
 @Module({
   imports: [
     // ✅ ENV Configuration
@@ -47,7 +50,7 @@ ConfigModule.forRoot({
   isGlobal: true,
   envFilePath: `apps/api-gateway/.env.${process.env.NODE_ENV || 'development'}`,
 }),
-
+ 
     // ✅ TCP Microservice Clients
     ClientsModule.register([
       {
@@ -100,7 +103,7 @@ ConfigModule.forRoot({
       },
     ]),
   ],
-
+ 
   controllers: [
     AppController,
     VendorController,
@@ -119,9 +122,10 @@ ConfigModule.forRoot({
     RequestForQuotationController,
     PurchaseOrderController,
     GoodsReceiptController,
+    DepartmentController,
     TemplateController,
   ],
-
+ 
   providers: [
     AppService,
     VendorGatewayService,
@@ -137,27 +141,28 @@ ConfigModule.forRoot({
     RequestForQuotationGatewayService,
     PurchaseOrderGatewayService,
     GoodsReceiptGatewayService,
+    DepartmentGatewayService,
     TemplateGatewayService,
   ],
 })
 export class AppModule {
   constructor() {
-
+ 
         // ✅ Log loaded env values
     console.log('================ ENV VALUES ================');
-
+ 
     console.log('VENDOR_SERVICE_HOST =>', process.env.VENDOR_SERVICE_HOST);
     console.log('VENDOR_SERVICE_PORT =>', process.env.VENDOR_SERVICE_PORT);
-
+ 
     console.log('MASTER_SERVICE_HOST =>', process.env.MASTER_SERVICE_HOST);
     console.log('MASTER_SERVICE_PORT =>', process.env.MASTER_SERVICE_PORT);
-
+ 
     console.log('REQUEST_SERVICE_HOST =>', process.env.REQUEST_SERVICE_HOST);
     console.log('REQUEST_SERVICE_PORT =>', process.env.REQUEST_SERVICE_PORT);
-
+ 
     console.log('AUTH_SERVICE_HOST =>', process.env.AUTH_SERVICE_HOST);
     console.log('AUTH_SERVICE_PORT =>', process.env.AUTH_SERVICE_PORT);
-
+ 
     console.log(
       'CONTRACTS_SERVICE_HOST =>',
       process.env.CONTRACTS_SERVICE_HOST,
@@ -166,6 +171,6 @@ export class AppModule {
       'CONTRACTS_SERVICE_PORT =>',
       process.env.CONTRACTS_SERVICE_PORT,
     );
-
+ 
   }
  }
