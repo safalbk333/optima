@@ -73,6 +73,17 @@ export class PurchaseOrderGatewayService {
     }
   }
 
+  async findByVendorId(vendorId: string) {
+    try {
+      return await firstValueFrom(
+        this.client.send(PURCHASE_ORDER_PATTERN.FIND_BY_VENDOR_ID, vendorId),
+      );
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
+    }
+  }
+
   async delete(id: string) {
     try{
       return await firstValueFrom(

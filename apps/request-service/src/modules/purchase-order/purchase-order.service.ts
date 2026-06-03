@@ -162,6 +162,52 @@ export class PurchaseOrderService {
     }
   }
 
+  async findByVendorId(strVendorId: string) {
+    try {
+      this.logger.log(`${PurchaseOrderProperties.service.findByVendorId.start}: ${strVendorId}`);
+      const vendor = await this.prisma.tbl_vendor.findUnique({
+        where: { pk_chr_vendor_id: strVendorId },
+      });
+
+      if (!vendor) {
+        throw new NotFoundException('Vendor not found');
+      }
+
+      const purchaseOrders = await this.prisma.tbl_purchase_order.findMany({
+        where: { fk_chr_vendor_id: strVendorId },
+        include: {
+          request: {
+            select: {
+              pk_chr_request_id: true,
+              chr_request_number: true,
+              chr_title: true,
+            },
+          },
+          vendor: {
+            select: {
+              pk_chr_vendor_id: true,
+              chr_vendor_name: true,
+              chr_vendor_email: true,
+            },
+          },
+          quotation: {
+            select: {
+              pk_chr_quotation_id: true,
+              chr_status: true,
+            },
+          },
+        },
+        orderBy: { tim_created: 'desc' },
+      });
+
+      this.logger.log(PurchaseOrderProperties.service.findByVendorId.success);
+      return ResponseHelper.success(purchaseOrders, 'Purchase orders fetched successfully');
+    } catch (error) {
+      this.logger.error(PurchaseOrderProperties.service.findByVendorId.error, error.stack);
+      throw error;
+    }
+  }
+
   async update(strId: string, objData: UpdatePurchaseOrderDto) {
     try {
       this.logger.log(`${PurchaseOrderProperties.service.update.start}: ${strId}`);

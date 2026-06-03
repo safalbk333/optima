@@ -51,22 +51,28 @@ export class EoiController {
         return this.eoiService.findOne(id);
     }
 
-    @Get('/vendor/:vendorId')
+    @Post('by-vendor')
     @ApiOperation({
         summary: 'Get EOIs by vendor id',
     })
+    @ApiBody({
+        description: 'Vendor ID payload',
+        schema: {
+            type: 'object',
+            properties: {
+                vendorId: { type: 'string' },
+            },
+            required: ['vendorId'],
+        },
+    })
     @ApiResponse({
         status: 200,
-        description:
-            'Vendor EOIs fetched successfully',
+        description: 'Vendor EOIs fetched successfully',
     })
     findByVendorId(
-        @Param('vendorId')
-        vendorId: string,
+        @Body('vendorId') vendorId: string,
     ) {
-        return this.eoiService.findByVendorId(
-            vendorId,
-        );
+        return this.eoiService.findByVendorId(vendorId);
     }
     @Post()
     @ApiOperation({ summary: 'Create a new EOI' })

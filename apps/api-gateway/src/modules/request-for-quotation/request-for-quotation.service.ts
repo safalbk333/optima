@@ -35,6 +35,12 @@ export class RequestForQuotationGatewayService {
     );
   }
 
+  async findByVendorId(vendorId: string) {
+    return await firstValueFrom(
+      this.client.send(RFQ_PATTERN.FIND_BY_VENDOR_ID, vendorId),
+    );
+  }
+
   async create(data: CreateRequestForQuotationDto) {
     return await firstValueFrom(
       this.client.send(

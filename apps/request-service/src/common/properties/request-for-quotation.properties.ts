@@ -20,6 +20,11 @@ export const RequestForQuotationProperties = {
       success: 'RFQ updated successfully',
       error: 'Error updating RFQ',
     },
+    findByVendorId: {
+      start: 'Fetching RFQs by vendor id',
+      success: 'RFQs by vendor fetched successfully',
+      error: 'Error fetching RFQs by vendor id',
+    },
     delete: {
       start: 'Deleting RFQ',
       success: 'RFQ deleted successfully',
