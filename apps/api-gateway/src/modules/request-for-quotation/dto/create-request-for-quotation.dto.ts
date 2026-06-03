@@ -69,4 +69,9 @@ export class CreateRequestForQuotationDto {
   @ValidateNested({ each: true })
   @Type(() => RfqItemDto)
   arrItems: RfqItemDto[];
+
+  @ApiProperty({ description: 'HTML content to render', required: false })
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 }

@@ -84,4 +84,9 @@ export class CreateGoodsReceiptDto {
   @ValidateNested({ each: true })
   @Type(() => GoodsReceiptItemDto)
   arrItems: GoodsReceiptItemDto[];
+
+  @ApiPropertyOptional({ description: 'HTML content to render' })
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 }

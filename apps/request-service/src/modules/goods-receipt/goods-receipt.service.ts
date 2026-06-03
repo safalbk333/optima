@@ -27,6 +27,7 @@ export class GoodsReceiptService {
           purchase_order: { connect: { pk_chr_purchase_order_id: receiptData.strPurchaseOrderId } },
           request: { connect: { pk_chr_request_id: receiptData.strRequestId } },
           vendor: { connect: { pk_chr_vendor_id: receiptData.strVendorId } },
+          ...(receiptData.strHtmlContent && { txt_rendered_html: receiptData.strHtmlContent }),
           ...(receiptData.strCreatedId && {
             created_by: { connect: { pk_chr_user_id: receiptData.strCreatedId } },
           }),

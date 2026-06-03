@@ -63,6 +63,8 @@ const quotation =
 
       chr_status: createQuotationDto.status.toUpperCase(),
 
+      ...(createQuotationDto.strHtmlContent && { txt_rendered_html: createQuotationDto.strHtmlContent }),
+
       dt_issue_date: new Date(
         createQuotationDto.issueDate,
       ),

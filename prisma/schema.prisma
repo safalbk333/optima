@@ -662,6 +662,7 @@ model tbl_contract {
   tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
+  txt_rendered_html   String?
   chr_document_status String                @default("D") @db.Char(1)
   created_by          tbl_user?             @relation("contract_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?             @relation("contract_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)

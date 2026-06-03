@@ -51,6 +51,10 @@ export class CreateRequestForQuotationDto {
   @IsString()
   strCreatedId?: string;
 
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => RfqItemDto)

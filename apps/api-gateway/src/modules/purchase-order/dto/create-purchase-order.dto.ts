@@ -51,4 +51,9 @@ export class CreatePurchaseOrderDto {
   @IsOptional()
   @IsString()
   strCreatedId?: string;
+
+  @ApiPropertyOptional({ description: 'HTML content to render' })
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 }

@@ -27,4 +27,8 @@ export class CreateQuotationDto {
 
   @IsString()
   status: string;
+
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 }

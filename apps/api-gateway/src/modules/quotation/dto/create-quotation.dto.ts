@@ -129,4 +129,9 @@ export class CreateQuotationDto {
   @ValidateNested({ each: true })
   @Type(() => QuotationItemDto)
   arrItems?: QuotationItemDto[];
+
+  @ApiPropertyOptional({ description: 'HTML content to render' })
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 }
