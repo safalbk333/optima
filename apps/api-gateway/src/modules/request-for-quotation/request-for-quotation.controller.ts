@@ -7,7 +7,7 @@ import {
   Body,
   Param,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { RequestForQuotationGatewayService } from './request-for-quotation.service';
 import { CreateRequestForQuotationDto } from './dto/create-request-for-quotation.dto';
 import { UpdateRequestForQuotationDto } from './dto/update-request-for-quotation.dto';
@@ -32,6 +32,20 @@ export class RequestForQuotationController {
   @ApiResponse({ status: 404, description: 'RFQ not found' })
   findOne(@Param('id') id: string) {
     return this.rfqService.findOne(id);
+  }
+
+  @Post('by-vendor')
+  @ApiOperation({ summary: 'Get RFQs by vendor id' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { vendorId: { type: 'string' } },
+      required: ['vendorId'],
+    },
+  })
+  @ApiResponse({ status: 200, description: 'RFQs fetched successfully' })
+  findByVendorId(@Body('vendorId') vendorId: string) {
+    return this.rfqService.findByVendorId(vendorId);
   }
 
   @Post()

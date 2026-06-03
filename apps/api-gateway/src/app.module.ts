@@ -38,6 +38,9 @@ import { GoodsReceiptGatewayService } from './modules/goods-receipt/goods-receip
 import { DepartmentController } from './modules/department/department.controller';
 import { DepartmentGatewayService } from './modules/department/department.service';
  
+import { TemplateController } from './modules/template/template.controller';
+import { TemplateGatewayService } from './modules/template/template.service';
+
 console.log('NODE_ENV =>', process.env.NODE_ENV);
  
 @Module({
@@ -79,7 +82,7 @@ ConfigModule.forRoot({
         transport: Transport.TCP,
         options: {
           host: process.env.SHIPMENT_SERVICE_HOST || 'localhost',
-          port: Number(process.env.SHIPMENT_SERVICE_PORT) || 3003,
+          port: Number(process.env.SHIPMENT_SERVICE_PORT) || 3004,
         },
       },
       {
@@ -120,6 +123,7 @@ ConfigModule.forRoot({
     PurchaseOrderController,
     GoodsReceiptController,
     DepartmentController,
+    TemplateController,
   ],
  
   providers: [
@@ -138,6 +142,7 @@ ConfigModule.forRoot({
     PurchaseOrderGatewayService,
     GoodsReceiptGatewayService,
     DepartmentGatewayService,
+    TemplateGatewayService,
   ],
 })
 export class AppModule {

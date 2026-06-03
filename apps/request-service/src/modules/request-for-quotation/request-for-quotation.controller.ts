@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { RequestForQuotationService } from './request-for-quotation.service';
 import { CreateRequestForQuotationDto } from './dto/create-request-for-quotation.dto';
 import { UpdateRequestForQuotationDto } from './dto/update-request-for-quotation.dto';
@@ -18,6 +18,11 @@ export class RequestForQuotationController {
   @MessagePattern({ cmd: 'rfq.findOne' })
   findOne(id: string) {
     return this.requestForQuotationService.findOne(id);
+  }
+
+  @MessagePattern({ cmd: 'rfq.findByVendorId' })
+  findByVendorId(@Payload() vendorId: string) {
+    return this.requestForQuotationService.findByVendorId(vendorId);
   }
 
   @MessagePattern({ cmd: 'rfq.create' })

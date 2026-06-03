@@ -13,6 +13,7 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
+  ApiBody,
 } from '@nestjs/swagger';
 import { PurchaseOrderGatewayService } from './purchase-order.service';
 import { CreatePurchaseOrderDto } from './dto/create-purchase-order.dto';
@@ -23,6 +24,20 @@ export class PurchaseOrderController {
   constructor(
     private readonly purchaseOrderService: PurchaseOrderGatewayService,
   ) { }
+
+  @Post('by-vendor')
+  @ApiOperation({ summary: 'Get purchase orders by vendor id' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { vendorId: { type: 'string' } },
+      required: ['vendorId'],
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Purchase orders fetched successfully' })
+  findByVendorId(@Body('vendorId') vendorId: string) {
+    return this.purchaseOrderService.findByVendorId(vendorId);
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create a new purchase order' })

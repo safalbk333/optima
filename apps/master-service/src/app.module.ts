@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ItemModule } from './modules/item/item.module';
 import { DepartmentModule } from './modules/department/department.module';
+import { TemplateModule } from './modules/template/template.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { DepartmentModule } from './modules/department/department.module';
     CategoryModule,
     ItemModule,
     DepartmentModule,
+    TemplateModule,
   ],
 
   controllers: [AppController],

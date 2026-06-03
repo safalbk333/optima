@@ -43,6 +43,12 @@ export class PurchaseOrderController {
     return this.purchaseOrderService.update(payload.id, payload.data);
   }
 
+  @MessagePattern('purchaseOrder.findByVendorId')
+  findByVendorId(@Payload() vendorId: string) {
+    this.logger.log(`${PurchaseOrderProperties.controller.findByVendorId}: ${vendorId}`);
+    return this.purchaseOrderService.findByVendorId(vendorId);
+  }
+
   @MessagePattern('purchaseOrder.delete')
   delete(@Payload() id: string) {
     this.logger.log(`${PurchaseOrderProperties.controller.delete}: ${id}`);

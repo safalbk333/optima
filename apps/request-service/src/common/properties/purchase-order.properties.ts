@@ -3,6 +3,7 @@ export const PurchaseOrderProperties = {
     start: 'Purchase Order Controller started successfully',
     findAll: 'Received request to find all purchase orders',
     findOne: 'Received request to find purchase order with id',
+    findByVendorId: 'Received request to find purchase orders by vendor id',
     create: 'Received request to create purchase order',
     update: 'Received request to update purchase order',
     delete: 'Received request to delete purchase order',
@@ -12,6 +13,11 @@ export const PurchaseOrderProperties = {
       start: 'Fetching all purchase orders',
       success: 'Purchase orders fetched successfully',
       error: 'Error fetching purchase orders',
+    },
+    findByVendorId: {
+      start: 'Fetching purchase orders by vendor id',
+      success: 'Purchase orders by vendor fetched successfully',
+      error: 'Error fetching purchase orders by vendor id',
     },
     findOne: {
       start: 'Fetching purchase order with id',

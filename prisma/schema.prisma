@@ -7,166 +7,158 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ============================================================
-// PHASE 1: Foundational Tables
-// ============================================================
-
 model tbl_tenant_registry {
-  pk_chr_tenant_id    String    @id @default(uuid())
-  chr_tenant_name     String    @unique
-  chr_tenant_code     String    @unique
-  chr_email           String    @unique
+  pk_chr_tenant_id    String     @id @default(uuid())
+  chr_tenant_name     String     @unique
+  chr_tenant_code     String     @unique
+  chr_email           String     @unique
   chr_phone           String
-  bln_is_active       Boolean   @default(true)
-  chr_status          String    @default("ACTIVE")
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  bln_is_active       Boolean    @default(true)
+  chr_status          String     @default("ACTIVE")
+  tim_created         DateTime   @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-  chr_document_status String    @default("N") @db.Char(1)
-
-  users tbl_user[]
+  chr_document_status String     @default("N") @db.Char(1)
+  users               tbl_user[]
 
   @@map("tbl_tenant_registry")
 }
 
 model tbl_user {
-  pk_chr_user_id      String    @id @default(uuid())
-  fk_chr_tenant_id    String
-  chr_user_name       String
-  chr_user_email      String    @unique
-  chr_user_phone      String
-  bln_is_active       Boolean   @default(true)
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
-  fk_chr_created_id   String?
-  fk_chr_modified_id  String?
-  chr_document_status String    @default("N") @db.Char(1)
+  pk_chr_user_id               String                              @id @default(uuid())
+  fk_chr_tenant_id             String
+  chr_user_name                String
+  chr_user_email               String                              @unique
+  chr_user_phone               String
+  bln_is_active                Boolean                             @default(true)
+  tim_created                  DateTime                            @default(now())
+  tim_modified                 DateTime?
+  fk_chr_created_id            String?
+  fk_chr_modified_id           String?
+  fk_chr_company_id           String?
 
-  tenant tbl_tenant_registry @relation(fields: [fk_chr_tenant_id], references: [pk_chr_tenant_id], onDelete: Restrict, onUpdate: Cascade)
-
-  created_by  tbl_user?  @relation("user_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?  @relation("user_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  users_created  tbl_user[] @relation("user_created_by")
-  users_modified tbl_user[] @relation("user_modified_by")
-
-  user_roles_created       tbl_user_role[]                    @relation("user_role_created_by")
-  user_roles_modified      tbl_user_role[]                    @relation("user_role_modified_by")
-  user_role_mappings       tbl_user_role_mapping[]            @relation("user_role_mapping_user")
-  user_role_mappings_created tbl_user_role_mapping[]          @relation("user_role_mapping_created_by")
-  user_role_mappings_modified tbl_user_role_mapping[]         @relation("user_role_mapping_modified_by")
-  activations              tbl_activations[]                  @relation("activations_user")
-  activations_created      tbl_activations[]                  @relation("activations_created_by")
-  activations_modified     tbl_activations[]                  @relation("activations_modified_by")
-  countries_created        tbl_country[]                      @relation("country_created_by")
-  countries_modified       tbl_country[]                      @relation("country_modified_by")
-  cities_created           tbl_city[]                         @relation("city_created_by")
-  cities_modified          tbl_city[]                         @relation("city_modified_by")
-  departments_created      tbl_department[]                   @relation("department_created_by")
-  departments_modified     tbl_department[]                   @relation("department_modified_by")
-  categories_created       tbl_category[]                     @relation("category_created_by")
-  categories_modified      tbl_category[]                     @relation("category_modified_by")
-  priorities_created       tbl_priority[]                     @relation("priority_created_by")
-  priorities_modified      tbl_priority[]                     @relation("priority_modified_by")
-  request_statuses_created tbl_request_status[]               @relation("request_status_created_by")
-  request_statuses_modified tbl_request_status[]              @relation("request_status_modified_by")
-  request_phases_created   tbl_request_phase[]                @relation("request_phase_created_by")
-  request_phases_modified  tbl_request_phase[]                @relation("request_phase_modified_by")
-  notification_types_created tbl_notification_type[]          @relation("notification_type_created_by")
-  notification_types_modified tbl_notification_type[]         @relation("notification_type_modified_by")
-  approval_levels_created  tbl_approval_level[]               @relation("approval_level_created_by")
-  approval_levels_modified tbl_approval_level[]               @relation("approval_level_modified_by")
-  sla_policies_created     tbl_sla_policy[]                   @relation("sla_policy_created_by")
-  sla_policies_modified    tbl_sla_policy[]                   @relation("sla_policy_modified_by")
-  vendors_created          tbl_vendor[]                       @relation("vendor_created_by")
-  vendors_modified         tbl_vendor[]                       @relation("vendor_modified_by")
-  items_created            tbl_item[]                         @relation("item_created_by")
-  items_modified           tbl_item[]                         @relation("item_modified_by")
-  vendor_items_created     tbl_vendor_items[]                 @relation("vendor_items_created_by")
-  vendor_items_modified    tbl_vendor_items[]                 @relation("vendor_items_modified_by")
-  purchase_requests        tbl_purchase_request[]             @relation("purchase_request_requested_by")
-  purchase_requests_created tbl_purchase_request[]            @relation("purchase_request_created_by")
-  purchase_requests_modified tbl_purchase_request[]           @relation("purchase_request_modified_by")
-  approvals                tbl_approval[]                     @relation("approval_approver")
-  approvals_created        tbl_approval[]                     @relation("approval_created_by")
-  approvals_modified       tbl_approval[]                     @relation("approval_modified_by")
-  request_histories        tbl_request_history[]              @relation("request_history_changed_by")
-  attachment_masters_uploaded tbl_request_attachment_master[] @relation("attachment_master_uploaded_by")
-  attachment_masters_created tbl_request_attachment_master[]  @relation("attachment_master_created_by")
-  attachment_masters_modified tbl_request_attachment_master[] @relation("attachment_master_modified_by")
-  attachments_uploaded     tbl_request_attachments[]          @relation("attachments_uploaded_by")
-  attachments_created      tbl_request_attachments[]          @relation("attachments_created_by")
-  attachments_modified     tbl_request_attachments[]          @relation("attachments_modified_by")
-  pr_item_mappings_created tbl_purchase_request_item_mapping[] @relation("pr_item_mapping_created_by")
-  pr_item_mappings_modified tbl_purchase_request_item_mapping[] @relation("pr_item_mapping_modified_by")
-  contracts_created        tbl_contract[]                     @relation("contract_created_by")
-  contracts_modified       tbl_contract[]                     @relation("contract_modified_by")
-  eois_created             tbl_expression_of_interest[]       @relation("eoi_created_by")
-  eois_modified            tbl_expression_of_interest[]       @relation("eoi_modified_by")
-  rfqs_created             tbl_request_for_quotation[]        @relation("rfq_created_by")
-  rfqs_modified            tbl_request_for_quotation[]        @relation("rfq_modified_by")
-  quotations_buyer         tbl_quotation[]                    @relation("quotation_buyer")
-  quotations_created       tbl_quotation[]                    @relation("quotation_created_by")
-  quotations_modified      tbl_quotation[]                    @relation("quotation_modified_by")
-  quotation_items_created  tbl_quotation_item[]               @relation("quotation_item_created_by")
-  quotation_items_modified tbl_quotation_item[]               @relation("quotation_item_modified_by")
-  purchase_orders_created  tbl_purchase_order[]               @relation("purchase_order_created_by")
-  purchase_orders_modified tbl_purchase_order[]               @relation("purchase_order_modified_by")
-  goods_receipts_created   tbl_goods_receipt[]                @relation("goods_receipt_created_by")
-  goods_receipts_modified  tbl_goods_receipt[]                @relation("goods_receipt_modified_by")
-  goods_receipt_items_created tbl_goods_receipt_item[]        @relation("goods_receipt_item_created_by")
-  goods_receipt_items_modified tbl_goods_receipt_item[]       @relation("goods_receipt_item_modified_by")
-  invoices_created         tbl_invoice[]                      @relation("invoice_created_by")
-  invoices_modified        tbl_invoice[]                      @relation("invoice_modified_by")
-  chat_rooms_created       tbl_chat_room[]                    @relation("chat_room_created_by")
-  chat_rooms_modified      tbl_chat_room[]                    @relation("chat_room_modified_by")
-  chat_room_members        tbl_chat_room_member[]             @relation("chat_room_member_user")
-  chat_messages            tbl_chat_message[]                 @relation("chat_message_sender")
-  notifications            tbl_notification[]                 @relation("notification_user")
-  notifications_created    tbl_notification[]                 @relation("notification_created_by")
-  notifications_modified   tbl_notification[]                 @relation("notification_modified_by")
-  rfq_item_mappings_created  tbl_rfq_item_mapping[] @relation("rfq_item_mapping_created_by")
-  rfq_item_mappings_modified tbl_rfq_item_mapping[] @relation("rfq_item_mapping_modified_by")
-
+  chr_document_status          String                              @default("N") @db.Char(1)
+  activations_created          tbl_activations[]                   @relation("activations_created_by")
+  activations_modified         tbl_activations[]                   @relation("activations_modified_by")
+  activations                  tbl_activations[]                   @relation("activations_user")
+  approvals                    tbl_approval[]                      @relation("approval_approver")
+  approvals_created            tbl_approval[]                      @relation("approval_created_by")
+  approvals_modified           tbl_approval[]                      @relation("approval_modified_by")
+  approval_levels_created      tbl_approval_level[]                @relation("approval_level_created_by")
+  approval_levels_modified     tbl_approval_level[]                @relation("approval_level_modified_by")
+  categories_created           tbl_category[]                      @relation("category_created_by")
+  categories_modified          tbl_category[]                      @relation("category_modified_by")
+  chat_messages                tbl_chat_message[]                  @relation("chat_message_sender")
+  chat_rooms_created           tbl_chat_room[]                     @relation("chat_room_created_by")
+  chat_rooms_modified          tbl_chat_room[]                     @relation("chat_room_modified_by")
+  chat_room_members            tbl_chat_room_member[]              @relation("chat_room_member_user")
+  cities_created               tbl_city[]                          @relation("city_created_by")
+  cities_modified              tbl_city[]                          @relation("city_modified_by")
+  contracts_created            tbl_contract[]                      @relation("contract_created_by")
+  contracts_modified           tbl_contract[]                      @relation("contract_modified_by")
+  countries_created            tbl_country[]                       @relation("country_created_by")
+  countries_modified           tbl_country[]                       @relation("country_modified_by")
+  departments_created          tbl_department[]                    @relation("department_created_by")
+  departments_modified         tbl_department[]                    @relation("department_modified_by")
+  eois_created                 tbl_expression_of_interest[]        @relation("eoi_created_by")
+  eois_modified                tbl_expression_of_interest[]        @relation("eoi_modified_by")
+  goods_receipts_created       tbl_goods_receipt[]                 @relation("goods_receipt_created_by")
+  goods_receipts_modified      tbl_goods_receipt[]                 @relation("goods_receipt_modified_by")
+  goods_receipt_items_created  tbl_goods_receipt_item[]            @relation("goods_receipt_item_created_by")
+  goods_receipt_items_modified tbl_goods_receipt_item[]            @relation("goods_receipt_item_modified_by")
+  invoices_created             tbl_invoice[]                       @relation("invoice_created_by")
+  invoices_modified            tbl_invoice[]                       @relation("invoice_modified_by")
+  items_created                tbl_item[]                          @relation("item_created_by")
+  items_modified               tbl_item[]                          @relation("item_modified_by")
+  notifications_created        tbl_notification[]                  @relation("notification_created_by")
+  notifications_modified       tbl_notification[]                  @relation("notification_modified_by")
+  notifications                tbl_notification[]                  @relation("notification_user")
+  notification_types_created   tbl_notification_type[]             @relation("notification_type_created_by")
+  notification_types_modified  tbl_notification_type[]             @relation("notification_type_modified_by")
+  priorities_created           tbl_priority[]                      @relation("priority_created_by")
+  priorities_modified          tbl_priority[]                      @relation("priority_modified_by")
+  purchase_orders_created      tbl_purchase_order[]                @relation("purchase_order_created_by")
+  purchase_orders_modified     tbl_purchase_order[]                @relation("purchase_order_modified_by")
+  purchase_requests_created    tbl_purchase_request[]              @relation("purchase_request_created_by")
+  purchase_requests_modified   tbl_purchase_request[]              @relation("purchase_request_modified_by")
+  purchase_requests            tbl_purchase_request[]              @relation("purchase_request_requested_by")
+  pr_item_mappings_created     tbl_purchase_request_item_mapping[] @relation("pr_item_mapping_created_by")
+  pr_item_mappings_modified    tbl_purchase_request_item_mapping[] @relation("pr_item_mapping_modified_by")
+  quotations_buyer             tbl_quotation[]                     @relation("quotation_buyer")
+  quotations_created           tbl_quotation[]                     @relation("quotation_created_by")
+  quotations_modified          tbl_quotation[]                     @relation("quotation_modified_by")
+  quotation_items_created      tbl_quotation_item[]                @relation("quotation_item_created_by")
+  quotation_items_modified     tbl_quotation_item[]                @relation("quotation_item_modified_by")
+  attachment_masters_created   tbl_request_attachment_master[]     @relation("attachment_master_created_by")
+  attachment_masters_modified  tbl_request_attachment_master[]     @relation("attachment_master_modified_by")
+  attachment_masters_uploaded  tbl_request_attachment_master[]     @relation("attachment_master_uploaded_by")
+  attachments_created          tbl_request_attachments[]           @relation("attachments_created_by")
+  attachments_modified         tbl_request_attachments[]           @relation("attachments_modified_by")
+  attachments_uploaded         tbl_request_attachments[]           @relation("attachments_uploaded_by")
+  rfqs_created                 tbl_request_for_quotation[]         @relation("rfq_created_by")
+  rfqs_modified                tbl_request_for_quotation[]         @relation("rfq_modified_by")
+  request_histories            tbl_request_history[]               @relation("request_history_changed_by")
+  request_phases_created       tbl_request_phase[]                 @relation("request_phase_created_by")
+  request_phases_modified      tbl_request_phase[]                 @relation("request_phase_modified_by")
+  request_statuses_created     tbl_request_status[]                @relation("request_status_created_by")
+  request_statuses_modified    tbl_request_status[]                @relation("request_status_modified_by")
+  rfq_item_mappings_created    tbl_rfq_item_mapping[]              @relation("rfq_item_mapping_created_by")
+  rfq_item_mappings_modified   tbl_rfq_item_mapping[]              @relation("rfq_item_mapping_modified_by")
+  sla_policies_created         tbl_sla_policy[]                    @relation("sla_policy_created_by")
+  sla_policies_modified        tbl_sla_policy[]                    @relation("sla_policy_modified_by")
+  created_by                   tbl_user?                           @relation("user_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  users_created                tbl_user[]                          @relation("user_created_by")
+  modified_by                  tbl_user?                           @relation("user_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  users_modified               tbl_user[]                          @relation("user_modified_by")
+  tenant                       tbl_tenant_registry                 @relation(fields: [fk_chr_tenant_id], references: [pk_chr_tenant_id])
+  user_roles_created           tbl_user_role[]                     @relation("user_role_created_by")
+  user_roles_modified          tbl_user_role[]                     @relation("user_role_modified_by")
+  user_role_mappings_created   tbl_user_role_mapping[]             @relation("user_role_mapping_created_by")
+  user_role_mappings_modified  tbl_user_role_mapping[]             @relation("user_role_mapping_modified_by")
+  user_role_mappings           tbl_user_role_mapping[]             @relation("user_role_mapping_user")
+  vendors_created              tbl_vendor[]                        @relation("vendor_created_by")
+  vendors_modified             tbl_vendor[]                        @relation("vendor_modified_by")
+  vendor_items_created         tbl_vendor_items[]                  @relation("vendor_items_created_by")
+  vendor_items_modified        tbl_vendor_items[]                  @relation("vendor_items_modified_by")
+  company                      tbl_company?                        @relation("user_company", fields: [fk_chr_company_id], references: [pk_chr_company_id]) 
+  
   @@index([fk_chr_tenant_id])
   @@map("tbl_user")
 }
 
 model tbl_user_role {
-  pk_chr_role_id      String    @id @default(uuid())
-  chr_role_name       String    @unique
-  chr_role_code       String    @unique
+  pk_chr_role_id      String                  @id @default(uuid())
+  chr_role_name       String                  @unique
+  chr_role_code       String                  @unique
   txt_description     String?
-  bln_is_active       Boolean   @default(true)
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  bln_is_active       Boolean                 @default(true)
+  tim_created         DateTime                @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-  chr_document_status String    @default("N") @db.Char(1)
-
-  created_by  tbl_user? @relation("user_role_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user? @relation("user_role_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  user_role_mappings tbl_user_role_mapping[]
+  chr_document_status String                  @default("N") @db.Char(1)
+  created_by          tbl_user?               @relation("user_role_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?               @relation("user_role_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  user_role_mappings  tbl_user_role_mapping[]
 
   @@map("tbl_user_role")
 }
 
 model tbl_user_role_mapping {
-  pk_chr_user_role_mapping_id String    @id @default(uuid())
+  pk_chr_user_role_mapping_id String        @id @default(uuid())
   fk_chr_user_id              String
   fk_chr_role_id              String
-  bln_is_active               Boolean   @default(true)
-  tim_created                 DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified                DateTime? @db.Timestamp(3)
+  bln_is_active               Boolean       @default(true)
+  tim_created                 DateTime      @default(now())
+  tim_modified                DateTime?
   fk_chr_created_id           String?
   fk_chr_modified_id          String?
-  chr_document_status         String    @default("N") @db.Char(1)
-
-  user        tbl_user      @relation("user_role_mapping_user", fields: [fk_chr_user_id], references: [pk_chr_user_id], onDelete: Cascade, onUpdate: Cascade)
-  role        tbl_user_role @relation(fields: [fk_chr_role_id], references: [pk_chr_role_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by  tbl_user?     @relation("user_role_mapping_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?     @relation("user_role_mapping_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  chr_document_status         String        @default("N") @db.Char(1)
+  created_by                  tbl_user?     @relation("user_role_mapping_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by                 tbl_user?     @relation("user_role_mapping_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  role                        tbl_user_role @relation(fields: [fk_chr_role_id], references: [pk_chr_role_id])
+  user                        tbl_user      @relation("user_role_mapping_user", fields: [fk_chr_user_id], references: [pk_chr_user_id], onDelete: Cascade)
 
   @@unique([fk_chr_user_id, fk_chr_role_id])
   @@index([fk_chr_user_id])
@@ -179,18 +171,17 @@ model tbl_activations {
   pk_chr_activation_token_id String    @id @default(uuid())
   fk_chr_user_id             String
   chr_token_hash             String    @unique
-  tim_expires_at             DateTime  @db.Timestamp(3)
-  tim_used_at                DateTime? @db.Timestamp(3)
+  tim_expires_at             DateTime
+  tim_used_at                DateTime?
   bln_is_used                Boolean   @default(false)
-  tim_created                DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified               DateTime? @db.Timestamp(3)
+  tim_created                DateTime  @default(now())
+  tim_modified               DateTime?
   fk_chr_created_id          String?
   fk_chr_modified_id         String?
   chr_document_status        String    @default("N") @db.Char(1)
-
-  user        tbl_user  @relation("activations_user", fields: [fk_chr_user_id], references: [pk_chr_user_id], onDelete: Cascade, onUpdate: Cascade)
-  created_by  tbl_user? @relation("activations_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user? @relation("activations_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  created_by                 tbl_user? @relation("activations_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by                tbl_user? @relation("activations_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  user                       tbl_user  @relation("activations_user", fields: [fk_chr_user_id], references: [pk_chr_user_id], onDelete: Cascade)
 
   @@index([fk_chr_user_id])
   @@index([tim_expires_at])
@@ -199,157 +190,139 @@ model tbl_activations {
 }
 
 model tbl_country {
-  pk_chr_country_id   String    @id @default(uuid())
-  chr_country_name    String    @unique
-  chr_country_code    String    @unique
-  bln_is_active       Boolean   @default(true)
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  pk_chr_country_id   String       @id @default(uuid())
+  chr_country_name    String       @unique
+  chr_country_code    String       @unique
+  bln_is_active       Boolean      @default(true)
+  tim_created         DateTime     @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-  chr_document_status String    @default("N") @db.Char(1)
-
-  created_by  tbl_user? @relation("country_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user? @relation("country_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  cities  tbl_city[]
-  vendors tbl_vendor[]
+  chr_document_status String       @default("N") @db.Char(1)
+  cities              tbl_city[]
+  created_by          tbl_user?    @relation("country_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?    @relation("country_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  vendors             tbl_vendor[]
 
   @@map("tbl_country")
 }
 
 model tbl_city {
-  pk_chr_city_id      String    @id @default(uuid())
+  pk_chr_city_id      String       @id @default(uuid())
   chr_city_name       String
   fk_chr_country_id   String
-  bln_is_active       Boolean   @default(true)
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  bln_is_active       Boolean      @default(true)
+  tim_created         DateTime     @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-  chr_document_status String    @default("D") @db.Char(1)
-
-  country     tbl_country @relation(fields: [fk_chr_country_id], references: [pk_chr_country_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by  tbl_user?   @relation("city_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?   @relation("city_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  vendors tbl_vendor[]
+  chr_document_status String       @default("D") @db.Char(1)
+  country             tbl_country  @relation(fields: [fk_chr_country_id], references: [pk_chr_country_id])
+  created_by          tbl_user?    @relation("city_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?    @relation("city_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  vendors             tbl_vendor[]
 
   @@index([fk_chr_country_id])
   @@map("tbl_city")
 }
 
-// ============================================================
-// PHASE 2: Lookup and Master Data Tables
-// ============================================================
-
 model tbl_department {
-  pk_chr_department_id String    @id @default(uuid())
-  chr_department_name  String    @unique
-  chr_department_code  String    @unique
+  pk_chr_department_id String                 @id @default(uuid())
+  chr_department_name  String                 @unique
+  chr_department_code  String                 @unique
   txt_description      String?
-  bln_is_active        Boolean   @default(true)
-  tim_created          DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified         DateTime? @db.Timestamp(3)
+  bln_is_active        Boolean                @default(true)
+  tim_created          DateTime               @default(now())
+  tim_modified         DateTime?
   fk_chr_created_id    String?
   fk_chr_modified_id   String?
-  chr_document_status  String    @default("D") @db.Char(1)
-
-  created_by  tbl_user? @relation("department_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user? @relation("department_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  purchase_requests tbl_purchase_request[]
+  chr_document_status  String                 @default("D") @db.Char(1)
+  created_by           tbl_user?              @relation("department_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by          tbl_user?              @relation("department_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  purchase_requests    tbl_purchase_request[]
 
   @@map("tbl_department")
 }
 
 model tbl_category {
-  pk_chr_category_id  String    @id @default(uuid())
+  pk_chr_category_id  String                 @id @default(uuid())
   chr_category_name   String
-  bln_is_active       Boolean   @default(true)
-  chr_document_status String    @default("D") @db.Char(1)
-  dt_deleted_at       DateTime? @db.Timestamp(3)
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  bln_is_active       Boolean                @default(true)
+  chr_document_status String                 @default("D") @db.Char(1)
+  dt_deleted_at       DateTime?
+  tim_created         DateTime               @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-
-  created_by  tbl_user? @relation("category_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user? @relation("category_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  items             tbl_item[]
-  purchase_requests tbl_purchase_request[]
-  quotations        tbl_quotation[]
+  created_by          tbl_user?              @relation("category_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?              @relation("category_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  items               tbl_item[]
+  purchase_requests   tbl_purchase_request[]
+  quotations          tbl_quotation[]
 
   @@index([bln_is_active])
   @@map("tbl_category")
 }
 
 model tbl_priority {
-  pk_chr_priority_id  String    @id @default(uuid())
-  chr_priority_name   String    @unique
-  chr_priority_code   String    @unique
+  pk_chr_priority_id  String                 @id @default(uuid())
+  chr_priority_name   String                 @unique
+  chr_priority_code   String                 @unique
   txt_description     String?
   int_level           Int
-  bln_is_active       Boolean   @default(true)
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  bln_is_active       Boolean                @default(true)
+  tim_created         DateTime               @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-  chr_document_status String    @default("N") @db.Char(1)
-
-  created_by  tbl_user? @relation("priority_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user? @relation("priority_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  purchase_requests tbl_purchase_request[]
-  sla_policies      tbl_sla_policy[]
+  chr_document_status String                 @default("N") @db.Char(1)
+  created_by          tbl_user?              @relation("priority_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?              @relation("priority_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  purchase_requests   tbl_purchase_request[]
+  sla_policies        tbl_sla_policy[]
 
   @@map("tbl_priority")
 }
 
 model tbl_request_status {
-  pk_chr_request_status_id String    @id @default(uuid())
-  chr_status_name          String    @unique
-  chr_status_code          String    @unique
+  pk_chr_request_status_id String                 @id @default(uuid())
+  chr_status_name          String                 @unique
+  chr_status_code          String                 @unique
   txt_description          String?
   int_order                Int
-  bln_is_active            Boolean   @default(true)
-  tim_created              DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified             DateTime? @db.Timestamp(3)
+  bln_is_active            Boolean                @default(true)
+  tim_created              DateTime               @default(now())
+  tim_modified             DateTime?
   fk_chr_created_id        String?
   fk_chr_modified_id       String?
-  chr_document_status      String    @default("N") @db.Char(1)
-
-  created_by  tbl_user? @relation("request_status_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user? @relation("request_status_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  purchase_requests         tbl_purchase_request[]  @relation("purchase_request_current_status")
-  request_histories_from    tbl_request_history[]   @relation("request_history_from_status")
-  request_histories_to      tbl_request_history[]   @relation("request_history_to_status")
+  chr_document_status      String                 @default("N") @db.Char(1)
+  purchase_requests        tbl_purchase_request[] @relation("purchase_request_current_status")
+  request_histories_from   tbl_request_history[]  @relation("request_history_from_status")
+  request_histories_to     tbl_request_history[]  @relation("request_history_to_status")
+  created_by               tbl_user?              @relation("request_status_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by              tbl_user?              @relation("request_status_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("tbl_request_status")
 }
 
 model tbl_request_phase {
-  pk_chr_request_phase_id String    @id @default(uuid())
-  chr_phase_name          String    @unique
-  chr_phase_code          String    @unique
+  pk_chr_request_phase_id String                          @id @default(uuid())
+  chr_phase_name          String                          @unique
+  chr_phase_code          String                          @unique
   txt_description         String?
   int_order               Int
-  bln_is_active           Boolean   @default(true)
-  tim_created             DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified            DateTime? @db.Timestamp(3)
+  bln_is_active           Boolean                         @default(true)
+  tim_created             DateTime                        @default(now())
+  tim_modified            DateTime?
   fk_chr_created_id       String?
   fk_chr_modified_id      String?
-  chr_document_status     String    @default("N") @db.Char(1)
-
-  created_by  tbl_user? @relation("request_phase_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user? @relation("request_phase_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  request_histories_from tbl_request_history[]          @relation("request_history_from_phase")
-  request_histories_to   tbl_request_history[]          @relation("request_history_to_phase")
-  attachment_masters     tbl_request_attachment_master[]
-  attachments            tbl_request_attachments[]
+  chr_document_status     String                          @default("N") @db.Char(1)
+  attachment_masters      tbl_request_attachment_master[]
+  attachments             tbl_request_attachments[]
+  request_histories_from  tbl_request_history[]           @relation("request_history_from_phase")
+  request_histories_to    tbl_request_history[]           @relation("request_history_to_phase")
+  created_by              tbl_user?                       @relation("request_phase_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by             tbl_user?                       @relation("request_phase_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([int_order])
   @@index([bln_is_active])
@@ -357,206 +330,187 @@ model tbl_request_phase {
 }
 
 model tbl_notification_type {
-  pk_chr_notification_type_id String    @id @default(uuid())
-  chr_type_name               String    @unique
-  chr_type_code               String    @unique
+  pk_chr_notification_type_id String             @id @default(uuid())
+  chr_type_name               String             @unique
+  chr_type_code               String             @unique
   txt_description             String?
-  bln_is_active               Boolean   @default(true)
-  tim_created                 DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified                DateTime? @db.Timestamp(3)
+  bln_is_active               Boolean            @default(true)
+  tim_created                 DateTime           @default(now())
+  tim_modified                DateTime?
   fk_chr_created_id           String?
   fk_chr_modified_id          String?
-  chr_document_status         String    @default("N") @db.Char(1)
-
-  created_by  tbl_user? @relation("notification_type_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user? @relation("notification_type_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  notifications tbl_notification[]
+  chr_document_status         String             @default("N") @db.Char(1)
+  notifications               tbl_notification[]
+  created_by                  tbl_user?          @relation("notification_type_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by                 tbl_user?          @relation("notification_type_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([bln_is_active])
   @@map("tbl_notification_type")
 }
 
 model tbl_approval_level {
-  pk_chr_approval_level_id String    @id @default(uuid())
-  chr_approval_level       String    @unique
+  pk_chr_approval_level_id String         @id @default(uuid())
+  chr_approval_level       String         @unique
   txt_description          String?
   int_order                Int
-  bln_is_active            Boolean   @default(true)
+  bln_is_active            Boolean        @default(true)
   flt_from_amount          Float
   flt_to_amount            Float
-  tim_created              DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified             DateTime? @db.Timestamp(3)
+  tim_created              DateTime       @default(now())
+  tim_modified             DateTime?
   fk_chr_created_id        String?
   fk_chr_modified_id       String?
-  chr_document_status      String    @default("N") @db.Char(1)
-
-  created_by  tbl_user? @relation("approval_level_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user? @relation("approval_level_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  approvals tbl_approval[]
+  chr_document_status      String         @default("N") @db.Char(1)
+  approvals                tbl_approval[]
+  created_by               tbl_user?      @relation("approval_level_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by              tbl_user?      @relation("approval_level_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([bln_is_active])
   @@map("tbl_approval_level")
 }
 
 model tbl_sla_policy {
-  pk_chr_sla_policy_id      String    @id @default(uuid())
-  chr_policy_name           String    @unique
-  chr_policy_code           String    @unique
-  txt_description           String?
-  fk_chr_priority_id        String
-  int_response_time_mins    Int
-  int_resolution_time_mins  Int
-  int_escalation_time_mins  Int
-  bln_is_active             Boolean   @default(true)
-  tim_created               DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified              DateTime? @db.Timestamp(3)
-  fk_chr_created_id         String?
-  fk_chr_modified_id        String?
-  chr_document_status       String    @default("N") @db.Char(1)
-
-  priority    tbl_priority @relation(fields: [fk_chr_priority_id], references: [pk_chr_priority_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by  tbl_user?    @relation("sla_policy_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?    @relation("sla_policy_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  pk_chr_sla_policy_id     String       @id @default(uuid())
+  chr_policy_name          String       @unique
+  chr_policy_code          String       @unique
+  txt_description          String?
+  fk_chr_priority_id       String
+  int_response_time_mins   Int
+  int_resolution_time_mins Int
+  int_escalation_time_mins Int
+  bln_is_active            Boolean      @default(true)
+  tim_created              DateTime     @default(now())
+  tim_modified             DateTime?
+  fk_chr_created_id        String?
+  fk_chr_modified_id       String?
+  chr_document_status      String       @default("N") @db.Char(1)
+  created_by               tbl_user?    @relation("sla_policy_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by              tbl_user?    @relation("sla_policy_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  priority                 tbl_priority @relation(fields: [fk_chr_priority_id], references: [pk_chr_priority_id])
 
   @@index([fk_chr_priority_id])
   @@index([bln_is_active])
   @@map("tbl_sla_policy")
 }
 
-// ============================================================
-// PHASE 3: Vendor and Item Tables
-// ============================================================
-
 model tbl_vendor {
-  pk_chr_vendor_id    String    @id @default(uuid())
+  pk_chr_vendor_id    String                       @id @default(uuid())
   chr_vendor_name     String
-  chr_vendor_email    String    @unique
+  chr_vendor_email    String                       @unique
   chr_vendor_phone    String
   fk_chr_country_id   String?
   fk_chr_city_id      String?
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  tim_created         DateTime                     @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-  chr_document_status String    @default("D") @db.Char(1)
-
-  country     tbl_country? @relation(fields: [fk_chr_country_id], references: [pk_chr_country_id], onDelete: SetNull, onUpdate: Cascade)
-  city        tbl_city?    @relation(fields: [fk_chr_city_id], references: [pk_chr_city_id], onDelete: SetNull, onUpdate: Cascade)
-  created_by  tbl_user?    @relation("vendor_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?    @relation("vendor_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  vendor_items       tbl_vendor_items[]
-  contracts          tbl_contract[]
-  eois               tbl_expression_of_interest[]
-  quotations         tbl_quotation[]
-  purchase_orders    tbl_purchase_order[]
-  goods_receipts     tbl_goods_receipt[]
-  invoices           tbl_invoice[]
-  chat_room_members  tbl_chat_room_member[]
+  fk_chr_company_id   String?
+  chr_document_status String                       @default("D") @db.Char(1)
+  chat_room_members   tbl_chat_room_member[]
+  contracts           tbl_contract[]
+  eois                tbl_expression_of_interest[]
+  goods_receipts      tbl_goods_receipt[]
+  invoices            tbl_invoice[]
+  purchase_orders     tbl_purchase_order[]
+  quotations          tbl_quotation[]
+  city                tbl_city?                    @relation(fields: [fk_chr_city_id], references: [pk_chr_city_id])
+  country             tbl_country?                 @relation(fields: [fk_chr_country_id], references: [pk_chr_country_id])
+  created_by          tbl_user?                    @relation("vendor_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?                    @relation("vendor_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  vendor_items        tbl_vendor_items[]
   shipments          tbl_shipment[]
+  company             tbl_company?                 @relation("vendor_company", fields: [fk_chr_company_id], references: [pk_chr_company_id])
 
   @@map("tbl_vendor")
 }
 
 model tbl_item {
-  pk_chr_item_id      String    @id @default(uuid())
+  pk_chr_item_id      String                              @id @default(uuid())
   chr_item_name       String
-  chr_item_code       String    @unique
+  chr_item_code       String                              @unique
   txt_description     String?
   fk_chr_category_id  String
   chr_unit            String?
   chr_documents       String?
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  tim_created         DateTime                            @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-  chr_document_status String    @default("D") @db.Char(1)
-
-  category    tbl_category @relation(fields: [fk_chr_category_id], references: [pk_chr_category_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by  tbl_user?    @relation("item_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?    @relation("item_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
+  chr_document_status String                              @default("D") @db.Char(1)
+  goods_receipt_items tbl_goods_receipt_item[]
+  category            tbl_category                        @relation(fields: [fk_chr_category_id], references: [pk_chr_category_id])
+  created_by          tbl_user?                           @relation("item_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?                           @relation("item_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   pr_item_mappings    tbl_purchase_request_item_mapping[]
   quotation_items     tbl_quotation_item[]
-  goods_receipt_items tbl_goods_receipt_item[]
-  rfq_item_mappings tbl_rfq_item_mapping[]
+  rfq_item_mappings   tbl_rfq_item_mapping[]
 
   @@index([fk_chr_category_id])
   @@map("tbl_item")
 }
 
 model tbl_vendor_items {
-  pk_chr_vendor_item_id String    @id @default(uuid())
+  pk_chr_vendor_item_id String               @id @default(uuid())
   fk_chr_vendor_id      String
   chr_item_name         String
   chr_item_code         String
   txt_description       String?
   chr_unit              String?
   flt_unit_price        Float?
-  chr_currency          String    @default("USD")
-  bln_is_active         Boolean   @default(true)
+  chr_currency          String               @default("USD")
+  bln_is_active         Boolean              @default(true)
   chr_documents         String?
-  tim_created           DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified          DateTime? @db.Timestamp(3)
+  tim_created           DateTime             @default(now())
+  tim_modified          DateTime?
   fk_chr_created_id     String?
   fk_chr_modified_id    String?
-  chr_document_status   String    @default("N") @db.Char(1)
-
-  vendor      tbl_vendor @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Cascade, onUpdate: Cascade)
-  created_by  tbl_user?  @relation("vendor_items_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?  @relation("vendor_items_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  quotation_items tbl_quotation_item[]
+  chr_document_status   String               @default("N") @db.Char(1)
+  quotation_items       tbl_quotation_item[]
+  created_by            tbl_user?            @relation("vendor_items_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by           tbl_user?            @relation("vendor_items_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  vendor                tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Cascade)
 
   @@index([fk_chr_vendor_id])
   @@index([bln_is_active])
   @@map("tbl_vendor_items")
 }
 
-// ============================================================
-// PHASE 4: Purchase Request and Approval Tables
-// ============================================================
-
 model tbl_purchase_request {
-  pk_chr_request_id         String    @id @default(uuid())
-  chr_request_number        String    @unique
-  chr_title                 String
-  txt_description           String?
-  fk_chr_current_status_id  String
-  fk_chr_priority_id        String
-  flt_estimated_value       Float?
-  chr_currency              String    @default("USD")
-  fk_chr_requested_by_id    String
-  fk_chr_department_id      String?
-  fk_chr_category_id        String?
-  tim_created               DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified              DateTime? @db.Timestamp(3)
-  fk_chr_created_id         String?
-  fk_chr_modified_id        String?
-  chr_document_status       String    @default("D") @db.Char(1)
-
-  current_status tbl_request_status @relation("purchase_request_current_status", fields: [fk_chr_current_status_id], references: [pk_chr_request_status_id], onDelete: Restrict, onUpdate: Cascade)
-  priority       tbl_priority       @relation(fields: [fk_chr_priority_id], references: [pk_chr_priority_id], onDelete: Restrict, onUpdate: Cascade)
-  requested_by   tbl_user           @relation("purchase_request_requested_by", fields: [fk_chr_requested_by_id], references: [pk_chr_user_id], onDelete: Restrict, onUpdate: Cascade)
-  department     tbl_department?    @relation(fields: [fk_chr_department_id], references: [pk_chr_department_id], onDelete: SetNull, onUpdate: Cascade)
-  category       tbl_category?      @relation(fields: [fk_chr_category_id], references: [pk_chr_category_id], onDelete: SetNull, onUpdate: Cascade)
-  created_by     tbl_user?          @relation("purchase_request_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by    tbl_user?          @relation("purchase_request_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  approvals          tbl_approval[]
-  request_histories  tbl_request_history[]
-  attachments        tbl_request_attachments[]
-  pr_item_mappings   tbl_purchase_request_item_mapping[]
-  contracts          tbl_contract[]
-  eois               tbl_expression_of_interest[]
-  rfqs               tbl_request_for_quotation[]
-  purchase_orders    tbl_purchase_order[]
-  goods_receipts     tbl_goods_receipt[]
-  invoices           tbl_invoice[]
-  chat_rooms         tbl_chat_room[]
-  notifications      tbl_notification[]
+  pk_chr_request_id        String                              @id @default(uuid())
+  chr_request_number       String                              @unique
+  chr_title                String
+  txt_description          String?
+  fk_chr_current_status_id String
+  fk_chr_priority_id       String
+  flt_estimated_value      Float?
+  chr_currency             String                              @default("USD")
+  fk_chr_requested_by_id   String
+  fk_chr_department_id     String?
+  fk_chr_category_id       String?
+  tim_created              DateTime                            @default(now())
+  tim_modified             DateTime?
+  fk_chr_created_id        String?
+  fk_chr_modified_id       String?
+  chr_document_status      String                              @default("D") @db.Char(1)
+  approvals                tbl_approval[]
+  chat_rooms               tbl_chat_room[]
+  contracts                tbl_contract[]
+  eois                     tbl_expression_of_interest[]
+  goods_receipts           tbl_goods_receipt[]
+  invoices                 tbl_invoice[]
+  notifications            tbl_notification[]
+  purchase_orders          tbl_purchase_order[]
+  category                 tbl_category?                       @relation(fields: [fk_chr_category_id], references: [pk_chr_category_id])
+  created_by               tbl_user?                           @relation("purchase_request_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  current_status           tbl_request_status                  @relation("purchase_request_current_status", fields: [fk_chr_current_status_id], references: [pk_chr_request_status_id])
+  department               tbl_department?                     @relation(fields: [fk_chr_department_id], references: [pk_chr_department_id])
+  modified_by              tbl_user?                           @relation("purchase_request_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  priority                 tbl_priority                        @relation(fields: [fk_chr_priority_id], references: [pk_chr_priority_id])
+  requested_by             tbl_user                            @relation("purchase_request_requested_by", fields: [fk_chr_requested_by_id], references: [pk_chr_user_id])
+  pr_item_mappings         tbl_purchase_request_item_mapping[]
+  attachments              tbl_request_attachments[]
+  rfqs                     tbl_request_for_quotation[]
+  request_histories        tbl_request_history[]
 
   @@index([fk_chr_current_status_id])
   @@index([fk_chr_requested_by_id])
@@ -566,24 +520,23 @@ model tbl_purchase_request {
 }
 
 model tbl_approval {
-  pk_chr_approval_id      String    @id @default(uuid())
-  fk_chr_request_id       String
-  fk_chr_approver_id      String
+  pk_chr_approval_id       String               @id @default(uuid())
+  fk_chr_request_id        String
+  fk_chr_approver_id       String
   fk_chr_approval_level_id String
-  chr_status              String    @default("PENDING")
-  txt_comment             String?
-  tim_actioned_at         DateTime? @db.Timestamp(3)
-  tim_created             DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified            DateTime? @db.Timestamp(3)
-  fk_chr_created_id       String?
-  fk_chr_modified_id      String?
-  chr_document_status     String    @default("D") @db.Char(1)
-
-  request        tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade, onUpdate: Cascade)
-  approver       tbl_user             @relation("approval_approver", fields: [fk_chr_approver_id], references: [pk_chr_user_id], onDelete: Restrict, onUpdate: Cascade)
-  approval_level tbl_approval_level   @relation(fields: [fk_chr_approval_level_id], references: [pk_chr_approval_level_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by     tbl_user?            @relation("approval_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by    tbl_user?            @relation("approval_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  chr_status               String               @default("PENDING")
+  txt_comment              String?
+  tim_actioned_at          DateTime?
+  tim_created              DateTime             @default(now())
+  tim_modified             DateTime?
+  fk_chr_created_id        String?
+  fk_chr_modified_id       String?
+  chr_document_status      String               @default("D") @db.Char(1)
+  approval_level           tbl_approval_level   @relation(fields: [fk_chr_approval_level_id], references: [pk_chr_approval_level_id])
+  approver                 tbl_user             @relation("approval_approver", fields: [fk_chr_approver_id], references: [pk_chr_user_id])
+  created_by               tbl_user?            @relation("approval_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by              tbl_user?            @relation("approval_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  request                  tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
 
   @@index([fk_chr_request_id])
   @@index([fk_chr_approver_id])
@@ -593,7 +546,7 @@ model tbl_approval {
 }
 
 model tbl_request_history {
-  pk_chr_status_history_id String    @id @default(uuid())
+  pk_chr_status_history_id String               @id @default(uuid())
   fk_chr_request_id        String
   fk_chr_from_status_id    String?
   fk_chr_to_status_id      String
@@ -602,14 +555,13 @@ model tbl_request_history {
   fk_chr_changed_by_id     String
   txt_comment              String?
   json_metadata            Json?
-  tim_created              DateTime  @default(now()) @db.Timestamp(3)
-
-  request      tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade, onUpdate: Cascade)
-  changed_by   tbl_user             @relation("request_history_changed_by", fields: [fk_chr_changed_by_id], references: [pk_chr_user_id], onDelete: Restrict, onUpdate: Cascade)
-  from_status  tbl_request_status?  @relation("request_history_from_status", fields: [fk_chr_from_status_id], references: [pk_chr_request_status_id], onDelete: SetNull, onUpdate: Cascade)
-  to_status    tbl_request_status   @relation("request_history_to_status", fields: [fk_chr_to_status_id], references: [pk_chr_request_status_id], onDelete: Restrict, onUpdate: Cascade)
-  from_phase   tbl_request_phase?   @relation("request_history_from_phase", fields: [fk_chr_from_phase_id], references: [pk_chr_request_phase_id], onDelete: SetNull, onUpdate: Cascade)
-  to_phase     tbl_request_phase    @relation("request_history_to_phase", fields: [fk_chr_to_phase_id], references: [pk_chr_request_phase_id], onDelete: Restrict, onUpdate: Cascade)
+  tim_created              DateTime             @default(now())
+  changed_by               tbl_user             @relation("request_history_changed_by", fields: [fk_chr_changed_by_id], references: [pk_chr_user_id])
+  from_phase               tbl_request_phase?   @relation("request_history_from_phase", fields: [fk_chr_from_phase_id], references: [pk_chr_request_phase_id])
+  from_status              tbl_request_status?  @relation("request_history_from_status", fields: [fk_chr_from_status_id], references: [pk_chr_request_status_id])
+  request                  tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
+  to_phase                 tbl_request_phase    @relation("request_history_to_phase", fields: [fk_chr_to_phase_id], references: [pk_chr_request_phase_id])
+  to_status                tbl_request_status   @relation("request_history_to_status", fields: [fk_chr_to_status_id], references: [pk_chr_request_status_id])
 
   @@index([fk_chr_request_id])
   @@index([tim_created])
@@ -617,24 +569,22 @@ model tbl_request_history {
 }
 
 model tbl_request_attachment_master {
-  pk_chr_attchment_master_id String    @id @default(uuid())
+  pk_chr_attchment_master_id String                    @id @default(uuid())
   chr_entity_type            String
   fk_chr_entity_id           String
   chr_folder_path            String
   fk_chr_phase_id            String?
   fk_chr_uploaded_by_id      String
-  tim_created                DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified               DateTime? @db.Timestamp(3)
+  tim_created                DateTime                  @default(now())
+  tim_modified               DateTime?
   fk_chr_created_id          String?
   fk_chr_modified_id         String?
-  chr_document_status        String    @default("D") @db.Char(1)
-
-  phase       tbl_request_phase?   @relation(fields: [fk_chr_phase_id], references: [pk_chr_request_phase_id], onDelete: SetNull, onUpdate: Cascade)
-  uploaded_by tbl_user             @relation("attachment_master_uploaded_by", fields: [fk_chr_uploaded_by_id], references: [pk_chr_user_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by  tbl_user?            @relation("attachment_master_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?            @relation("attachment_master_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  attachments tbl_request_attachments[]
+  chr_document_status        String                    @default("D") @db.Char(1)
+  created_by                 tbl_user?                 @relation("attachment_master_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by                tbl_user?                 @relation("attachment_master_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  phase                      tbl_request_phase?        @relation(fields: [fk_chr_phase_id], references: [pk_chr_request_phase_id])
+  uploaded_by                tbl_user                  @relation("attachment_master_uploaded_by", fields: [fk_chr_uploaded_by_id], references: [pk_chr_user_id])
+  attachments                tbl_request_attachments[]
 
   @@index([fk_chr_entity_id])
   @@index([chr_entity_type])
@@ -644,7 +594,7 @@ model tbl_request_attachment_master {
 }
 
 model tbl_request_attachments {
-  pk_chr_request_attchment_id String    @id @default(uuid())
+  pk_chr_request_attchment_id String                        @id @default(uuid())
   fk_chr_attchment_master_id  String
   fk_chr_request_id           String
   chr_file_name               String
@@ -653,18 +603,17 @@ model tbl_request_attachments {
   int_file_size               Int?
   fk_chr_uploaded_by_id       String
   fk_chr_phase_id             String?
-  tim_created                 DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified                DateTime? @db.Timestamp(3)
+  tim_created                 DateTime                      @default(now())
+  tim_modified                DateTime?
   fk_chr_created_id           String?
   fk_chr_modified_id          String?
-  chr_document_status         String    @default("D") @db.Char(1)
-
-  attachment_master tbl_request_attachment_master @relation(fields: [fk_chr_attchment_master_id], references: [pk_chr_attchment_master_id], onDelete: Cascade, onUpdate: Cascade)
-  request           tbl_purchase_request          @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade, onUpdate: Cascade)
-  uploaded_by       tbl_user                      @relation("attachments_uploaded_by", fields: [fk_chr_uploaded_by_id], references: [pk_chr_user_id], onDelete: Restrict, onUpdate: Cascade)
-  phase             tbl_request_phase?            @relation(fields: [fk_chr_phase_id], references: [pk_chr_request_phase_id], onDelete: SetNull, onUpdate: Cascade)
-  created_by        tbl_user?                     @relation("attachments_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by       tbl_user?                     @relation("attachments_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  chr_document_status         String                        @default("D") @db.Char(1)
+  attachment_master           tbl_request_attachment_master @relation(fields: [fk_chr_attchment_master_id], references: [pk_chr_attchment_master_id], onDelete: Cascade)
+  created_by                  tbl_user?                     @relation("attachments_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by                 tbl_user?                     @relation("attachments_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  phase                       tbl_request_phase?            @relation(fields: [fk_chr_phase_id], references: [pk_chr_request_phase_id])
+  request                     tbl_purchase_request          @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
+  uploaded_by                 tbl_user                      @relation("attachments_uploaded_by", fields: [fk_chr_uploaded_by_id], references: [pk_chr_user_id])
 
   @@index([fk_chr_attchment_master_id])
   @@index([fk_chr_request_id])
@@ -675,7 +624,7 @@ model tbl_request_attachments {
 }
 
 model tbl_purchase_request_item_mapping {
-  pk_chr_pr_item_mapping_id String    @id @default(uuid())
+  pk_chr_pr_item_mapping_id String               @id @default(uuid())
   fk_chr_request_id         String
   fk_chr_item_id            String
   chr_item_description      String
@@ -683,46 +632,40 @@ model tbl_purchase_request_item_mapping {
   chr_unit_of_measure       String?
   flt_estimated_unit_price  Float?
   flt_total_price           Float?
-  tim_created               DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified              DateTime? @db.Timestamp(3)
+  tim_created               DateTime             @default(now())
+  tim_modified              DateTime?
   fk_chr_created_id         String?
   fk_chr_modified_id        String?
-  chr_document_status       String    @default("D") @db.Char(1)
-
-  request     tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade, onUpdate: Cascade)
-  item        tbl_item             @relation(fields: [fk_chr_item_id], references: [pk_chr_item_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by  tbl_user?            @relation("pr_item_mapping_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?            @relation("pr_item_mapping_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  chr_document_status       String               @default("D") @db.Char(1)
+  created_by                tbl_user?            @relation("pr_item_mapping_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  item                      tbl_item             @relation(fields: [fk_chr_item_id], references: [pk_chr_item_id])
+  modified_by               tbl_user?            @relation("pr_item_mapping_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  request                   tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
 
   @@index([fk_chr_request_id])
   @@index([fk_chr_item_id])
   @@map("tbl_purchase_request_item_mapping")
 }
 
-// ============================================================
-// PHASE 5: Contract, EOI, RFQ, and Quotation Tables
-// ============================================================
-
 model tbl_contract {
-  pk_chr_contract_id  String    @id @default(uuid())
+  pk_chr_contract_id  String                @id @default(uuid())
   chr_title           String
   txt_description     String?
-  chr_status          String    @default("DRAFT")
-  dt_start_date       DateTime  @db.Timestamp(3)
-  dt_end_date         DateTime  @db.Timestamp(3)
+  chr_status          String                @default("DRAFT")
+  dt_start_date       DateTime
+  dt_end_date         DateTime
   flt_value           Float
   fk_chr_vendor_id    String
   fk_chr_request_id   String?
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  tim_created         DateTime              @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-  chr_document_status String    @default("D") @db.Char(1)
-
-  vendor      tbl_vendor            @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Restrict, onUpdate: Cascade)
-  request     tbl_purchase_request? @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: SetNull, onUpdate: Cascade)
-  created_by  tbl_user?             @relation("contract_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?             @relation("contract_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  chr_document_status String                @default("D") @db.Char(1)
+  created_by          tbl_user?             @relation("contract_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?             @relation("contract_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  request             tbl_purchase_request? @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id])
+  vendor              tbl_vendor            @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
 
   @@index([fk_chr_vendor_id])
   @@index([fk_chr_request_id])
@@ -731,27 +674,25 @@ model tbl_contract {
 }
 
 model tbl_expression_of_interest {
-  pk_chr_eoi_id           String    @id @default(uuid())
-  chr_eoi_code            String    @unique
-  chr_eoi_title           String
-  fk_chr_request_id       String
-  fk_chr_vendor_id        String
-  chr_status              String    @default("DRAFT")
-  txt_notes               String?
-  dt_submission_deadline  DateTime  @db.Timestamp(3)
-  dt_submitted_at         DateTime? @db.Timestamp(3)
-  tim_created             DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified            DateTime? @db.Timestamp(3)
-  fk_chr_created_id       String?
-  fk_chr_modified_id      String?
-  chr_document_status     String    @default("D") @db.Char(1)
-
-  request     tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade, onUpdate: Cascade)
-  vendor      tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by  tbl_user?            @relation("eoi_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?            @relation("eoi_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  rfqs tbl_request_for_quotation[]
+  pk_chr_eoi_id          String                      @id @default(uuid())
+  chr_eoi_code           String                      @unique
+  chr_eoi_title          String
+  fk_chr_request_id      String
+  fk_chr_vendor_id       String
+  chr_status             String                      @default("DRAFT")
+  txt_notes              String?
+  dt_submission_deadline DateTime
+  dt_submitted_at        DateTime?
+  tim_created            DateTime                    @default(now())
+  tim_modified           DateTime?
+  fk_chr_created_id      String?
+  fk_chr_modified_id     String?
+  chr_document_status    String                      @default("D") @db.Char(1)
+  created_by             tbl_user?                   @relation("eoi_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by            tbl_user?                   @relation("eoi_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  request                tbl_purchase_request        @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
+  vendor                 tbl_vendor                  @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
+  rfqs                   tbl_request_for_quotation[]
 
   @@index([fk_chr_request_id])
   @@index([fk_chr_vendor_id])
@@ -761,29 +702,28 @@ model tbl_expression_of_interest {
 }
 
 model tbl_request_for_quotation {
-  pk_chr_rfq_id           String    @id @default(uuid())
-  chr_rfq_code            String    @unique
-  chr_rfq_title           String
-  fk_chr_request_id       String
-  fk_chr_eoi_id           String?
-  chr_status              String    @default("DRAFT")
-  dt_issue_date           DateTime  @db.Timestamp(3)
-  dt_due_date             DateTime  @db.Timestamp(3)
-  dt_submission_deadline  DateTime  @db.Timestamp(3)
-  txt_notes               String?
-  tim_created             DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified            DateTime? @db.Timestamp(3)
-  fk_chr_created_id       String?
-  fk_chr_modified_id      String?
-  chr_document_status     String    @default("N") @db.Char(1)
-
-  request     tbl_purchase_request        @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade, onUpdate: Cascade)
-  eoi         tbl_expression_of_interest? @relation(fields: [fk_chr_eoi_id], references: [pk_chr_eoi_id], onDelete: SetNull, onUpdate: Cascade)
-  created_by  tbl_user?                   @relation("rfq_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?                   @relation("rfq_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  quotations tbl_quotation[]
-  rfq_item_mappings tbl_rfq_item_mapping[]
+  pk_chr_rfq_id          String                      @id @default(uuid())
+  chr_rfq_code           String                      @unique
+  chr_rfq_title          String
+  fk_chr_request_id      String
+  fk_chr_eoi_id          String?
+  chr_status             String                      @default("DRAFT")
+  dt_issue_date          DateTime
+  dt_due_date            DateTime
+  dt_submission_deadline DateTime
+  txt_notes              String?
+  tim_created            DateTime                    @default(now())
+  tim_modified           DateTime?
+  fk_chr_created_id      String?
+  fk_chr_modified_id     String?
+  txt_rendered_html      String?
+  chr_document_status    String                      @default("N") @db.Char(1)
+  quotations             tbl_quotation[]
+  created_by             tbl_user?                   @relation("rfq_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  eoi                    tbl_expression_of_interest? @relation(fields: [fk_chr_eoi_id], references: [pk_chr_eoi_id])
+  modified_by            tbl_user?                   @relation("rfq_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  request                tbl_purchase_request        @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
+  rfq_item_mappings      tbl_rfq_item_mapping[]
 
   @@index([fk_chr_request_id])
   @@index([fk_chr_eoi_id])
@@ -794,7 +734,7 @@ model tbl_request_for_quotation {
 }
 
 model tbl_rfq_item_mapping {
-  pk_chr_rfq_item_mapping_id String    @id @default(uuid())
+  pk_chr_rfq_item_mapping_id String                    @id @default(uuid())
   fk_chr_rfq_id              String
   fk_chr_item_id             String
   chr_item_description       String
@@ -803,17 +743,15 @@ model tbl_rfq_item_mapping {
   flt_estimated_unit_price   Float?
   flt_total_price            Float?
   txt_notes                  String?
-  tim_created                DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified               DateTime? @db.Timestamp(3)
+  tim_created                DateTime                  @default(now())
+  tim_modified               DateTime?
   fk_chr_created_id          String?
   fk_chr_modified_id         String?
-  chr_document_status        String    @default("D") @db.Char(1)
-
-  /// Relations
-  rfq         tbl_request_for_quotation @relation(fields: [fk_chr_rfq_id], references: [pk_chr_rfq_id], onDelete: Cascade, onUpdate: Cascade)
-  item        tbl_item                  @relation(fields: [fk_chr_item_id], references: [pk_chr_item_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by  tbl_user?                 @relation("rfq_item_mapping_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?                 @relation("rfq_item_mapping_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  chr_document_status        String                    @default("D") @db.Char(1)
+  created_by                 tbl_user?                 @relation("rfq_item_mapping_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  item                       tbl_item                  @relation(fields: [fk_chr_item_id], references: [pk_chr_item_id])
+  modified_by                tbl_user?                 @relation("rfq_item_mapping_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  rfq                        tbl_request_for_quotation @relation(fields: [fk_chr_rfq_id], references: [pk_chr_rfq_id], onDelete: Cascade)
 
   @@unique([fk_chr_rfq_id, fk_chr_item_id])
   @@index([fk_chr_rfq_id])
@@ -822,34 +760,33 @@ model tbl_rfq_item_mapping {
 }
 
 model tbl_quotation {
-  pk_chr_quotation_id String    @id @default(uuid())
+  pk_chr_quotation_id String                    @id @default(uuid())
   fk_chr_vendor_id    String
   fk_chr_rfq_id       String
   fk_chr_category_id  String?
   fk_chr_buyer_id     String?
-  chr_buyer_details     String?
-  chr_seller_details     String?
-  chr_status          String    @default("DRAFT")
+  chr_status          String                    @default("DRAFT")
   flt_total_amount    Float?
-  chr_currency        String    @default("USD")
-  dt_issue_date       DateTime  @db.Timestamp(3)
-  dt_due_date         DateTime  @db.Timestamp(3)
+  chr_currency        String                    @default("USD")
+  dt_issue_date       DateTime
+  dt_due_date         DateTime
   txt_notes           String?
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  tim_created         DateTime                  @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-  chr_document_status String    @default("D") @db.Char(1)
-
-  vendor      tbl_vendor                 @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Cascade, onUpdate: Cascade)
-  rfq         tbl_request_for_quotation  @relation(fields: [fk_chr_rfq_id], references: [pk_chr_rfq_id], onDelete: Cascade, onUpdate: Cascade)
-  category    tbl_category?              @relation(fields: [fk_chr_category_id], references: [pk_chr_category_id], onDelete: SetNull, onUpdate: Cascade)
-  buyer       tbl_user?                  @relation("quotation_buyer", fields: [fk_chr_buyer_id], references: [pk_chr_user_id], onDelete: SetNull, onUpdate: Cascade)
-  created_by  tbl_user?                  @relation("quotation_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?                  @relation("quotation_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  quotation_items tbl_quotation_item[]
-  purchase_orders tbl_purchase_order[]
+  chr_document_status String                    @default("D") @db.Char(1)
+  chr_buyer_details   String?
+  chr_seller_details  String?
+  txt_rendered_html   String?
+  purchase_orders     tbl_purchase_order[]
+  buyer               tbl_user?                 @relation("quotation_buyer", fields: [fk_chr_buyer_id], references: [pk_chr_user_id])
+  category            tbl_category?             @relation(fields: [fk_chr_category_id], references: [pk_chr_category_id])
+  created_by          tbl_user?                 @relation("quotation_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?                 @relation("quotation_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  rfq                 tbl_request_for_quotation @relation(fields: [fk_chr_rfq_id], references: [pk_chr_rfq_id], onDelete: Cascade)
+  vendor              tbl_vendor                @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Cascade)
+  quotation_items     tbl_quotation_item[]
 
   @@index([fk_chr_vendor_id])
   @@index([fk_chr_rfq_id])
@@ -861,7 +798,7 @@ model tbl_quotation {
 }
 
 model tbl_quotation_item {
-  pk_chr_quotation_item_id String    @id @default(uuid())
+  pk_chr_quotation_item_id String            @id @default(uuid())
   fk_chr_quotation_id      String
   fk_chr_item_id           String
   fk_chr_vendor_item_id    String?
@@ -869,23 +806,23 @@ model tbl_quotation_item {
   int_quantity             Int
   chr_unit_of_measure      String?
   flt_unit_price           Float
-  flt_tax_percentage       Float     @default(0)
-  flt_tax_amount           Float     @default(0)
+  flt_tax_percentage       Float             @default(0)
+  flt_tax_amount           Float             @default(0)
   flt_total_price          Float
-  chr_currency             String    @default("USD")
-  dt_delivery_lead_time    DateTime? @db.Timestamp(3)
+  chr_currency             String            @default("USD")
+  dt_delivery_lead_time    DateTime?
   txt_notes                String?
-  tim_created              DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified             DateTime? @db.Timestamp(3)
+  tim_created              DateTime          @default(now())
+  tim_modified             DateTime?
   fk_chr_created_id        String?
   fk_chr_modified_id       String?
-  chr_document_status      String    @default("D") @db.Char(1)
-
-  quotation    tbl_quotation     @relation(fields: [fk_chr_quotation_id], references: [pk_chr_quotation_id], onDelete: Cascade, onUpdate: Cascade)
-  item         tbl_item          @relation(fields: [fk_chr_item_id], references: [pk_chr_item_id], onDelete: Restrict, onUpdate: Cascade)
-  vendor_item  tbl_vendor_items? @relation(fields: [fk_chr_vendor_item_id], references: [pk_chr_vendor_item_id], onDelete: SetNull, onUpdate: Cascade)
-  created_by   tbl_user?         @relation("quotation_item_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by  tbl_user?         @relation("quotation_item_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  txt_rendered_html        String?
+  chr_document_status      String            @default("D") @db.Char(1)
+  created_by               tbl_user?         @relation("quotation_item_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  item                     tbl_item          @relation(fields: [fk_chr_item_id], references: [pk_chr_item_id])
+  modified_by              tbl_user?         @relation("quotation_item_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  quotation                tbl_quotation     @relation(fields: [fk_chr_quotation_id], references: [pk_chr_quotation_id], onDelete: Cascade)
+  vendor_item              tbl_vendor_items? @relation(fields: [fk_chr_vendor_item_id], references: [pk_chr_vendor_item_id])
 
   @@index([fk_chr_quotation_id])
   @@index([fk_chr_item_id])
@@ -898,29 +835,29 @@ model tbl_quotation_item {
 // ========================================================================================
 
 model tbl_purchase_order {
-  pk_chr_purchase_order_id String    @id @default(uuid())
+  pk_chr_purchase_order_id String               @id @default(uuid())
   fk_chr_request_id        String
-  chr_po_number            String    @unique
+  chr_po_number            String               @unique
   fk_chr_vendor_id         String
-  fk_chr_quotation_id      String
   flt_total_value          Float
-  chr_currency             String    @default("USD")
-  dt_issued_at             DateTime? @db.Timestamp(3)
+  chr_currency             String               @default("USD")
+  dt_issued_at             DateTime?
   chr_delivery_address     String?
-  dt_expected_delivery     DateTime? @db.Timestamp(3)
-  tim_created              DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified             DateTime? @db.Timestamp(3)
+  dt_expected_delivery     DateTime?
+  tim_created              DateTime             @default(now())
+  tim_modified             DateTime?
   fk_chr_created_id        String?
   fk_chr_modified_id       String?
-  chr_document_status      String    @default("D") @db.Char(1)
-
-  request     tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade, onUpdate: Cascade)
-  vendor      tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by  tbl_user?            @relation("purchase_order_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?            @relation("purchase_order_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  quotation tbl_quotation @relation(fields: [fk_chr_quotation_id], references: [pk_chr_quotation_id], onDelete: Restrict, onUpdate: Cascade)
-  goods_receipts tbl_goods_receipt[]
-  invoices       tbl_invoice[]
+  chr_document_status      String               @default("D") @db.Char(1)
+  fk_chr_quotation_id      String
+  txt_rendered_html        String?
+  goods_receipts           tbl_goods_receipt[]
+  invoices                 tbl_invoice[]
+  created_by               tbl_user?            @relation("purchase_order_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by              tbl_user?            @relation("purchase_order_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  quotation                tbl_quotation        @relation(fields: [fk_chr_quotation_id], references: [pk_chr_quotation_id])
+  request                  tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
+  vendor                   tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
 
   @@index([fk_chr_request_id])
   @@index([fk_chr_vendor_id])
@@ -958,30 +895,29 @@ model tbl_shipment_tracking {
 }
 
 model tbl_goods_receipt {
-  pk_chr_goods_receipt_id  String    @id @default(uuid())
-  chr_grn_code             String    @unique
+  pk_chr_goods_receipt_id  String                   @id @default(uuid())
+  chr_grn_code             String                   @unique
   fk_chr_purchase_order_id String
   fk_chr_request_id        String
   fk_chr_vendor_id         String
-  chr_status               String    @default("PENDING")
-  dt_received_at           DateTime  @db.Timestamp(3)
+  chr_status               String                   @default("PENDING")
+  dt_received_at           DateTime
   chr_delivery_note_no     String?
   txt_notes                String?
-  tim_created              DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified             DateTime? @db.Timestamp(3)
+  tim_created              DateTime                 @default(now())
+  tim_modified             DateTime?
   fk_chr_created_id        String?
   fk_chr_modified_id       String?
-  chr_document_status      String    @default("D") @db.Char(1)
-
-  purchase_order tbl_purchase_order   @relation(fields: [fk_chr_purchase_order_id], references: [pk_chr_purchase_order_id], onDelete: Restrict, onUpdate: Cascade)
-  request        tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Restrict, onUpdate: Cascade)
-  vendor         tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by     tbl_user?            @relation("goods_receipt_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by    tbl_user?            @relation("goods_receipt_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  goods_receipt_items tbl_goods_receipt_item[]
-  invoices            tbl_invoice[]
-  shipments           tbl_shipment[]
+  txt_rendered_html        String?
+  chr_document_status      String                   @default("D") @db.Char(1)
+  created_by               tbl_user?                @relation("goods_receipt_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by              tbl_user?                @relation("goods_receipt_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  purchase_order           tbl_purchase_order       @relation(fields: [fk_chr_purchase_order_id], references: [pk_chr_purchase_order_id])
+  request                  tbl_purchase_request     @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id])
+  vendor                   tbl_vendor               @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
+  goods_receipt_items      tbl_goods_receipt_item[]
+  invoices                 tbl_invoice[]
+  shipments                tbl_shipment[]
 
   @@index([fk_chr_purchase_order_id])
   @@index([fk_chr_request_id])
@@ -992,24 +928,23 @@ model tbl_goods_receipt {
 }
 
 model tbl_goods_receipt_item {
-  pk_chr_gri_id           String    @id @default(uuid())
+  pk_chr_gri_id           String            @id @default(uuid())
   fk_chr_goods_receipt_id String
   fk_chr_item_id          String
   int_quantity_ordered    Int
   int_quantity_received   Int
-  int_quantity_rejected   Int       @default(0)
+  int_quantity_rejected   Int               @default(0)
   chr_unit_of_measure     String?
   txt_rejection_reason    String?
-  tim_created             DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified            DateTime? @db.Timestamp(3)
+  tim_created             DateTime          @default(now())
+  tim_modified            DateTime?
   fk_chr_created_id       String?
   fk_chr_modified_id      String?
-  chr_document_status     String    @default("D") @db.Char(1)
-
-  goods_receipt tbl_goods_receipt @relation(fields: [fk_chr_goods_receipt_id], references: [pk_chr_goods_receipt_id], onDelete: Cascade, onUpdate: Cascade)
-  item          tbl_item          @relation(fields: [fk_chr_item_id], references: [pk_chr_item_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by    tbl_user?         @relation("goods_receipt_item_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by   tbl_user?         @relation("goods_receipt_item_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  chr_document_status     String            @default("D") @db.Char(1)
+  created_by              tbl_user?         @relation("goods_receipt_item_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  goods_receipt           tbl_goods_receipt @relation(fields: [fk_chr_goods_receipt_id], references: [pk_chr_goods_receipt_id], onDelete: Cascade)
+  item                    tbl_item          @relation(fields: [fk_chr_item_id], references: [pk_chr_item_id])
+  modified_by             tbl_user?         @relation("goods_receipt_item_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([fk_chr_goods_receipt_id])
   @@index([fk_chr_item_id])
@@ -1017,33 +952,33 @@ model tbl_goods_receipt_item {
 }
 
 model tbl_invoice {
-  pk_chr_invoice_id        String    @id @default(uuid())
-  chr_invoice_number       String    @unique
+  pk_chr_invoice_id        String               @id @default(uuid())
+  chr_invoice_number       String               @unique
   fk_chr_purchase_order_id String
   fk_chr_goods_receipt_id  String?
   fk_chr_request_id        String
   fk_chr_vendor_id         String
-  chr_status               String    @default("PENDING")
+  chr_status               String               @default("PENDING")
   flt_subtotal             Float
-  flt_tax_amount           Float     @default(0)
+  flt_tax_amount           Float                @default(0)
   flt_total_amount         Float
-  chr_currency             String    @default("USD")
-  dt_invoice_date          DateTime  @db.Timestamp(3)
-  dt_due_date              DateTime  @db.Timestamp(3)
-  dt_paid_at               DateTime? @db.Timestamp(3)
+  chr_currency             String               @default("USD")
+  dt_invoice_date          DateTime
+  dt_due_date              DateTime
+  dt_paid_at               DateTime?
   txt_notes                String?
-  tim_created              DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified             DateTime? @db.Timestamp(3)
+  tim_created              DateTime             @default(now())
+  tim_modified             DateTime?
   fk_chr_created_id        String?
   fk_chr_modified_id       String?
-  chr_document_status      String    @default("D") @db.Char(1)
-
-  purchase_order  tbl_purchase_order   @relation(fields: [fk_chr_purchase_order_id], references: [pk_chr_purchase_order_id], onDelete: Restrict, onUpdate: Cascade)
-  goods_receipt   tbl_goods_receipt?   @relation(fields: [fk_chr_goods_receipt_id], references: [pk_chr_goods_receipt_id], onDelete: SetNull, onUpdate: Cascade)
-  request         tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Restrict, onUpdate: Cascade)
-  vendor          tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Restrict, onUpdate: Cascade)
-  created_by      tbl_user?            @relation("invoice_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by     tbl_user?            @relation("invoice_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  txt_rendered_html        String?
+  chr_document_status      String               @default("D") @db.Char(1)
+  created_by               tbl_user?            @relation("invoice_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  goods_receipt            tbl_goods_receipt?   @relation(fields: [fk_chr_goods_receipt_id], references: [pk_chr_goods_receipt_id])
+  modified_by              tbl_user?            @relation("invoice_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  purchase_order           tbl_purchase_order   @relation(fields: [fk_chr_purchase_order_id], references: [pk_chr_purchase_order_id])
+  request                  tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id])
+  vendor                   tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
 
   @@index([fk_chr_purchase_order_id])
   @@index([fk_chr_goods_receipt_id])
@@ -1055,44 +990,37 @@ model tbl_invoice {
   @@map("tbl_invoice")
 }
 
-// ============================================================
-// PHASE 7: Chat and Notification Tables
-// ============================================================
-
 model tbl_chat_room {
-  pk_chr_chat_room_id String    @id @default(uuid())
+  pk_chr_chat_room_id String                 @id @default(uuid())
   fk_chr_request_id   String
   chr_name            String
-  bln_is_active       Boolean   @default(true)
-  tim_created         DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified        DateTime? @db.Timestamp(3)
+  bln_is_active       Boolean                @default(true)
+  tim_created         DateTime               @default(now())
+  tim_modified        DateTime?
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
-  chr_document_status String    @default("D") @db.Char(1)
-
-  request     tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade, onUpdate: Cascade)
-  created_by  tbl_user?            @relation("chat_room_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by tbl_user?            @relation("chat_room_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  members  tbl_chat_room_member[]
-  messages tbl_chat_message[]
+  chr_document_status String                 @default("D") @db.Char(1)
+  messages            tbl_chat_message[]
+  created_by          tbl_user?              @relation("chat_room_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?              @relation("chat_room_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  request             tbl_purchase_request   @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
+  members             tbl_chat_room_member[]
 
   @@index([fk_chr_request_id])
   @@map("tbl_chat_room")
 }
 
 model tbl_chat_room_member {
-  pk_chr_chat_room_member_id String   @id @default(uuid())
+  pk_chr_chat_room_member_id String        @id @default(uuid())
   fk_chr_chat_room_id        String
   fk_chr_user_id             String?
   fk_chr_vendor_id           String?
-  chr_role                   String   @default("MEMBER")
-  bln_is_active              Boolean  @default(true)
-  tim_created                DateTime @default(now()) @db.Timestamp(3)
-
-  chat_room tbl_chat_room @relation(fields: [fk_chr_chat_room_id], references: [pk_chr_chat_room_id], onDelete: Cascade, onUpdate: Cascade)
-  user      tbl_user?     @relation("chat_room_member_user", fields: [fk_chr_user_id], references: [pk_chr_user_id], onDelete: SetNull, onUpdate: Cascade)
-  vendor    tbl_vendor?   @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: SetNull, onUpdate: Cascade)
+  chr_role                   String        @default("MEMBER")
+  bln_is_active              Boolean       @default(true)
+  tim_created                DateTime      @default(now())
+  chat_room                  tbl_chat_room @relation(fields: [fk_chr_chat_room_id], references: [pk_chr_chat_room_id], onDelete: Cascade)
+  user                       tbl_user?     @relation("chat_room_member_user", fields: [fk_chr_user_id], references: [pk_chr_user_id])
+  vendor                     tbl_vendor?   @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
 
   @@unique([fk_chr_chat_room_id, fk_chr_user_id])
   @@index([fk_chr_chat_room_id])
@@ -1100,18 +1028,17 @@ model tbl_chat_room_member {
 }
 
 model tbl_chat_message {
-  pk_chr_chat_message_id String   @id @default(uuid())
+  pk_chr_chat_message_id String        @id @default(uuid())
   fk_chr_chat_room_id    String
   fk_chr_sender_id       String
   chr_sender_type        String
   txt_content            String
-  bln_is_read            Boolean  @default(false)
+  bln_is_read            Boolean       @default(false)
   chr_attachment_url     String?
   chr_attachment_type    String?
-  tim_created            DateTime @default(now()) @db.Timestamp(3)
-
-  chat_room tbl_chat_room @relation(fields: [fk_chr_chat_room_id], references: [pk_chr_chat_room_id], onDelete: Cascade, onUpdate: Cascade)
-  sender    tbl_user      @relation("chat_message_sender", fields: [fk_chr_sender_id], references: [pk_chr_user_id], onDelete: Restrict, onUpdate: Cascade)
+  tim_created            DateTime      @default(now())
+  chat_room              tbl_chat_room @relation(fields: [fk_chr_chat_room_id], references: [pk_chr_chat_room_id], onDelete: Cascade)
+  sender                 tbl_user      @relation("chat_message_sender", fields: [fk_chr_sender_id], references: [pk_chr_user_id])
 
   @@index([fk_chr_chat_room_id])
   @@index([fk_chr_sender_id])
@@ -1120,29 +1047,28 @@ model tbl_chat_message {
 }
 
 model tbl_notification {
-  pk_chr_notification_id      String    @id @default(uuid())
+  pk_chr_notification_id      String                @id @default(uuid())
   fk_chr_notification_type_id String
   fk_chr_user_id              String
   fk_chr_request_id           String?
   chr_title                   String
   txt_message                 String
-  chr_channel                 String    @default("IN_APP")
-  chr_status                  String    @default("PENDING")
-  bln_is_read                 Boolean   @default(false)
-  tim_sent_at                 DateTime? @db.Timestamp(3)
-  tim_read_at                 DateTime? @db.Timestamp(3)
+  chr_channel                 String                @default("IN_APP")
+  chr_status                  String                @default("PENDING")
+  bln_is_read                 Boolean               @default(false)
+  tim_sent_at                 DateTime?
+  tim_read_at                 DateTime?
   json_metadata               Json?
-  tim_created                 DateTime  @default(now()) @db.Timestamp(3)
-  tim_modified                DateTime? @db.Timestamp(3)
+  tim_created                 DateTime              @default(now())
+  tim_modified                DateTime?
   fk_chr_created_id           String?
   fk_chr_modified_id          String?
-  chr_document_status         String    @default("D") @db.Char(1)
-
-  notification_type tbl_notification_type @relation(fields: [fk_chr_notification_type_id], references: [pk_chr_notification_type_id], onDelete: Restrict, onUpdate: Cascade)
-  user              tbl_user              @relation("notification_user", fields: [fk_chr_user_id], references: [pk_chr_user_id], onDelete: Cascade, onUpdate: Cascade)
-  request           tbl_purchase_request? @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: SetNull, onUpdate: Cascade)
-  created_by        tbl_user?             @relation("notification_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by       tbl_user?             @relation("notification_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  chr_document_status         String                @default("D") @db.Char(1)
+  created_by                  tbl_user?             @relation("notification_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by                 tbl_user?             @relation("notification_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  notification_type           tbl_notification_type @relation(fields: [fk_chr_notification_type_id], references: [pk_chr_notification_type_id])
+  request                     tbl_purchase_request? @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id])
+  user                        tbl_user              @relation("notification_user", fields: [fk_chr_user_id], references: [pk_chr_user_id], onDelete: Cascade)
 
   @@index([fk_chr_user_id])
   @@index([fk_chr_notification_type_id])
@@ -1155,53 +1081,48 @@ model tbl_notification {
   @@map("tbl_notification")
 }
 
-// ============================================================
-// USER SERVICE RBAC MODELS
-// ============================================================
 
-enum UserSource {
-  MANUAL
-  AD
+model tbl_templates {
+  pk_chr_template_id  String    @id @default(uuid())
+  chr_template_code   String    @unique
+  chr_template_name   String
+  chr_document_type   String
+  txt_html_content    String
+  bln_is_active       Boolean   @default(true)
+  tim_created         DateTime  @default(now())
+  tim_modified        DateTime?
+  chr_document_status String    @default("N") @db.Char(1)
+
+  @@index([chr_template_code])
+  @@index([chr_document_type])
+  @@index([bln_is_active])
+  @@map("tbl_templates")
 }
 
-model User {
-  id             String     @id @default(uuid())
-  keycloakUserId String     @unique
-  optimaId       String     @unique
-  email          String     @unique
-  firstName      String
-  middleName     String?
-  lastName       String
-  isActive       Boolean    @default(true)
-  source         UserSource
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+model tbl_company {
+  pk_chr_company_id   String    @id @default(uuid())
+  chr_company_name    String
+  chr_company_code    String    @unique
+  chr_company_email   String    @unique
+  chr_company_phone   String
+  chr_company_address String?
+  chr_city            String?
+  chr_state           String?
+  chr_country         String?
+  chr_postal_code     String?
+  chr_website         String?
+  chr_tax_number      String?
+  chr_currency        String    @default("USD")
+  chr_logo_url        String?
+  bln_is_active       Boolean   @default(true)
+  tim_created         DateTime  @default(now())
+  tim_modified        DateTime?
+  chr_document_status String    @default("N") @db.Char(1)
 
-  @@index([optimaId])
-  @@index([email])
-}
+  users    tbl_user[]    @relation("user_company")
+  vendors  tbl_vendor[]  @relation("vendor_company")
 
-model Role {
-  id             String   @id @default(uuid())
-  keycloakRoleId String   @unique
-  name           String   @unique
-  description    String?
-  createdAt      DateTime @default(now())
-}
-
-model PermissionGroup {
-  id             String   @id @default(uuid())
-  keycloakRoleId String   @unique
-  name           String   @unique
-  description    String?
-  createdAt      DateTime @default(now())
-}
-
-model Permission {
-  id             String   @id @default(uuid())
-  keycloakRoleId String   @unique
-  name           String   @unique
-  description    String?
-  module         String?
-  createdAt      DateTime @default(now())
+  @@index([chr_company_code])
+  @@index([bln_is_active])
+  @@map("tbl_company")
 }

@@ -287,6 +287,65 @@ export class RequestForQuotationService {
     }
   }
 
+  async findByVendorId(strVendorId: string) {
+    try {
+      this.logger.log(RequestForQuotationProperties.service.findByVendorId.start);
+      const vendor = await this.prisma.tbl_vendor.findUnique({
+        where: { pk_chr_vendor_id: strVendorId },
+      });
+
+      if (!vendor) {
+        throw new NotFoundException('Vendor not found');
+      }
+
+      const rfqs = await this.prisma.tbl_request_for_quotation.findMany({
+        where: {
+          eoi: {
+            fk_chr_vendor_id: strVendorId,
+          },
+        },
+        include: {
+          request: {
+            select: {
+              pk_chr_request_id: true,
+              chr_request_number: true,
+              chr_title: true,
+            },
+          },
+          eoi: {
+            select: {
+              pk_chr_eoi_id: true,
+              chr_eoi_code: true,
+              chr_eoi_title: true,
+            },
+          },
+          quotations: {
+            include: {
+              vendor: {
+                select: {
+                  pk_chr_vendor_id: true,
+                  chr_vendor_name: true,
+                },
+              },
+            },
+          },
+          rfq_item_mappings: {
+            include: {
+              item: true,
+            },
+          },
+        },
+        orderBy: { tim_created: 'desc' },
+      });
+
+      this.logger.log(RequestForQuotationProperties.service.findByVendorId.success);
+      return ResponseHelper.success(rfqs, 'RFQs fetched successfully');
+    } catch (error) {
+      this.logger.error(RequestForQuotationProperties.service.findByVendorId.error, error.stack);
+      throw error;
+    }
+  }
+
   async delete(strId: string) {
     try {
       this.logger.log(`${RequestForQuotationProperties.service.delete.start}: ${strId}`);
