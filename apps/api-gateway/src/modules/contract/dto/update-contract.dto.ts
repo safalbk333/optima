@@ -10,6 +10,13 @@ import {
 
 export class UpdateContractDto {
   @ApiPropertyOptional({
+    description: 'Contract code',
+  })
+  @IsOptional()
+  @IsString()
+  contractCode?: string;
+
+  @ApiPropertyOptional({
     description: 'Title of the contract',
   })
   @IsOptional()

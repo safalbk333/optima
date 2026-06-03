@@ -8,6 +8,10 @@ import {
 export class UpdateContractDto {
   @IsOptional()
   @IsString()
+  contractCode?: string;
+
+  @IsOptional()
+  @IsString()
   title?: string;
 
   @IsOptional()

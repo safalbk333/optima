@@ -10,6 +10,10 @@ import {
 } from 'class-validator';
 
 export class CreateContractDto {
+  @ApiProperty({ example: 'CNT-2026-001', description: 'Contract code' })
+  @IsString()
+  contractCode: string;
+
   @ApiProperty({
     description: 'Title of the contract',
   })

@@ -7,6 +7,9 @@ import {
 
 export class CreateContractDto {
   @IsString()
+  contractCode: string;
+
+  @IsString()
   title: string;
 
   @IsOptional()
