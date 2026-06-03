@@ -649,6 +649,7 @@ model tbl_purchase_request_item_mapping {
 
 model tbl_contract {
   pk_chr_contract_id  String                @id @default(uuid())
+  chr_contract_code   String?
   chr_title           String
   txt_description     String?
   chr_status          String                @default("DRAFT")

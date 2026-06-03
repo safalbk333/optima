@@ -106,6 +106,7 @@ async create(
       await this.prisma.tbl_contract.create({
         data: {
           chr_title: objData.title,
+          chr_contract_code: objData.contractCode,
           txt_description:
             objData.description,
 
@@ -174,6 +175,10 @@ async update(
         },
 
         data: {
+          ...(objData.contractCode && {
+            chr_contract_code: objData.contractCode,
+          }),
+
           ...(objData.title && {
             chr_title: objData.title,
           }),
