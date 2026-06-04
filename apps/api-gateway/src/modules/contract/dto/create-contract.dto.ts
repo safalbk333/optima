@@ -50,4 +50,9 @@ export class CreateContractDto {
   })
   @IsString()
   vendorId: string;
+
+  @ApiPropertyOptional({ description: 'HTML content to render' })
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 }

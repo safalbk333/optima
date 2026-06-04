@@ -10,10 +10,6 @@ import {
 import { Type } from 'class-transformer';
 
 export class QuotationItemDto {
-  @ApiProperty({ description: 'Item ID' })
-  @IsString()
-  strItemId: string;
-
   @ApiPropertyOptional({ description: 'Vendor item ID' })
   @IsOptional()
   @IsString()
@@ -55,11 +51,6 @@ export class QuotationItemDto {
   @IsString()
   strCurrency?: string;
 
-  @ApiPropertyOptional({ description: 'Delivery lead time' })
-  @IsOptional()
-  @IsDateString()
-  dtDeliveryLeadTime?: string;
-
   @ApiPropertyOptional({ description: 'Notes' })
   @IsOptional()
   @IsString()
@@ -75,10 +66,6 @@ export class CreateQuotationDto {
   @IsString()
   strRfqId: string;
 
-  @ApiPropertyOptional({ description: 'Category ID' })
-  @IsOptional()
-  @IsString()
-  strCategoryId?: string;
 
   @ApiPropertyOptional({ description: 'Buyer user ID' })
   @IsOptional()
@@ -129,4 +116,9 @@ export class CreateQuotationDto {
   @ValidateNested({ each: true })
   @Type(() => QuotationItemDto)
   arrItems?: QuotationItemDto[];
+
+  @ApiPropertyOptional({ description: 'HTML content to render' })
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 }

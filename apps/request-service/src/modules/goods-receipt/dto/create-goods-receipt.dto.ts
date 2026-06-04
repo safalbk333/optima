@@ -38,12 +38,6 @@ export class CreateGoodsReceiptDto {
   @IsString()
   strPurchaseOrderId: string;
 
-  @IsString()
-  strRequestId: string;
-
-  @IsString()
-  strVendorId: string;
-
   @IsOptional()
   @IsString()
   strStatus?: string;
@@ -62,6 +56,10 @@ export class CreateGoodsReceiptDto {
   @IsOptional()
   @IsString()
   strCreatedId?: string;
+
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 
   @IsArray()
   @ValidateNested({ each: true })

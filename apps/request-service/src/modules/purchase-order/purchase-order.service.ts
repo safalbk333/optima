@@ -26,6 +26,7 @@ export class PurchaseOrderService {
           request: { connect: { pk_chr_request_id: objData.strRequestId } },
           vendor: { connect: { pk_chr_vendor_id: objData.strVendorId } },
           quotation: { connect: { pk_chr_quotation_id: objData.strQuotationId } },
+          ...(objData.strHtmlContent && { txt_rendered_html: objData.strHtmlContent }),
           ...(objData.strCreatedId && {
             created_by: {
               connect: { pk_chr_user_id: objData.strCreatedId },

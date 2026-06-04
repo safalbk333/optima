@@ -13,6 +13,27 @@ import { ContractProperties } from '../../common/properties/contract.properties'
 
 import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
+const vendorInclude = {
+  vendor: {
+    select: {
+      pk_chr_vendor_id: true,
+      chr_vendor_name: true,
+      chr_vendor_email: true,
+      chr_vendor_phone: true,
+      company: {
+        select: {
+          pk_chr_company_id: true,
+          chr_company_name: true,
+          chr_company_code: true,
+          chr_company_email: true,
+          chr_company_phone: true,
+          chr_company_address: true,
+        },
+      },
+    },
+  },
+};
+
 @Injectable()
 export class ContractService {
   private readonly logger =
@@ -29,7 +50,9 @@ export class ContractService {
       );
 
       const arrContracts =
-        await this.prisma.tbl_contract.findMany();
+        await this.prisma.tbl_contract.findMany({
+          include: vendorInclude,
+        });
 
       this.logger.log(
         `${ContractProperties.service.findAll.success}: ${arrContracts.length}`,
@@ -59,13 +82,12 @@ export class ContractService {
       );
 
       const objContract =
-        await this.prisma.tbl_contract.findUnique(
-          {
-            where: {
-              pk_chr_contract_id: strId,
-            },
+        await this.prisma.tbl_contract.findUnique({
+          where: {
+            pk_chr_contract_id: strId,
           },
-        );
+          include: vendorInclude,
+        });
 
       if (!objContract) {
         throw new NotFoundException(
@@ -94,141 +116,113 @@ export class ContractService {
     }
   }
 
-async create(
-  objData: CreateContractDto,
-) {
-  try {
-    this.logger.log(
-      ContractProperties.service.create.start,
-    );
+  async create(objData: CreateContractDto) {
+    try {
+      this.logger.log(
+        ContractProperties.service.create.start,
+      );
 
-    const objContract =
-      await this.prisma.tbl_contract.create({
-        data: {
-          chr_title: objData.title,
-          chr_contract_code: objData.contractCode,
-          txt_description:
-            objData.description,
+      const objContract =
+        await this.prisma.tbl_contract.create({
+          data: {
+            chr_title: objData.title,
+            chr_contract_code: objData.contractCode,
+            txt_description: objData.description,
+            dt_start_date: new Date(objData.startDate),
+            dt_end_date: new Date(objData.endDate),
+            flt_value: objData.value,
+            fk_chr_vendor_id: objData.vendorId,
+            ...(objData.strHtmlContent && { txt_rendered_html: objData.strHtmlContent }),
+          },
+          include: vendorInclude,
+        });
 
-          dt_start_date: new Date(
-            objData.startDate,
-          ),
+      this.logger.log(
+        `${ContractProperties.service.create.success}: ${objContract.pk_chr_contract_id}`,
+      );
 
-          dt_end_date: new Date(
-            objData.endDate,
-          ),
+      return ResponseHelper.success(
+        objContract,
+        'Contract created successfully',
+      );
+    } catch (error) {
+      this.logger.error(
+        ContractProperties.service.create.error,
+        error.stack,
+      );
 
-          flt_value: objData.value,
-
-          fk_chr_vendor_id:
-            objData.vendorId,
-        },
-      });
-
-    this.logger.log(
-      `${ContractProperties.service.create.success}: ${objContract.pk_chr_contract_id}`,
-    );
-
-    return ResponseHelper.success(
-      objContract,
-      'Contract created successfully',
-    );
-  } catch (error) {
-    this.logger.error(
-      ContractProperties.service.create.error,
-      error.stack,
-    );
-
-    return ResponseHelper.error(
-      'Failed to create contract',
-      error.message,
-    );
-  }
-}
-
-async update(
-  strId: string,
-  objData: UpdateContractDto,
-) {
-  try {
-    this.logger.log(
-      `${ContractProperties.service.update.start}: ${strId}`,
-    );
-
-    const objContract =
-      await this.prisma.tbl_contract.findUnique({
-        where: {
-          pk_chr_contract_id: strId,
-        },
-      });
-
-    if (!objContract) {
-      throw new NotFoundException(
-        'Contract not found',
+      return ResponseHelper.error(
+        'Failed to create contract',
+        error.message,
       );
     }
-
-    const objUpdatedContract =
-      await this.prisma.tbl_contract.update({
-        where: {
-          pk_chr_contract_id: strId,
-        },
-
-        data: {
-          ...(objData.contractCode && {
-            chr_contract_code: objData.contractCode,
-          }),
-
-          ...(objData.title && {
-            chr_title: objData.title,
-          }),
-
-          ...(objData.description && {
-            txt_description:
-              objData.description,
-          }),
-
-          ...(objData.startDate && {
-            dt_start_date: new Date(
-              objData.startDate,
-            ),
-          }),
-
-          ...(objData.endDate && {
-            dt_end_date: new Date(
-              objData.endDate,
-            ),
-          }),
-
-          ...(objData.value && {
-            flt_value: objData.value,
-          }),
-
-          ...(objData.vendorId && {
-            fk_chr_vendor_id:
-              objData.vendorId,
-          }),
-        },
-      });
-
-    this.logger.log(
-      `${ContractProperties.service.update.success}: ${strId}`,
-    );
-
-    return ResponseHelper.success(
-      objUpdatedContract,
-      'Contract updated successfully',
-    );
-  } catch (error) {
-    this.logger.error(
-      `${ContractProperties.service.update.error}: ${strId}`,
-      error.stack,
-    );
-
-    return ResponseHelper.error(
-      'Failed to update contract',
-      error.message,
-    );
   }
-}
+
+  async update(strId: string, objData: UpdateContractDto) {
+    try {
+      this.logger.log(
+        `${ContractProperties.service.update.start}: ${strId}`,
+      );
+
+      const objContract =
+        await this.prisma.tbl_contract.findUnique({
+          where: {
+            pk_chr_contract_id: strId,
+          },
+        });
+
+      if (!objContract) {
+        throw new NotFoundException(
+          'Contract not found',
+        );
+      }
+
+      const objUpdatedContract =
+        await this.prisma.tbl_contract.update({
+          where: {
+            pk_chr_contract_id: strId,
+          },
+          data: {
+            ...(objData.title && {
+              chr_title: objData.title,
+            }),
+            ...(objData.description && {
+              txt_description: objData.description,
+            }),
+            ...(objData.startDate && {
+              dt_start_date: new Date(objData.startDate),
+            }),
+            ...(objData.endDate && {
+              dt_end_date: new Date(objData.endDate),
+            }),
+            ...(objData.value && {
+              flt_value: objData.value,
+            }),
+            ...(objData.vendorId && {
+              fk_chr_vendor_id: objData.vendorId,
+            }),
+          },
+          include: vendorInclude,
+        });
+
+      this.logger.log(
+        `${ContractProperties.service.update.success}: ${strId}`,
+      );
+
+      return ResponseHelper.success(
+        objUpdatedContract,
+        'Contract updated successfully',
+      );
+    } catch (error) {
+      this.logger.error(
+        `${ContractProperties.service.update.error}: ${strId}`,
+        error.stack,
+      );
+
+      return ResponseHelper.error(
+        'Failed to update contract',
+        error.message,
+      );
+    }
+  }
 }

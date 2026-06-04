@@ -24,13 +24,10 @@ export class GoodsReceiptService {
           dt_received_at: new Date(receiptData.strReceivedAt),
           chr_delivery_note_no: receiptData.strDeliveryNoteNo,
           txt_notes: receiptData.strNotes,
-          purchase_order: { connect: { pk_chr_purchase_order_id: receiptData.strPurchaseOrderId } },
-          request: { connect: { pk_chr_request_id: receiptData.strRequestId } },
-          vendor: { connect: { pk_chr_vendor_id: receiptData.strVendorId } },
-          ...(receiptData.strCreatedId && {
-            created_by: { connect: { pk_chr_user_id: receiptData.strCreatedId } },
-          }),
-          ...(arrItems && arrItems.length > 0 && {
+          fk_chr_purchase_order_id: receiptData.strPurchaseOrderId,
+          ...(receiptData.strHtmlContent && { txt_rendered_html: receiptData.strHtmlContent }),
+          ...(receiptData.strCreatedId && { fk_chr_created_id: receiptData.strCreatedId }),
+          ...(arrItems?.length > 0 && {
             goods_receipt_items: {
               create: arrItems.map(item => ({
                 fk_chr_item_id: item.strItemId,
@@ -42,26 +39,12 @@ export class GoodsReceiptService {
               })),
             },
           }),
-        },
+        } as any,
         include: {
           purchase_order: {
             select: {
               pk_chr_purchase_order_id: true,
               chr_po_number: true,
-            },
-          },
-          request: {
-            select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
-            },
-          },
-          vendor: {
-            select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
             },
           },
           goods_receipt_items: {
@@ -73,15 +56,9 @@ export class GoodsReceiptService {
       });
 
       this.logger.log(`${GoodsReceiptProperties.service.create.success}: ${goodsReceipt.pk_chr_goods_receipt_id}`);
-      return ResponseHelper.success(
-        goodsReceipt,
-        "Goods receipt created successfully",
-      );
+      return ResponseHelper.success(goodsReceipt, "Goods receipt created successfully");
     } catch (error) {
-      this.logger.error(
-        GoodsReceiptProperties.service.create.error,
-        error.stack,
-      );
+      this.logger.error(GoodsReceiptProperties.service.create.error, error.stack);
       return ResponseHelper.error("Failed to create goods receipt", error.message);
     }
   }
@@ -97,41 +74,19 @@ export class GoodsReceiptService {
               chr_po_number: true,
             },
           },
-          request: {
-            select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
-            },
-          },
-          vendor: {
-            select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
-            },
-          },
           goods_receipt_items: {
             include: {
               item: true,
             },
           },
         },
-        orderBy: {
-          tim_created: 'desc',
-        },
+        orderBy: { tim_created: 'desc' },
       });
 
       this.logger.log(GoodsReceiptProperties.service.findAll.success);
-      return ResponseHelper.success(
-        goodsReceipts,
-        "Goods receipts fetched successfully",
-      );
+      return ResponseHelper.success(goodsReceipts, "Goods receipts fetched successfully");
     } catch (error) {
-      this.logger.error(
-        GoodsReceiptProperties.service.findAll.error,
-        error.stack,
-      );
+      this.logger.error(GoodsReceiptProperties.service.findAll.error, error.stack);
       return ResponseHelper.error("Failed to fetch goods receipts", error.message);
     }
   }
@@ -148,20 +103,6 @@ export class GoodsReceiptService {
               chr_po_number: true,
             },
           },
-          request: {
-            select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
-            },
-          },
-          vendor: {
-            select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
-            },
-          },
           goods_receipt_items: {
             include: {
               item: true,
@@ -175,15 +116,9 @@ export class GoodsReceiptService {
       }
 
       this.logger.log(`${GoodsReceiptProperties.service.findOne.success}: ${strId}`);
-      return ResponseHelper.success(
-        goodsReceipt,
-        "Goods receipt fetched successfully",
-      );
+      return ResponseHelper.success(goodsReceipt, "Goods receipt fetched successfully");
     } catch (error) {
-      this.logger.error(
-        `${GoodsReceiptProperties.service.findOne.error}: ${strId}`,
-        error.stack,
-      );
+      this.logger.error(`${GoodsReceiptProperties.service.findOne.error}: ${strId}`, error.stack);
       throw error;
     }
   }
@@ -208,7 +143,7 @@ export class GoodsReceiptService {
           ...(updateData.strReceivedAt !== undefined && { dt_received_at: new Date(updateData.strReceivedAt) }),
           ...(updateData.strDeliveryNoteNo !== undefined && { chr_delivery_note_no: updateData.strDeliveryNoteNo }),
           ...(updateData.strNotes !== undefined && { txt_notes: updateData.strNotes }),
-          ...(updateData.strModifiedId && { modified_by: { connect: { pk_chr_user_id: updateData.strModifiedId } } }),
+          ...(updateData.strModifiedId && { fk_chr_modified_id: updateData.strModifiedId }),
           tim_modified: new Date(),
           ...(arrItems && {
             goods_receipt_items: {
@@ -223,26 +158,12 @@ export class GoodsReceiptService {
               })),
             },
           }),
-        },
+        } as any,
         include: {
           purchase_order: {
             select: {
               pk_chr_purchase_order_id: true,
               chr_po_number: true,
-            },
-          },
-          request: {
-            select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
-            },
-          },
-          vendor: {
-            select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
             },
           },
           goods_receipt_items: {
@@ -254,15 +175,9 @@ export class GoodsReceiptService {
       });
 
       this.logger.log(`${GoodsReceiptProperties.service.update.success}: ${strId}`);
-      return ResponseHelper.success(
-        updatedGoodsReceipt,
-        "Goods receipt updated successfully",
-      );
+      return ResponseHelper.success(updatedGoodsReceipt, "Goods receipt updated successfully");
     } catch (error) {
-      this.logger.error(
-        `${GoodsReceiptProperties.service.update.error}: ${strId}`,
-        error.stack,
-      );
+      this.logger.error(`${GoodsReceiptProperties.service.update.error}: ${strId}`, error.stack);
       throw error;
     }
   }
@@ -283,15 +198,9 @@ export class GoodsReceiptService {
       });
 
       this.logger.log(`${GoodsReceiptProperties.service.delete.success}: ${strId}`);
-      return ResponseHelper.success(
-        deletedGoodsReceipt,
-        "Goods receipt deleted successfully",
-      );
+      return ResponseHelper.success(deletedGoodsReceipt, "Goods receipt deleted successfully");
     } catch (error) {
-      this.logger.error(
-        `${GoodsReceiptProperties.service.delete.error}: ${strId}`,
-        error.stack,
-      );
+      this.logger.error(`${GoodsReceiptProperties.service.delete.error}: ${strId}`, error.stack);
       throw error;
     }
   }

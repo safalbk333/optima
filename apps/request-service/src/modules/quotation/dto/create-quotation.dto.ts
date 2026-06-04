@@ -9,9 +9,6 @@ import {
 import { Type } from 'class-transformer';
 
 export class QuotationItemDto {
-  @IsString()
-  strItemId: string;
-
   @IsOptional()
   @IsString()
   strVendorItemId?: string;
@@ -43,10 +40,6 @@ export class QuotationItemDto {
   @IsOptional()
   @IsString()
   strCurrency?: string;
-
-  @IsOptional()
-  @IsDateString()
-  dtDeliveryLeadTime?: string;
 
   @IsOptional()
   @IsString()
@@ -101,6 +94,10 @@ export class CreateQuotationDto {
   @IsOptional()
   @IsString()
   strCreatedId?: string;
+
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 
   @IsOptional()
   @IsArray()

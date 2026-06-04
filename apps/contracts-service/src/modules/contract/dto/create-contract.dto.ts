@@ -27,4 +27,8 @@ export class CreateContractDto {
 
   @IsString()
   vendorId: string;
+
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 }

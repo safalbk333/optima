@@ -40,4 +40,8 @@ export class CreatePurchaseOrderDto {
   @IsOptional()
   @IsString()
   strCreatedId?: string;
+
+  @IsOptional()
+  @IsString()
+  strHtmlContent?: string;
 }

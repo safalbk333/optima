@@ -1,4 +1,4 @@
-generator client {
+﻿generator client {
   provider = "prisma-client-js"
 }
 
@@ -409,6 +409,7 @@ model tbl_vendor {
   chat_room_members   tbl_chat_room_member[]
   contracts           tbl_contract[]
   eois                tbl_expression_of_interest[]
+  goods_receipts      tbl_goods_receipt[]
   invoices            tbl_invoice[]
   purchase_orders     tbl_purchase_order[]
   quotations          tbl_quotation[]
@@ -448,9 +449,7 @@ model tbl_item {
 }
 
 model tbl_vendor_items {
-  pk_chr_vendor_item_id String               @id @default(uuid())
-  fk_chr_vendor_id      String
-  chr_item_name         String
+  pk_chr_vendor_item_id String               @id @default(uuid())`n  chr_item_name         String
   chr_item_code         String
   txt_description       String?
   chr_unit              String?
@@ -466,10 +465,7 @@ model tbl_vendor_items {
   quotation_items       tbl_quotation_item[]
   created_by            tbl_user?            @relation("vendor_items_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by           tbl_user?            @relation("vendor_items_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  vendor                tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Cascade)
-
-  @@index([fk_chr_vendor_id])
-  @@index([bln_is_active])
+  vendor                tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Cascade)`n  @@index([bln_is_active])
   @@map("tbl_vendor_items")
 }
 
@@ -494,6 +490,7 @@ model tbl_purchase_request {
   chat_rooms               tbl_chat_room[]
   contracts                tbl_contract[]
   eois                     tbl_expression_of_interest[]
+  goods_receipts           tbl_goods_receipt[]
   invoices                 tbl_invoice[]
   notifications            tbl_notification[]
   purchase_orders          tbl_purchase_order[]
@@ -517,9 +514,7 @@ model tbl_purchase_request {
 }
 
 model tbl_approval {
-  pk_chr_approval_id       String               @id @default(uuid())
-  fk_chr_request_id        String
-  fk_chr_approver_id       String
+  pk_chr_approval_id       String               @id @default(uuid())`n  fk_chr_approver_id       String
   fk_chr_approval_level_id String
   chr_status               String               @default("PENDING")
   txt_comment              String?
@@ -533,19 +528,14 @@ model tbl_approval {
   approver                 tbl_user             @relation("approval_approver", fields: [fk_chr_approver_id], references: [pk_chr_user_id])
   created_by               tbl_user?            @relation("approval_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by              tbl_user?            @relation("approval_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  request                  tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
-
-  @@index([fk_chr_request_id])
-  @@index([fk_chr_approver_id])
+  request                  tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)`n  @@index([fk_chr_approver_id])
   @@index([fk_chr_approval_level_id])
   @@index([chr_status])
   @@map("tbl_approval")
 }
 
 model tbl_request_history {
-  pk_chr_status_history_id String               @id @default(uuid())
-  fk_chr_request_id        String
-  fk_chr_from_status_id    String?
+  pk_chr_status_history_id String               @id @default(uuid())`n  fk_chr_from_status_id    String?
   fk_chr_to_status_id      String
   fk_chr_from_phase_id     String?
   fk_chr_to_phase_id       String
@@ -558,10 +548,7 @@ model tbl_request_history {
   from_status              tbl_request_status?  @relation("request_history_from_status", fields: [fk_chr_from_status_id], references: [pk_chr_request_status_id])
   request                  tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
   to_phase                 tbl_request_phase    @relation("request_history_to_phase", fields: [fk_chr_to_phase_id], references: [pk_chr_request_phase_id])
-  to_status                tbl_request_status   @relation("request_history_to_status", fields: [fk_chr_to_status_id], references: [pk_chr_request_status_id])
-
-  @@index([fk_chr_request_id])
-  @@index([tim_created])
+  to_status                tbl_request_status   @relation("request_history_to_status", fields: [fk_chr_to_status_id], references: [pk_chr_request_status_id])`n  @@index([tim_created])
   @@map("tbl_request_history")
 }
 
@@ -592,9 +579,7 @@ model tbl_request_attachment_master {
 
 model tbl_request_attachments {
   pk_chr_request_attchment_id String                        @id @default(uuid())
-  fk_chr_attchment_master_id  String
-  fk_chr_request_id           String
-  chr_file_name               String
+  fk_chr_attchment_master_id  String`n  chr_file_name               String
   chr_file_url                String
   chr_file_type               String
   int_file_size               Int?
@@ -612,18 +597,14 @@ model tbl_request_attachments {
   request                     tbl_purchase_request          @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
   uploaded_by                 tbl_user                      @relation("attachments_uploaded_by", fields: [fk_chr_uploaded_by_id], references: [pk_chr_user_id])
 
-  @@index([fk_chr_attchment_master_id])
-  @@index([fk_chr_request_id])
-  @@index([fk_chr_uploaded_by_id])
+  @@index([fk_chr_attchment_master_id])`n  @@index([fk_chr_uploaded_by_id])
   @@index([fk_chr_phase_id])
   @@index([chr_file_type])
   @@map("tbl_request_attachments")
 }
 
 model tbl_purchase_request_item_mapping {
-  pk_chr_pr_item_mapping_id String               @id @default(uuid())
-  fk_chr_request_id         String
-  fk_chr_item_id            String
+  pk_chr_pr_item_mapping_id String               @id @default(uuid())`n  fk_chr_item_id            String
   chr_item_description      String
   int_quantity              Int
   chr_unit_of_measure       String?
@@ -637,10 +618,7 @@ model tbl_purchase_request_item_mapping {
   created_by                tbl_user?            @relation("pr_item_mapping_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   item                      tbl_item             @relation(fields: [fk_chr_item_id], references: [pk_chr_item_id])
   modified_by               tbl_user?            @relation("pr_item_mapping_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  request                   tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
-
-  @@index([fk_chr_request_id])
-  @@index([fk_chr_item_id])
+  request                   tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)`n  @@index([fk_chr_item_id])
   @@map("tbl_purchase_request_item_mapping")
 }
 
@@ -652,9 +630,7 @@ model tbl_contract {
   chr_status          String                @default("DRAFT")
   dt_start_date       DateTime
   dt_end_date         DateTime
-  flt_value           Float
-  fk_chr_vendor_id    String
-  fk_chr_request_id   String?
+  flt_value           Float`n  fk_chr_request_id   String?
   tim_created         DateTime              @default(now())
   tim_modified        DateTime?
   fk_chr_created_id   String?
@@ -663,21 +639,15 @@ model tbl_contract {
   chr_document_status String                @default("D") @db.Char(1)
   created_by          tbl_user?             @relation("contract_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?             @relation("contract_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  request             tbl_purchase_request? @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id])
-  vendor              tbl_vendor            @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
-
-  @@index([fk_chr_vendor_id])
-  @@index([fk_chr_request_id])
-  @@index([chr_status])
+  request             tbl_purchase_request? @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id])`n
+  @@index([fk_chr_vendor_id])`n  @@index([chr_status])
   @@map("tbl_contract")
 }
 
 model tbl_expression_of_interest {
   pk_chr_eoi_id          String                      @id @default(uuid())
   chr_eoi_code           String                      @unique
-  chr_eoi_title          String
-  fk_chr_request_id      String
-  fk_chr_vendor_id       String
+  chr_eoi_title          String`n  fk_chr_vendor_id       String
   chr_status             String                      @default("DRAFT")
   txt_notes              String?
   dt_submission_deadline DateTime
@@ -689,12 +659,7 @@ model tbl_expression_of_interest {
   chr_document_status    String                      @default("D") @db.Char(1)
   created_by             tbl_user?                   @relation("eoi_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by            tbl_user?                   @relation("eoi_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  request                tbl_purchase_request        @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
-  vendor                 tbl_vendor                  @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
-  rfqs                   tbl_request_for_quotation[]
-
-  @@index([fk_chr_request_id])
-  @@index([fk_chr_vendor_id])
+  request                tbl_purchase_request        @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)`n  rfqs                   tbl_request_for_quotation[]`n  @@index([fk_chr_vendor_id])
   @@index([chr_status])
   @@index([dt_submission_deadline])
   @@map("tbl_expression_of_interest")
@@ -703,9 +668,7 @@ model tbl_expression_of_interest {
 model tbl_request_for_quotation {
   pk_chr_rfq_id          String                      @id @default(uuid())
   chr_rfq_code           String                      @unique
-  chr_rfq_title          String
-  fk_chr_request_id      String
-  fk_chr_eoi_id          String?
+  chr_rfq_title          String`n  fk_chr_eoi_id          String?
   chr_status             String                      @default("DRAFT")
   dt_issue_date          DateTime
   dt_due_date            DateTime
@@ -722,10 +685,7 @@ model tbl_request_for_quotation {
   eoi                    tbl_expression_of_interest? @relation(fields: [fk_chr_eoi_id], references: [pk_chr_eoi_id])
   modified_by            tbl_user?                   @relation("rfq_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   request                tbl_purchase_request        @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
-  rfq_item_mappings      tbl_rfq_item_mapping[]
-
-  @@index([fk_chr_request_id])
-  @@index([fk_chr_eoi_id])
+  rfq_item_mappings      tbl_rfq_item_mapping[]`n  @@index([fk_chr_eoi_id])
   @@index([chr_status])
   @@index([dt_submission_deadline])
   @@index([dt_due_date])
@@ -759,9 +719,7 @@ model tbl_rfq_item_mapping {
 }
 
 model tbl_quotation {
-  pk_chr_quotation_id String                    @id @default(uuid())
-  fk_chr_vendor_id    String
-  fk_chr_rfq_id       String
+  pk_chr_quotation_id String                    @id @default(uuid())`n  fk_chr_rfq_id       String
   fk_chr_category_id  String?
   fk_chr_buyer_id     String?
   chr_status          String                    @default("DRAFT")
@@ -785,10 +743,7 @@ model tbl_quotation {
   modified_by         tbl_user?                 @relation("quotation_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   rfq                 tbl_request_for_quotation @relation(fields: [fk_chr_rfq_id], references: [pk_chr_rfq_id], onDelete: Cascade)
   vendor              tbl_vendor                @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Cascade)
-  quotation_items     tbl_quotation_item[]
-
-  @@index([fk_chr_vendor_id])
-  @@index([fk_chr_rfq_id])
+  quotation_items     tbl_quotation_item[]`n  @@index([fk_chr_rfq_id])
   @@index([fk_chr_category_id])
   @@index([fk_chr_buyer_id])
   @@index([chr_status])
@@ -830,11 +785,7 @@ model tbl_quotation_item {
 // ========================================================================================
 
 model tbl_purchase_order {
-  pk_chr_purchase_order_id String               @id @default(uuid())
-  fk_chr_request_id        String
-  chr_po_number            String               @unique
-  fk_chr_vendor_id         String
-  flt_total_value          Float
+  pk_chr_purchase_order_id String               @id @default(uuid())`n  chr_po_number            String               @unique`n  flt_total_value          Float
   chr_currency             String               @default("USD")
   dt_issued_at             DateTime?
   chr_delivery_address     String?
@@ -851,19 +802,13 @@ model tbl_purchase_order {
   created_by               tbl_user?            @relation("purchase_order_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by              tbl_user?            @relation("purchase_order_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   quotation                tbl_quotation        @relation(fields: [fk_chr_quotation_id], references: [pk_chr_quotation_id])
-  request                  tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
-  vendor                   tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
-
-  @@index([fk_chr_request_id])
-  @@index([fk_chr_vendor_id])
+  request                  tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)`n`n  @@index([fk_chr_vendor_id])
   @@map("tbl_purchase_order")
 }
 
 model tbl_shipment {
   pk_chr_shipment_id       String    @id @default(uuid())
-  fk_po_number             String
-  fk_chr_vendor_id         String
-  chr_asn_id               String    @unique
+  fk_po_number             String`n  chr_asn_id               String    @unique
   dt_dispatch_date         DateTime
   dt_delivery_date         DateTime
   chr_logistics_provider   String
@@ -892,7 +837,7 @@ model tbl_shipment_tracking {
 model tbl_goods_receipt {
   pk_chr_goods_receipt_id  String                   @id @default(uuid())
   chr_grn_code             String                   @unique
-  fk_chr_purchase_order_id String
+  fk_chr_purchase_order_id String`n  fk_chr_vendor_id         String
   chr_status               String                   @default("PENDING")
   dt_received_at           DateTime
   chr_delivery_note_no     String?
@@ -905,12 +850,12 @@ model tbl_goods_receipt {
   chr_document_status      String                   @default("D") @db.Char(1)
   created_by               tbl_user?                @relation("goods_receipt_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by              tbl_user?                @relation("goods_receipt_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  purchase_order           tbl_purchase_order       @relation(fields: [fk_chr_purchase_order_id], references: [pk_chr_purchase_order_id])
+  purchase_order           tbl_purchase_order       @relation(fields: [fk_chr_purchase_order_id], references: [pk_chr_purchase_order_id])`n  vendor                   tbl_vendor               @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
   goods_receipt_items      tbl_goods_receipt_item[]
   invoices                 tbl_invoice[]
   shipments                tbl_shipment[]
 
-  @@index([fk_chr_purchase_order_id])
+  @@index([fk_chr_purchase_order_id])`n  @@index([fk_chr_vendor_id])
   @@index([chr_status])
   @@index([dt_received_at])
   @@map("tbl_goods_receipt")
@@ -944,9 +889,7 @@ model tbl_invoice {
   pk_chr_invoice_id        String               @id @default(uuid())
   chr_invoice_number       String               @unique
   fk_chr_purchase_order_id String
-  fk_chr_goods_receipt_id  String?
-  fk_chr_request_id        String
-  fk_chr_vendor_id         String
+  fk_chr_goods_receipt_id  String?`n  fk_chr_vendor_id         String
   chr_status               String               @default("PENDING")
   flt_subtotal             Float
   flt_tax_amount           Float                @default(0)
@@ -965,14 +908,10 @@ model tbl_invoice {
   created_by               tbl_user?            @relation("invoice_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   goods_receipt            tbl_goods_receipt?   @relation(fields: [fk_chr_goods_receipt_id], references: [pk_chr_goods_receipt_id])
   modified_by              tbl_user?            @relation("invoice_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  purchase_order           tbl_purchase_order   @relation(fields: [fk_chr_purchase_order_id], references: [pk_chr_purchase_order_id])
-  request                  tbl_purchase_request @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id])
-  vendor                   tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
+  purchase_order           tbl_purchase_order   @relation(fields: [fk_chr_purchase_order_id], references: [pk_chr_purchase_order_id])`n  vendor                   tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id])
 
   @@index([fk_chr_purchase_order_id])
-  @@index([fk_chr_goods_receipt_id])
-  @@index([fk_chr_request_id])
-  @@index([fk_chr_vendor_id])
+  @@index([fk_chr_goods_receipt_id])`n  @@index([fk_chr_vendor_id])
   @@index([chr_status])
   @@index([dt_due_date])
   @@index([dt_paid_at])
@@ -980,9 +919,7 @@ model tbl_invoice {
 }
 
 model tbl_chat_room {
-  pk_chr_chat_room_id String                 @id @default(uuid())
-  fk_chr_request_id   String
-  chr_name            String
+  pk_chr_chat_room_id String                 @id @default(uuid())`n  chr_name            String
   bln_is_active       Boolean                @default(true)
   tim_created         DateTime               @default(now())
   tim_modified        DateTime?
@@ -993,10 +930,7 @@ model tbl_chat_room {
   created_by          tbl_user?              @relation("chat_room_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?              @relation("chat_room_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   request             tbl_purchase_request   @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
-  members             tbl_chat_room_member[]
-
-  @@index([fk_chr_request_id])
-  @@map("tbl_chat_room")
+  members             tbl_chat_room_member[]`n  @@map("tbl_chat_room")
 }
 
 model tbl_chat_room_member {
@@ -1060,9 +994,7 @@ model tbl_notification {
   user                        tbl_user              @relation("notification_user", fields: [fk_chr_user_id], references: [pk_chr_user_id], onDelete: Cascade)
 
   @@index([fk_chr_user_id])
-  @@index([fk_chr_notification_type_id])
-  @@index([fk_chr_request_id])
-  @@index([chr_channel])
+  @@index([fk_chr_notification_type_id])`n  @@index([chr_channel])
   @@index([chr_status])
   @@index([bln_is_read])
   @@index([tim_sent_at])

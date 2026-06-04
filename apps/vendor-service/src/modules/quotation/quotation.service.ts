@@ -58,6 +58,7 @@ export class QuotationService {
                 },
               },
             }),
+              ...(createQuotationDto.strHtmlContent && { txt_rendered_html: createQuotationDto.strHtmlContent }),
 
             chr_status: createQuotationDto.status.toUpperCase(),
 
@@ -168,7 +169,7 @@ export class QuotationService {
       );
     }
   }
-  
+
   async findOne(quotation_id: string) {
     try {
       this.logger.log(

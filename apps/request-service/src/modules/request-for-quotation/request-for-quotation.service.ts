@@ -108,11 +108,7 @@ export class RequestForQuotationService {
                   chr_vendor_email: true,
                 },
               },
-              quotation_items: {
-                include: {
-                  item: true,
-                },
-              },
+              quotation_items: true,
             },
           },
           rfq_item_mappings: {
@@ -157,6 +153,7 @@ export class RequestForQuotationService {
           dt_submission_deadline: new Date(rfqData.strSubmissionDeadline),
           txt_notes: rfqData.strNotes,
           fk_chr_created_id: rfqData.strCreatedId,
+          ...(rfqData.strHtmlContent && { txt_rendered_html: rfqData.strHtmlContent }),
           ...(arrItems && arrItems.length > 0 && {
             rfq_item_mappings: {
               create: arrItems.map(item => ({
