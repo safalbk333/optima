@@ -35,6 +35,15 @@ export class ContractGatewayService {
     );
   }
 
+  async findByVendorId(vendorId: string) {
+    return await firstValueFrom(
+      this.client.send(
+        CONTRACT_PATTERN.FIND_BY_VENDOR_ID,
+        vendorId,
+      ),
+    );
+  }
+
   async create(data: CreateContractDto) {
     return await firstValueFrom(
       this.client.send(

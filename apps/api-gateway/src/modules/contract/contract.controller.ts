@@ -7,6 +7,7 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBody } from '@nestjs/swagger';
 
 import {
   ApiBearerAuth,
@@ -51,6 +52,24 @@ export class ContractController {
   })
   findAll() {
     return this.contractService.findAll();
+  }
+
+  @Post('by-vendor')
+  @ApiOperation({ summary: 'Get contracts by vendor id' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { vendorId: { type: 'string' } },
+      required: ['vendorId'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Contracts fetched successfully',
+  })
+  findByVendorId(@Body('vendorId') vendorId: string) {
+    return this.contractService.findByVendorId(vendorId);
   }
 
   @Get(':id')

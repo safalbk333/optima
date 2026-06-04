@@ -158,6 +158,45 @@ export class ContractService {
     }
   }
 
+  async findByVendorId(strVendorId: string) {
+    try {
+      this.logger.log(
+        `${ContractProperties.service.findByVendorId.start}: ${strVendorId}`,
+      );
+
+      const objVendor = await this.prisma.tbl_vendor.findUnique({
+        where: { pk_chr_vendor_id: strVendorId },
+      });
+
+      if (!objVendor) {
+        throw new NotFoundException('Vendor not found');
+      }
+
+      const arrContracts =
+        await this.prisma.tbl_contract.findMany({
+          where: { fk_chr_vendor_id: strVendorId },
+          include: vendorInclude,
+          orderBy: { tim_created: 'desc' },
+        });
+
+      this.logger.log(
+        `${ContractProperties.service.findByVendorId.success}: ${strVendorId}`,
+      );
+
+      return ResponseHelper.success(
+        arrContracts,
+        'Contracts fetched successfully',
+      );
+    } catch (error) {
+      this.logger.error(
+        ContractProperties.service.findByVendorId.error,
+        error.stack,
+      );
+
+      throw error;
+    }
+  }
+
   async update(strId: string, objData: UpdateContractDto) {
     try {
       this.logger.log(
