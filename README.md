@@ -91,7 +91,25 @@ For open source projects, say how it is licensed.
 
 ## Project status
 If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+db structure
 
+Tenant
+ └── Company
+      ├── Users
+      │    ├── Roles
+      │    └── Purchase Requests
+      │          ├── Items
+      │          ├── Approvals
+      │          ├── EOI
+      │          ├── RFQ
+      │          ├── Quotations
+      │          ├── Purchase Orders
+      │          ├── Shipments
+      │          ├── Goods Receipts
+      │          └── Invoices
+      └── Vendors
+            └── Vendor Items
+            
 
 create two env files inside each microservice
 create .env.developement
@@ -115,3 +133,11 @@ shipment-service	3004
 master-service	    3005
 request-service	    3006
 user-service        3007
+
+npm run start:gateway:dev    
+npm run start:contracts:dev    
+npm run start:vendor:dev         
+npm run start:request:dev              
+npm run start:master:dev   
+
+ 
