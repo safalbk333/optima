@@ -82,7 +82,7 @@ export class ShipmentService {
         };
       }
 
-      const shipments = await this.prisma.shipment.findMany({
+      const shipments = await this.prisma.tbl_shipment.findMany({
         where: whereClause,
         skip: offset,
         take: limit,
@@ -113,8 +113,8 @@ export class ShipmentService {
     try {
       this.logger.log(`${ShipmentProperties.service.findOne.start}: ${shipment_id}`);
       const shipment =
-        await this.prisma.shipment.findUnique({
-          where: { id: shipment_id },
+        await this.prisma.tbl_shipment.findUnique({
+          where: { pk_chr_shipment_id: shipment_id },
           include: {
             tracking: true,
           },
