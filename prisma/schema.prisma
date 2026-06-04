@@ -405,7 +405,7 @@ model tbl_vendor {
   fk_chr_created_id   String?
   fk_chr_modified_id  String?
   fk_chr_company_id   String?
-  chr_document_status String                       @default("D") @db.Char(1)
+  chr_document_status String                       @default("N") @db.Char(1)
   chat_room_members   tbl_chat_room_member[]
   contracts           tbl_contract[]
   eois                tbl_expression_of_interest[]
@@ -489,7 +489,7 @@ model tbl_purchase_request {
   tim_modified             DateTime?
   fk_chr_created_id        String?
   fk_chr_modified_id       String?
-  chr_document_status      String                              @default("D") @db.Char(1)
+  chr_document_status      String                              @default("N") @db.Char(1)
   approvals                tbl_approval[]
   chat_rooms               tbl_chat_room[]
   contracts                tbl_contract[]
@@ -686,7 +686,7 @@ model tbl_expression_of_interest {
   tim_modified           DateTime?
   fk_chr_created_id      String?
   fk_chr_modified_id     String?
-  chr_document_status    String                      @default("D") @db.Char(1)
+  chr_document_status    String                      @default("N") @db.Char(1)
   created_by             tbl_user?                   @relation("eoi_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by            tbl_user?                   @relation("eoi_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   request                tbl_purchase_request        @relation(fields: [fk_chr_request_id], references: [pk_chr_request_id], onDelete: Cascade)
