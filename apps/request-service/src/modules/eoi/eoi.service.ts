@@ -14,6 +14,7 @@ import { EoiStatus } from './enum/eoi-status.enum';
 
 import { AppLogger } from '../../common/logger/app.logger';
 import { EoiProperties } from '../../common/properties/eoi.properties';
+import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
 @Injectable()
 export class EoiService {
@@ -23,7 +24,7 @@ export class EoiService {
 
   constructor(
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
 
   // =========================================================
   // FIND ALL
@@ -34,7 +35,7 @@ export class EoiService {
       EoiProperties.service.findAll,
     );
 
-    return this.prisma.tbl_expression_of_interest.findMany({
+    const eoi = await this.prisma.tbl_expression_of_interest.findMany({
       where: {
         chr_document_status: {
           not: 'D',
@@ -50,6 +51,11 @@ export class EoiService {
         tim_created: 'desc',
       },
     });
+
+    return ResponseHelper.success(
+      eoi,
+      "Expression of Interest fetched successfully",
+    );
   }
 
   // =========================================================
@@ -86,61 +92,68 @@ export class EoiService {
       );
     }
 
-    return eoi;
-  }
-// =========================================================
-// GET EOI BY VENDOR ID
-// =========================================================
-
-async findByVendorId(
-  vendorId: string,
-) {
-  const vendor =
-    await this.prisma.tbl_vendor.findUnique({
-      where: {
-        pk_chr_vendor_id: vendorId,
-      },
-    });
-
-  if (!vendor) {
-    throw new NotFoundException(
-      'Vendor not found',
+    return ResponseHelper.success(
+      eoi,
+      "Expression of Interest fetched successfully",
     );
   }
+  // =========================================================
+  // GET EOI BY VENDOR ID
+  // =========================================================
 
-  return this.prisma.tbl_expression_of_interest.findMany({
-    where: {
-      fk_chr_vendor_id: vendorId,
-      chr_document_status: {
-        not: 'D',
-      },
-    },
+  async findByVendorId(
+    vendorId: string,
+  ) {
+    const vendor =
+      await this.prisma.tbl_vendor.findUnique({
+        where: {
+          pk_chr_vendor_id: vendorId,
+        },
+      });
 
-    include: {
-      request: {
-        select: {
-          pk_chr_request_id: true,
-          chr_request_number: true,
-          chr_title: true,
-          chr_currency: true,
-          flt_estimated_value: true,
+    if (!vendor) {
+      throw new NotFoundException(
+        'Vendor not found',
+      );
+    }
+
+    const vendor_eoi = await this.prisma.tbl_expression_of_interest.findMany({
+      where: {
+        fk_chr_vendor_id: vendorId,
+        chr_document_status: {
+          not: 'D',
         },
       },
 
-      vendor: {
-        select: {
-          pk_chr_vendor_id: true,
-          chr_vendor_name: true,
-          chr_vendor_email: true,
+      include: {
+        request: {
+          select: {
+            pk_chr_request_id: true,
+            chr_request_number: true,
+            chr_title: true,
+            chr_currency: true,
+            flt_estimated_value: true,
+          },
+        },
+
+        vendor: {
+          select: {
+            pk_chr_vendor_id: true,
+            chr_vendor_name: true,
+            chr_vendor_email: true,
+          },
         },
       },
-    },
 
-    orderBy: {
-      tim_created: 'desc',
-    },
-  });
-}
+      orderBy: {
+        tim_created: 'desc',
+      },
+    });
+    return ResponseHelper.success(
+      vendor_eoi,
+      "Expression of Interest of vendor fetched successfully",
+    );
+  }
   // =========================================================
   // CREATE
   // =========================================================
@@ -180,7 +193,7 @@ async findByVendorId(
 
     const eoiCode = `EOI-${Date.now()}`;
 
-    return this.prisma.tbl_expression_of_interest.create({
+    const eoi = await this.prisma.tbl_expression_of_interest.create({
       data: {
         chr_eoi_code: eoiCode,
 
@@ -205,6 +218,10 @@ async findByVendorId(
           EoiStatus.DRAFT,
       },
     });
+    return ResponseHelper.success(
+      eoi,
+      "Expression of Interest of vendor created successfully",
+    );
   }
 
   // =========================================================
@@ -223,7 +240,7 @@ async findByVendorId(
       await this.findOne(eoiId);
 
     if (
-      eoi.chr_status ===
+      eoi.data.chr_status ===
       EoiStatus.ACCEPTED
     ) {
       throw new BadRequestException(
@@ -231,7 +248,7 @@ async findByVendorId(
       );
     }
 
-    return this.prisma.tbl_expression_of_interest.update({
+    const eoi_data = await this.prisma.tbl_expression_of_interest.update({
       where: {
         pk_chr_eoi_id: eoiId,
       },
@@ -246,14 +263,18 @@ async findByVendorId(
         dt_submission_deadline:
           dto.dt_submission_deadline
             ? new Date(
-                dto.dt_submission_deadline,
-              )
+              dto.dt_submission_deadline,
+            )
             : undefined,
 
         tim_modified:
           new Date(),
       },
     });
+    return ResponseHelper.success(
+      eoi_data,
+      "Expression of Interest of vendor updated successfully",
+    );
   }
 
   // =========================================================
@@ -272,10 +293,10 @@ async findByVendorId(
       await this.findOne(eoiId);
 
     if (
-      eoi.chr_status ===
-        EoiStatus.ACCEPTED &&
+      eoi.data.chr_status ===
+      EoiStatus.ACCEPTED &&
       dto.chr_status !==
-        EoiStatus.ACCEPTED
+      EoiStatus.ACCEPTED
     ) {
       throw new BadRequestException(
         'Accepted EOI status cannot be changed',
@@ -296,9 +317,9 @@ async findByVendorId(
 
         dt_submitted_at:
           dto.chr_status ===
-          EoiStatus.ACCEPTED
+            EoiStatus.ACCEPTED
             ? new Date()
-            : eoi.dt_submitted_at,
+            : eoi.data.dt_submitted_at,
 
         tim_modified:
           new Date(),
