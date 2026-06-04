@@ -16,6 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { QuotationGatewayService } from './quotation.service';
 import { CreateQuotationDto } from './dto/create-quotation.dto';
+import { UpdateQuotationDto } from './dto/update-quotation.dto';
 
 @ApiTags('Quotation-Service')
 @Controller('quotation')
@@ -65,7 +66,7 @@ export class QuotationController {
   @ApiResponse({ status: 200, description: 'Quotation updated successfully' })
   update(
     @Param('id') id: string,
-    @Body() data: any,
+    @Body() data: UpdateQuotationDto,
   ) {
     return this.quotationService.update(id, data);
   }

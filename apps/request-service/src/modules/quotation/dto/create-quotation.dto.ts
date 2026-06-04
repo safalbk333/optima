@@ -11,7 +11,7 @@ import { Type } from 'class-transformer';
 export class QuotationItemDto {
   @IsOptional()
   @IsString()
-  strVendorItemId?: string;
+  strItemId?: string;
 
   @IsString()
   strItemDescription: string;

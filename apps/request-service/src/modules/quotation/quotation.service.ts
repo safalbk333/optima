@@ -42,7 +42,7 @@ export class QuotationService {
           ...(arrItems && arrItems.length > 0 && {
             quotation_items: {
               create: arrItems.map(item => ({
-                fk_chr_vendor_item_id: item.strVendorItemId,
+                fk_chr_item_id: item.strItemId,
                 chr_item_description: item.strItemDescription,
                 int_quantity: item.intQuantity,
                 chr_unit_of_measure: item.strUnitOfMeasure,
@@ -198,7 +198,7 @@ export class QuotationService {
             quotation_items: {
               deleteMany: {},
               create: arrItems.map(item => ({
-                fk_chr_vendor_item_id: item.strVendorItemId,
+                fk_chr_item_id: item.strItemId,
                 chr_item_description: item.strItemDescription,
                 int_quantity: item.intQuantity,
                 chr_unit_of_measure: item.strUnitOfMeasure,

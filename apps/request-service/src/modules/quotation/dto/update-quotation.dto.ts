@@ -15,10 +15,6 @@ export class QuotationItemDto {
 
   @IsOptional()
   @IsString()
-  strVendorItemId?: string;
-
-  @IsOptional()
-  @IsString()
   strItemDescription?: string;
 
   @IsOptional()

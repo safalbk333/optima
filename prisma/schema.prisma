@@ -442,6 +442,7 @@ model tbl_item {
   modified_by         tbl_user?                           @relation("item_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   pr_item_mappings    tbl_purchase_request_item_mapping[]
   rfq_item_mappings   tbl_rfq_item_mapping[]
+  quotation_items     tbl_quotation_item[]
 
   @@index([fk_chr_category_id])
   @@map("tbl_item")
@@ -463,7 +464,6 @@ model tbl_vendor_items {
   fk_chr_created_id     String?
   fk_chr_modified_id    String?
   chr_document_status   String               @default("N") @db.Char(1)
-  quotation_items       tbl_quotation_item[]
   created_by            tbl_user?            @relation("vendor_items_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by           tbl_user?            @relation("vendor_items_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
   vendor                tbl_vendor           @relation(fields: [fk_chr_vendor_id], references: [pk_chr_vendor_id], onDelete: Cascade)
@@ -797,31 +797,31 @@ model tbl_quotation {
 }
 
 model tbl_quotation_item {
-  pk_chr_quotation_item_id String            @id @default(uuid())
+  pk_chr_quotation_item_id String        @id @default(uuid())
   fk_chr_quotation_id      String
-  fk_chr_vendor_item_id    String?
+  fk_chr_item_id           String?
   chr_item_description     String
   int_quantity             Int
   chr_unit_of_measure      String?
   flt_unit_price           Float
-  flt_tax_percentage       Float             @default(0)
-  flt_tax_amount           Float             @default(0)
+  flt_tax_percentage       Float         @default(0)
+  flt_tax_amount           Float         @default(0)
   flt_total_price          Float
-  chr_currency             String            @default("USD")
+  chr_currency             String        @default("USD")
   txt_notes                String?
-  tim_created              DateTime          @default(now())
+  tim_created              DateTime      @default(now())
   tim_modified             DateTime?
   fk_chr_created_id        String?
   fk_chr_modified_id       String?
   txt_rendered_html        String?
-  chr_document_status      String            @default("D") @db.Char(1)
-  created_by               tbl_user?         @relation("quotation_item_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by              tbl_user?         @relation("quotation_item_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
-  quotation                tbl_quotation     @relation(fields: [fk_chr_quotation_id], references: [pk_chr_quotation_id], onDelete: Cascade)
-  vendor_item              tbl_vendor_items? @relation(fields: [fk_chr_vendor_item_id], references: [pk_chr_vendor_item_id])
+  chr_document_status      String        @default("D") @db.Char(1)
+  created_by               tbl_user?     @relation("quotation_item_created_by", fields: [fk_chr_created_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by              tbl_user?     @relation("quotation_item_modified_by", fields: [fk_chr_modified_id], references: [pk_chr_user_id], onDelete: NoAction, onUpdate: NoAction)
+  quotation                tbl_quotation @relation(fields: [fk_chr_quotation_id], references: [pk_chr_quotation_id], onDelete: Cascade)
+  item                     tbl_item?     @relation(fields: [fk_chr_item_id], references: [pk_chr_item_id])
 
   @@index([fk_chr_quotation_id])
-  @@index([fk_chr_vendor_item_id])
+  @@index([fk_chr_item_id])
   @@map("tbl_quotation_item")
 }
 
