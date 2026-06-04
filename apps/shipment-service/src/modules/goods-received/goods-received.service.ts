@@ -81,7 +81,7 @@ export class GoodsReceivedService {
         };
       }
 
-      const goodsReceiveds = await this.prisma.gRN.findMany({
+      const goodsReceiveds = await this.prisma.tbl_goods_receipt.findMany({
         where: whereClause,
         skip: offset,
         take: limit,
@@ -112,8 +112,8 @@ export class GoodsReceivedService {
     try {
       this.logger.log(`${GoodsReceivedProperties.service.findOne.start}: ${goods_received_id}`);
       const goodsReceived =
-        await this.prisma.gRN.findUnique({
-          where: { id: goods_received_id },
+        await this.prisma.tbl_goods_receipt.findUnique({
+          where: { pk_chr_goods_receipt_id: goods_received_id },
           // include: {
           //   tracking: true,
           // },
