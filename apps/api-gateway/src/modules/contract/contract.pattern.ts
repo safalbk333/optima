@@ -4,4 +4,5 @@ export const CONTRACT_PATTERN = {
   CREATE: 'contract.create',
   UPDATE: 'contract.update',
   DELETE: 'contract.delete',
+  FIND_BY_VENDOR_ID: 'contract.findByVendorId',
 };

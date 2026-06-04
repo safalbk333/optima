@@ -5,6 +5,7 @@ export const ContractProperties = {
     findOne: 'Received request to find contract with id',
     create: 'Received request to create contract',
     update: 'Received request to update contract with id',
+    findByVendorId: 'Received request to find contracts by vendor id',
   },
   service: {
     findAll: {
@@ -28,6 +29,11 @@ export const ContractProperties = {
       success: 'Contract updated with id',
       notFound: 'Contract not found with id',
       error: 'Failed to update contract with ID',
+    },
+    findByVendorId: {
+      start: 'Fetching contracts by vendor id',
+      success: 'Contracts fetched by vendor id',
+      error: 'Failed to fetch contracts by vendor id',
     },
   },
 };

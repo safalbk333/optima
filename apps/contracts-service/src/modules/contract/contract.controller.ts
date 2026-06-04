@@ -39,6 +39,12 @@ export class ContractController {
     return this.contractService.create(data);
   }
 
+  @MessagePattern('contract.findByVendorId')
+  findByVendorId(@Payload() vendorId: string) {
+    this.logger.log(`${ContractProperties.controller.findByVendorId}: ${vendorId}`);
+    return this.contractService.findByVendorId(vendorId);
+  }
+
   @MessagePattern('contract.update')
   update(
     @Payload()
