@@ -10,12 +10,16 @@ import {
 import { Type } from 'class-transformer';
 
 export class QuotationItemDto {
-  @ApiPropertyOptional({ description: 'Item ID from tbl_item' })
+  @ApiPropertyOptional({ description: 'Item ID from tbl_item',
+    example:"get id from rfq items list "
+   })
   @IsOptional()
   @IsString()
   strItemId?: string;
 
-  @ApiProperty({ description: 'Item description' })
+  @ApiProperty({ description: 'Item description',
+    example:" "
+   })
   @IsString()
   strItemDescription: string;
 
