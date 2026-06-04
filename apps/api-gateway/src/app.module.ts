@@ -40,6 +40,8 @@ import { DepartmentGatewayService } from './modules/department/department.servic
  
 import { TemplateController } from './modules/template/template.controller';
 import { TemplateGatewayService } from './modules/template/template.service';
+import { InvoiceController } from './modules/invoice/invoice.controller';
+import { InvoiceGatewayService } from './modules/invoice/invoice.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
  
@@ -124,6 +126,7 @@ ConfigModule.forRoot({
     GoodsReceiptController,
     DepartmentController,
     TemplateController,
+    InvoiceController
   ],
  
   providers: [
@@ -143,6 +146,7 @@ ConfigModule.forRoot({
     GoodsReceiptGatewayService,
     DepartmentGatewayService,
     TemplateGatewayService,
+    InvoiceGatewayService
   ],
 })
 export class AppModule {
