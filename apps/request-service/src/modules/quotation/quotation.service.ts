@@ -19,10 +19,14 @@ export class QuotationService {
 
       const quotation = await this.prisma.tbl_quotation.create({
         data: {
-          fk_chr_vendor_id: quotationData.strVendorId,
-          fk_chr_rfq_id: quotationData.strRfqId,
-          fk_chr_category_id: quotationData.strCategoryId,
-          fk_chr_buyer_id: quotationData.strBuyerId,
+          vendor: { connect: { pk_chr_vendor_id: quotationData.strVendorId } },
+          rfq: { connect: { pk_chr_rfq_id: quotationData.strRfqId } },
+          ...(quotationData.strCategoryId && {
+            category: { connect: { pk_chr_category_id: quotationData.strCategoryId } },
+          }),
+          ...(quotationData.strBuyerId && {
+            buyer: { connect: { pk_chr_user_id: quotationData.strBuyerId } },
+          }),
           chr_buyer_details: quotationData.strBuyerDetails,
           chr_seller_details: quotationData.strSellerDetails,
           chr_status: quotationData.strStatus || 'DRAFT',
@@ -31,11 +35,13 @@ export class QuotationService {
           dt_issue_date: new Date(quotationData.strIssueDate),
           dt_due_date: new Date(quotationData.strDueDate),
           txt_notes: quotationData.strNotes,
-          fk_chr_created_id: quotationData.strCreatedId,
+          ...(quotationData.strCreatedId && {
+            created_by: { connect: { pk_chr_user_id: quotationData.strCreatedId } },
+          }),
+          ...(quotationData.strHtmlContent && { txt_rendered_html: quotationData.strHtmlContent }),
           ...(arrItems && arrItems.length > 0 && {
             quotation_items: {
               create: arrItems.map(item => ({
-                fk_chr_item_id: item.strItemId,
                 fk_chr_vendor_item_id: item.strVendorItemId,
                 chr_item_description: item.strItemDescription,
                 int_quantity: item.intQuantity,
@@ -45,9 +51,8 @@ export class QuotationService {
                 flt_tax_amount: item.intTaxAmount || 0,
                 flt_total_price: item.intTotalPrice,
                 chr_currency: item.strCurrency || 'USD',
-                dt_delivery_lead_time: item.dtDeliveryLeadTime ? new Date(item.dtDeliveryLeadTime) : undefined,
                 txt_notes: item.strNotes,
-              })),
+              })) as any,
             },
           }),
         },
@@ -56,24 +61,14 @@ export class QuotationService {
           rfq: true,
           category: true,
           buyer: true,
-          quotation_items: {
-            include: {
-              item: true,
-            },
-          },
+          quotation_items: true,
         },
       });
 
       this.logger.log(`${QuotationProperties.service.create.success}: ${quotation.pk_chr_quotation_id}`);
-      return ResponseHelper.success(
-        quotation,
-        "Quotation created successfully",
-      );
+      return ResponseHelper.success(quotation, "Quotation created successfully");
     } catch (error) {
-      this.logger.error(
-        QuotationProperties.service.create.error,
-        error.stack,
-      );
+      this.logger.error(QuotationProperties.service.create.error, error.stack);
       return ResponseHelper.error("Failed to create quotation", error.message);
     }
   }
@@ -105,27 +100,15 @@ export class QuotationService {
               chr_user_email: true,
             },
           },
-          quotation_items: {
-            include: {
-              item: true,
-            },
-          },
+          quotation_items: true,
         },
-        orderBy: {
-          tim_created: 'desc',
-        },
+        orderBy: { tim_created: 'desc' },
       });
 
       this.logger.log(QuotationProperties.service.findAll.success);
-      return ResponseHelper.success(
-        quotations,
-        "Quotations fetched successfully",
-      );
+      return ResponseHelper.success(quotations, "Quotations fetched successfully");
     } catch (error) {
-      this.logger.error(
-        QuotationProperties.service.findAll.error,
-        error.stack,
-      );
+      this.logger.error(QuotationProperties.service.findAll.error, error.stack);
       return ResponseHelper.error("Failed to fetch quotations", error.message);
     }
   }
@@ -158,11 +141,7 @@ export class QuotationService {
               chr_user_email: true,
             },
           },
-          quotation_items: {
-            include: {
-              item: true,
-            },
-          },
+          quotation_items: true,
         },
       });
 
@@ -171,15 +150,9 @@ export class QuotationService {
       }
 
       this.logger.log(`${QuotationProperties.service.findOne.success}: ${strId}`);
-      return ResponseHelper.success(
-        quotation,
-        "Quotation fetched successfully",
-      );
+      return ResponseHelper.success(quotation, "Quotation fetched successfully");
     } catch (error) {
-      this.logger.error(
-        `${QuotationProperties.service.findOne.error}: ${strId}`,
-        error.stack,
-      );
+      this.logger.error(`${QuotationProperties.service.findOne.error}: ${strId}`, error.stack);
       throw error;
     }
   }
@@ -200,9 +173,15 @@ export class QuotationService {
       const updatedQuotation = await this.prisma.tbl_quotation.update({
         where: { pk_chr_quotation_id: strId },
         data: {
-          ...(updateData.strVendorId !== undefined && { fk_chr_vendor_id: updateData.strVendorId }),
-          ...(updateData.strCategoryId !== undefined && { fk_chr_category_id: updateData.strCategoryId }),
-          ...(updateData.strBuyerId !== undefined && { fk_chr_buyer_id: updateData.strBuyerId }),
+          ...(updateData.strVendorId !== undefined && {
+            vendor: { connect: { pk_chr_vendor_id: updateData.strVendorId } },
+          }),
+          ...(updateData.strCategoryId !== undefined && {
+            category: { connect: { pk_chr_category_id: updateData.strCategoryId } },
+          }),
+          ...(updateData.strBuyerId !== undefined && {
+            buyer: { connect: { pk_chr_user_id: updateData.strBuyerId } },
+          }),
           ...(updateData.strBuyerDetails !== undefined && { chr_buyer_details: updateData.strBuyerDetails }),
           ...(updateData.strSellerDetails !== undefined && { chr_seller_details: updateData.strSellerDetails }),
           ...(updateData.strStatus !== undefined && { chr_status: updateData.strStatus }),
@@ -211,13 +190,14 @@ export class QuotationService {
           ...(updateData.strIssueDate !== undefined && { dt_issue_date: new Date(updateData.strIssueDate) }),
           ...(updateData.strDueDate !== undefined && { dt_due_date: new Date(updateData.strDueDate) }),
           ...(updateData.strNotes !== undefined && { txt_notes: updateData.strNotes }),
-          ...(updateData.strModifiedId !== undefined && { fk_chr_modified_id: updateData.strModifiedId }),
+          ...(updateData.strModifiedId !== undefined && {
+            modified_by: { connect: { pk_chr_user_id: updateData.strModifiedId } },
+          }),
           tim_modified: new Date(),
           ...(arrItems && {
             quotation_items: {
               deleteMany: {},
               create: arrItems.map(item => ({
-                fk_chr_item_id: item.strItemId,
                 fk_chr_vendor_item_id: item.strVendorItemId,
                 chr_item_description: item.strItemDescription,
                 int_quantity: item.intQuantity,
@@ -227,9 +207,8 @@ export class QuotationService {
                 flt_tax_amount: item.intTaxAmount || 0,
                 flt_total_price: item.intTotalPrice,
                 chr_currency: item.strCurrency || 'USD',
-                dt_delivery_lead_time: item.dtDeliveryLeadTime ? new Date(item.dtDeliveryLeadTime) : undefined,
                 txt_notes: item.strNotes,
-              })),
+              })) as any,
             },
           }),
         },
@@ -238,24 +217,14 @@ export class QuotationService {
           rfq: true,
           category: true,
           buyer: true,
-          quotation_items: {
-            include: {
-              item: true,
-            },
-          },
+          quotation_items: true,
         },
       });
 
       this.logger.log(`${QuotationProperties.service.update.success}: ${strId}`);
-      return ResponseHelper.success(
-        updatedQuotation,
-        "Quotation updated successfully",
-      );
+      return ResponseHelper.success(updatedQuotation, "Quotation updated successfully");
     } catch (error) {
-      this.logger.error(
-        `${QuotationProperties.service.update.error}: ${strId}`,
-        error.stack,
-      );
+      this.logger.error(`${QuotationProperties.service.update.error}: ${strId}`, error.stack);
       throw error;
     }
   }
@@ -276,15 +245,9 @@ export class QuotationService {
       });
 
       this.logger.log(`${QuotationProperties.service.delete.success}: ${strId}`);
-      return ResponseHelper.success(
-        deletedQuotation,
-        "Quotation deleted successfully",
-      );
+      return ResponseHelper.success(deletedQuotation, "Quotation deleted successfully");
     } catch (error) {
-      this.logger.error(
-        `${QuotationProperties.service.delete.error}: ${strId}`,
-        error.stack,
-      );
+      this.logger.error(`${QuotationProperties.service.delete.error}: ${strId}`, error.stack);
       throw error;
     }
   }

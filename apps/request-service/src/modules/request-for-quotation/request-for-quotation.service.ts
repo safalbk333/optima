@@ -108,11 +108,7 @@ export class RequestForQuotationService {
                   chr_vendor_email: true,
                 },
               },
-              quotation_items: {
-                include: {
-                  item: true,
-                },
-              },
+              quotation_items: true,
             },
           },
           rfq_item_mappings: {

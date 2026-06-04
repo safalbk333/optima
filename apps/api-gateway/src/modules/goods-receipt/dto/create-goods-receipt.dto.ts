@@ -47,14 +47,6 @@ export class CreateGoodsReceiptDto {
   @IsString()
   strPurchaseOrderId: string;
 
-  @ApiProperty({ description: 'Purchase request ID' })
-  @IsString()
-  strRequestId: string;
-
-  @ApiProperty({ description: 'Vendor ID' })
-  @IsString()
-  strVendorId: string;
-
   @ApiPropertyOptional({ description: 'Status', default: 'PENDING' })
   @IsOptional()
   @IsString()

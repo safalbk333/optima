@@ -38,12 +38,6 @@ export class CreateGoodsReceiptDto {
   @IsString()
   strPurchaseOrderId: string;
 
-  @IsString()
-  strRequestId: string;
-
-  @IsString()
-  strVendorId: string;
-
   @IsOptional()
   @IsString()
   strStatus?: string;
