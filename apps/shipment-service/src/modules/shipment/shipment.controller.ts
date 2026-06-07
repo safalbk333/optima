@@ -6,6 +6,7 @@ import {
 import { ShipmentService } from './shipment.service';
 import { AppLogger } from '../../common/logger/app.logger';
 import { ShipmentProperties } from '../../common/properties/shipment.properties';
+import { CreateShipmentDto } from './dto/create-shipment.dto';
 
 @Controller()
 export class ShipmentController {
@@ -16,6 +17,12 @@ export class ShipmentController {
   ) {
     this.logger.log(ShipmentProperties.controller.start);
   }
+
+  @MessagePattern('shipment.create')
+    create(@Payload() createShipmentDto: CreateShipmentDto) {
+      this.logger.log(ShipmentProperties.controller.create);
+      return this.shipmentService.create(createShipmentDto);
+    }
 
   @MessagePattern('shipment.findAll')
   findAll(

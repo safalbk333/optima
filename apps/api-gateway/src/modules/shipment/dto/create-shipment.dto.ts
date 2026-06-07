@@ -4,9 +4,17 @@ import {
   IsString,
   IsNumber,
   IsDateString,
+  IsInt,
+  IsOptional,
 } from 'class-validator';
 
-export class CreateQuotationDto {
+export class CreateShipmentDto {
+  @ApiProperty({
+    description: 'Purchase Order number',
+  })
+  @IsString()
+  poNumber: string;
+
   @ApiProperty({
     description: 'ID of the vendor',
   })
@@ -14,39 +22,51 @@ export class CreateQuotationDto {
   vendorId: string;
 
   @ApiProperty({
-    description: 'RFQ title of the vendor',
+    description: 'ASN number',
   })
   @IsString()
-  rfqTitle: string;
+  asnNumber: string;
 
   @ApiProperty({
-    description: 'Category of the vendor',
-  })
-  @IsString()
-  category: string;
-
-  @ApiProperty({
-    description: 'Issue date of the RFQ',
+    description: 'Dispatch date',
   })
   @IsDateString()
-  issueDate: Date;
+  dispatchDate: Date;
 
   @ApiProperty({
-    description: 'Due date of the RFQ',
+    description: 'Delivery date',
   })
   @IsDateString()
-  dueDate: Date;
+  deliveryDate: Date;
 
   @ApiProperty({
-    description: 'Buyer of the vendor',
+    description: 'Provider',
   })
   @IsString()
-  buyer: string;
+  logistics_provider: string;
 
   @ApiProperty({
-    description: 'Status of the quotation',
-    default: 'Pending',
+    description: 'Shipment tracking number',
   })
   @IsString()
-  status: string;
+  tracking_no: string;
+
+  @ApiProperty({
+    description: 'Item quantity',
+  })
+  @IsInt()
+  quantity: number;
+
+  @ApiProperty({
+    description: 'ASN notes',
+  })
+  @IsString()
+  notes: string;
+
+  @ApiPropertyOptional({
+    description: 'Status', default: 1,
+  })
+  @IsOptional()
+  @IsInt()
+  status?: number;
 }

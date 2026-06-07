@@ -1,27 +1,37 @@
 import {
     IsString,
     IsNumber,
+    IsInt,
 } from 'class-validator';
 
-export class CreateQuotationDto {
+export class CreateShipmentDto {
+    @IsString()
+    poNumber: string;
+
     @IsString()
     vendorId: string;
 
     @IsString()
-    rfqTitle: string;
+    asnNumber: string;
 
     @IsString()
-    category: string;
+    dispatchDate: string;
 
     @IsString()
-    issueDate: string;
+    deliveryDate: string;
 
     @IsString()
-    dueDate: string;
+    logistics_provider: string;
 
     @IsString()
-    buyer: string;
+    tracking_no: string;
+
+    @IsInt()
+    quantity: number;
+
+    @IsInt()
+    status: number;
 
     @IsString()
-    status: string;
+    notes: string;
 }

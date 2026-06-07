@@ -16,6 +16,20 @@ export class ShipmentGatewayService {
   ) {
     this.logger = new Logger(ShipmentGatewayService.name);
   }
+
+  async create(data: any) {
+      try{
+        return await firstValueFrom(
+          this.client.send(
+            SHIPMENT_PATTERN.CREATE,
+            data,
+          ),
+        );
+      }catch(error){
+        this.logger.error(error.message, error);
+        throw error;
+      }
+    }
   
   async findAll(payload: any) {
     try{

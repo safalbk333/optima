@@ -134,7 +134,6 @@ export class CreateQuotationDto {
   arrItems?: QuotationItemDto[];
 
   @ApiPropertyOptional({ description: 'HTML content to render',
-    
     example:" HTML content to render " 
    })
   @IsOptional()

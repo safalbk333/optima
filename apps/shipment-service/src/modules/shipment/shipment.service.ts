@@ -8,15 +8,57 @@ import { ShipmentProperties } from '../../common/properties/shipment.properties'
 import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 import { QuotationProperties } from 'apps/vendor-service/src/common/properties/quotation.properties';
 import {Shipment_status} from '../constant/enum';
+import { CreateShipmentDto } from './dto/create-shipment.dto';
 
 
 @Injectable()
 export class ShipmentService {
   private readonly logger = new AppLogger(ShipmentService.name);
-
   constructor(
     private readonly prisma: PrismaService,
   ) {}
+
+  async create(createShipmentDto: CreateShipmentDto) {
+      const asn =
+        await this.prisma.tbl_shipment.create({
+          data: {
+            fk_po_number:
+              createShipmentDto.poNumber,
+  
+            fk_chr_vendor_id:
+              createShipmentDto.vendorId,
+  
+            chr_asn_id:
+              createShipmentDto.asnNumber,
+            
+              dt_dispatch_date:
+              createShipmentDto.dispatchDate,
+
+              dt_delivery_date:
+              createShipmentDto.deliveryDate,
+
+              chr_logistics_provider:
+              createShipmentDto.logistics_provider,
+
+              fk_chr_tracking_no:
+              createShipmentDto.tracking_no,
+
+              int_quantity:
+              createShipmentDto.quantity,
+
+              int_status:
+              createShipmentDto.status,
+
+              chr_notes:
+              createShipmentDto.notes,
+          },
+        });
+  
+      return ResponseHelper.success(
+        asn,
+        'ASN created successfully',
+      );
+    }
 
   async findAll(payload: {
     limit?: number;

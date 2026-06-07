@@ -13,6 +13,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ShipmentGatewayService } from './shipment.service';
+import { CreateShipmentDto } from './dto/create-shipment.dto';
 
 @ApiTags('Shipment-Service')
 @Controller('shipment')
@@ -21,18 +22,18 @@ export class ShipmentController {
     private readonly shipmentService: ShipmentGatewayService,
   ) { }
 
-  // @Post()
-  // @ApiOperation({
-  //   summary: 'Create a new quotation',
-  // })
-  // @ApiResponse({
-  //   status: 200,
-  //   description:
-  //     'Quotation created successfully',
-  // })
-  // create(@Body() data: CreateShipmentDto) {
-  //   return this.shipmentService.create(data);
-  // }
+  @Post()
+  @ApiOperation({
+    summary: 'Create new ASN',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'ASN created successfully',
+  })
+  create(@Body() data: CreateShipmentDto) {
+    return this.shipmentService.create(data);
+  }
 
   @Get()
   @ApiOperation({
