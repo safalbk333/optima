@@ -80,7 +80,15 @@ export class EoiService {
         },
 
         include: {
-          request: true,
+          request: {
+            include: {
+              pr_item_mappings: {
+                include: {
+                  item: true,
+                },
+              },
+            },
+          },
           vendor: true,
           rfqs: true,
         },

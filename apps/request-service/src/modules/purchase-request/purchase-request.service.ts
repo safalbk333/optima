@@ -198,7 +198,15 @@ export class PurchaseRequestService {
       const updatedPurchaseRequest = await this.prisma.tbl_purchase_request.update({
         where: { pk_chr_request_id: strId },
         data: {
-          ...updateData,
+          ...(updateData.strTitle !== undefined && { chr_title: updateData.strTitle }),
+          ...(updateData.strDescription !== undefined && { txt_description: updateData.strDescription }),
+          ...(updateData.strCurrentStatusId !== undefined && { fk_chr_current_status_id: updateData.strCurrentStatusId }),
+          ...(updateData.strPriorityId !== undefined && { fk_chr_priority_id: updateData.strPriorityId }),
+          ...(updateData.intEstimatedValue !== undefined && { flt_estimated_value: updateData.intEstimatedValue }),
+          ...(updateData.strCurrency !== undefined && { chr_currency: updateData.strCurrency }),
+          ...(updateData.strDepartmentId !== undefined && { fk_chr_department_id: updateData.strDepartmentId }),
+          ...(updateData.strCategoryId !== undefined && { fk_chr_category_id: updateData.strCategoryId }),
+          ...(updateData.strModifiedId !== undefined && { fk_chr_modified_id: updateData.strModifiedId }),
           tim_modified: new Date(),
           ...(arrItems && {
             pr_item_mappings: {
