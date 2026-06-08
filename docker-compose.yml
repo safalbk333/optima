@@ -21,9 +21,12 @@ services:
     ports:
       - "3001:3001"
     env_file:
+      - ./.env
       - ./apps/vendor-service/.env.production
     environment:
       NODE_ENV: production
+    depends_on:
+      - postgres
     restart: always
 
   auth-service:
@@ -34,6 +37,7 @@ services:
     ports:
       - "3002:3002"
     env_file:
+      - ./.env
       - ./apps/auth-service/.env.production
     environment:
       NODE_ENV: production
@@ -47,10 +51,75 @@ services:
     ports:
       - "3003:3003"
     env_file:
+      - ./.env
       - ./apps/contracts-service/.env.production
     environment:
       NODE_ENV: production
+    depends_on:
+      - postgres
     restart: always
+
+  shipment-service:
+    build:
+      context: .
+      dockerfile: apps/shipment-service/Dockerfile
+    container_name: shipment-service
+    ports:
+      - "3004:3004"
+    env_file:
+      - ./.env
+      - ./apps/shipment-service/.env.production
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - postgres
+    restart: always
+
+  master-service:
+    build:
+      context: .
+      dockerfile: apps/master-service/Dockerfile
+    container_name: master-service
+    ports:
+      - "3005:3005"
+    env_file:
+      - ./.env
+      - ./apps/master-service/.env.production
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - postgres
+    restart: always
+
+  request-service:
+    build:
+      context: .
+      dockerfile: apps/request-service/Dockerfile
+    container_name: request-service
+    ports:
+      - "3006:3006"
+    env_file:
+      - ./.env
+      - ./apps/request-service/.env.production
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - postgres
+    restart: always
+
+  # user-service:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/user-service/Dockerfile
+  #   container_name: user-service
+  #   ports:
+  #     - "3007:3007"
+  #   env_file:
+  #     - ./.env
+  #     - ./apps/user-service/.env.production
+  #   environment:
+  #     NODE_ENV: production
+  #   restart: always
 
   postgres:
     image: postgres:16
@@ -58,6 +127,7 @@ services:
     restart: unless-stopped
 
     env_file:
+      - ./.env
       - ./apps/api-gateway/.env.production
 
     environment:

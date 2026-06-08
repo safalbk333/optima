@@ -12,7 +12,6 @@ COPY . .
 
 RUN npx prisma generate
 
-RUN npm run build vendor-service
+RUN npm run build shipment-service
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/apps/vendor-service/main"]
-
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/apps/shipment-service/main"]

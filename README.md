@@ -139,5 +139,4 @@ npm run start:contracts:dev
 npm run start:vendor:dev         
 npm run start:request:dev              
 npm run start:master:dev   
-
- 
+npm run start:shipment:dev
