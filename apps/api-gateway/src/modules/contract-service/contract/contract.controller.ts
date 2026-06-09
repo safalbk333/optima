@@ -27,7 +27,7 @@ import {
   Permissions,
   HOME_READ,
 
-} from '../guards';
+} from '../../guards';
 
 @ApiTags('Contracts-Service')
 @Controller('contract')

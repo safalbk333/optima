@@ -97,7 +97,7 @@ export class InvoiceController {
     type: String,
     required: false,
     description: 'Search by invoice number, vendor name, or other fields',
-    example: 'INV-2026-001',
+    // example: 'INV-2026-001',
   })
   @ApiResponse({
     status: HttpStatus.OK,
