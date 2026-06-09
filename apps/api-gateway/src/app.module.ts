@@ -12,8 +12,8 @@ import { QuotationController } from './modules/vendor-service/vendor/quotation/q
 import { QuotationGatewayService } from './modules/vendor-service/vendor/quotation/quotation.service';
 import { ItemGatewayService } from './modules/master-service/item/item.service';
 import { ItemController } from './modules/master-service/item/item.controller';
-import { AuthController } from './modules/auth/auth.controller';
-import { AuthService } from './modules/auth/auth.service';
+import { AuthController } from './modules/auth-service/auth/auth.controller';
+import { AuthService } from './modules/auth-service/auth/auth.service';
 import { ContractController } from './modules/contract-service/contract/contract.controller';
 import { ContractGatewayService } from './modules/contract-service/contract/contract.service';
 import { CategoryController } from './modules/master-service/category/category.controller';
@@ -25,8 +25,8 @@ import { GoodsReceivedGatewayService } from './modules/shipment-service/goods-re
 import { KeycloakController } from './modules/authentication/keycloak/keycloak.controller';
 import { PermissionsController } from './modules/authentication/permissions/permissions.controller';
 import { GroupRolesController } from './modules/authentication/roles/roles.controller';
-import { PurchaseRequestController } from './modules/purchase-request/purchase-request.controller';
-import { PurchaseRequestGatewayService } from './modules/purchase-request/purchase-request.service';
+import { PurchaseRequestController } from './modules/request-service/purchase-request/purchase-request.controller';
+import { PurchaseRequestGatewayService } from './modules/request-service/purchase-request/purchase-request.service';
 import { EoiController } from './modules/request-service/eoi/eoi.controller';
 import { EoiGatewayService } from './modules/request-service/eoi/eoi.service';
 import { RequestForQuotationController } from './modules/request-service/request-for-quotation/request-for-quotation.controller';
