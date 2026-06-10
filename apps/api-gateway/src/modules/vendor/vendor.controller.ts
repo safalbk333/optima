@@ -35,7 +35,6 @@ export class VendorController {
   }
 
   @Get()
-
   @ApiOperation({
     summary: 'Get all vendors',
   })
