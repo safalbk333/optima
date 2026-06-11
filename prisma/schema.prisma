@@ -705,6 +705,7 @@ model tbl_purchase_order {
   fk_vendor_id         String
   total_value          Float
   currency             String               @default("USD")
+  status               String
   issued_at            DateTime?
   delivery_address     String?
   expected_delivery    DateTime?
