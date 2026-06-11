@@ -27,7 +27,7 @@ import {
     Permissions,
     HOME_READ,
 
-} from '../guards';
+} from '../../guards';
 
 @ApiTags('EOIs-Service')
 @Controller('eoi')
