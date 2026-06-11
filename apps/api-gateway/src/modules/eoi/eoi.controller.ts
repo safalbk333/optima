@@ -135,13 +135,13 @@ export class EoiController {
             },
             example2: {
                 value: {
-                    chr_status: 'ACCEPTED',
+                    chr_status: 'INTERESTED',
                     txt_notes: 'Vendor has accepted the EOI',
                 },
             },
             example3: {
                 value: {
-                    chr_status: 'REJECTED',
+                    chr_status: 'DECLINED',
                     txt_notes: 'Vendor rejected the quote',
                 },
             },
