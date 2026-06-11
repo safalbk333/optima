@@ -18,7 +18,7 @@ import { QuotationGatewayService } from './quotation.service';
 import { CreateQuotationDto } from './dto/create-quotation.dto';
 import { UpdateQuotationDto } from './dto/update-quotation.dto';
 
-@ApiTags('Quotation-Service')
+@ApiTags('Quotation-[vendor Service]')
 @Controller('quotation')
 export class QuotationController {
   constructor(
