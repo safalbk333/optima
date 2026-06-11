@@ -6,6 +6,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { PURCHASE_ORDER_PATTERN } from './purchase-order.pattern';
+import { UpdatePurchaseOrderDto } from './dto/update-purchase-order.dto';
 
 @Injectable()
 export class PurchaseOrderGatewayService {
@@ -59,7 +60,7 @@ export class PurchaseOrderGatewayService {
     }
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: UpdatePurchaseOrderDto) {
     try{
       return await firstValueFrom(
         this.client.send(

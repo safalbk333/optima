@@ -17,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { PurchaseOrderGatewayService } from './purchase-order.service';
 import { CreatePurchaseOrderDto } from './dto/create-purchase-order.dto';
+import { UpdatePurchaseOrderDto } from './dto/update-purchase-order.dto';
 
 @ApiTags('Purchase-Order-Service')
 @Controller('purchase-order')
@@ -80,7 +81,7 @@ export class PurchaseOrderController {
   @ApiResponse({ status: 200, description: 'Purchase order updated successfully' })
   update(
     @Param('id') id: string,
-    @Body() data: any,
+    @Body() data: UpdatePurchaseOrderDto,
   ) {
     return this.purchaseOrderService.update(id, data);
   }
