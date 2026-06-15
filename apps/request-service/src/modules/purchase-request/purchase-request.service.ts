@@ -21,16 +21,16 @@ export class PurchaseRequestService {
           priority: true,
           requested_by: {
             select: {
-              pk_chr_user_id: true,
-              chr_user_name: true,
-              chr_user_email: true,
+              pk_user_id: true,
+              user_name: true,
+              user_email: true,
             }
           },
           department: true,
           category: true,
         },
         orderBy: {
-          tim_created: 'desc',
+          created: 'desc',
         },
       });
 
@@ -52,15 +52,15 @@ export class PurchaseRequestService {
     try {
       this.logger.log(`${PurchaseRequestProperties.service.findOne.start}: ${strId}`);
       const purchaseRequest = await this.prisma.tbl_purchase_request.findUnique({
-        where: { pk_chr_request_id: strId },
+        where: { pk_request_id: strId },
         include: {
           current_status: true,
           priority: true,
           requested_by: {
             select: {
-              pk_chr_user_id: true,
-              chr_user_name: true,
-              chr_user_email: true,
+              pk_user_id: true,
+              user_name: true,
+              user_email: true,
             }
           },
           department: true,
@@ -78,9 +78,9 @@ export class PurchaseRequestService {
             include: {
               approver: {
                 select: {
-                  pk_chr_user_id: true,
-                  chr_user_name: true,
-                  chr_user_email: true,
+                  pk_user_id: true,
+                  user_name: true,
+                  user_email: true,
                 }
               },
               approval_level: true,
@@ -94,13 +94,13 @@ export class PurchaseRequestService {
               to_phase: true,
               changed_by: {
                 select: {
-                  pk_chr_user_id: true,
-                  chr_user_name: true,
+                  pk_user_id: true,
+                  user_name: true,
                 }
               }
             },
             orderBy: {
-              tim_created: 'desc',
+              created: 'desc',
             }
           },
         },
@@ -129,22 +129,22 @@ export class PurchaseRequestService {
       this.logger.log(PurchaseRequestProperties.service.create.start);
       const purchaseRequest = await this.prisma.tbl_purchase_request.create({
         data: {
-          chr_request_number: objData.strRequestNumber,
-          chr_title: objData.strTitle,
-          txt_description: objData.strDescription,
-          fk_chr_current_status_id: objData.strCurrentStatusId,
-          fk_chr_priority_id: objData.strPriorityId,
-          flt_estimated_value: objData.intEstimatedValue,
-          chr_currency: objData.strCurrency || 'USD',
-          fk_chr_requested_by_id: objData.strRequestedById,
-          fk_chr_department_id: objData.strDepartmentId,
-          fk_chr_category_id: objData.strCategoryId,
-          fk_chr_created_id: objData.strCreatedId,
+          request_number: objData.strRequestNumber,
+          title: objData.strTitle,
+          description: objData.strDescription,
+          fk_current_status_id: objData.strCurrentStatusId,
+          fk_priority_id: objData.strPriorityId,
+          estimated_value: objData.intEstimatedValue,
+          currency: objData.strCurrency || 'USD',
+          fk_requested_by_id: objData.strRequestedById,
+          fk_department_id: objData.strDepartmentId,
+          fk_category_id: objData.strCategoryId,
+          fk_created_id: objData.strCreatedId,
           pr_item_mappings: {
             create: objData.arrItems.map(item => ({
-              fk_chr_item_id: item.strItemId,
-              chr_item_description: '',
-              int_quantity: item.intQuantity,
+              fk_item_id: item.strItemId,
+              item_description: '',
+              quantity: item.intQuantity,
             })),
           },
         },
@@ -153,9 +153,9 @@ export class PurchaseRequestService {
           priority: true,
           requested_by: {
             select: {
-              pk_chr_user_id: true,
-              chr_user_name: true,
-              chr_user_email: true,
+              pk_user_id: true,
+              user_name: true,
+              user_email: true,
             }
           },
           department: true,
@@ -168,7 +168,7 @@ export class PurchaseRequestService {
         },
       });
       
-      this.logger.log(`${PurchaseRequestProperties.service.create.success}: ${purchaseRequest.pk_chr_request_id}`);
+      this.logger.log(`${PurchaseRequestProperties.service.create.success}: ${purchaseRequest.pk_request_id}`);
       return ResponseHelper.success(
         purchaseRequest,
         "Purchase request created successfully",
@@ -186,7 +186,7 @@ export class PurchaseRequestService {
     try {
       this.logger.log(`${PurchaseRequestProperties.service.update.start}: ${strId}`);
       const purchaseRequest = await this.prisma.tbl_purchase_request.findUnique({
-        where: { pk_chr_request_id: strId },
+        where: { pk_request_id: strId },
       });
 
       if (!purchaseRequest) {
@@ -196,25 +196,25 @@ export class PurchaseRequestService {
       const { arrItems, ...updateData } = objData;
 
       const updatedPurchaseRequest = await this.prisma.tbl_purchase_request.update({
-        where: { pk_chr_request_id: strId },
+        where: { pk_request_id: strId },
         data: {
-          ...(updateData.strTitle !== undefined && { chr_title: updateData.strTitle }),
-          ...(updateData.strDescription !== undefined && { txt_description: updateData.strDescription }),
-          ...(updateData.strCurrentStatusId !== undefined && { fk_chr_current_status_id: updateData.strCurrentStatusId }),
-          ...(updateData.strPriorityId !== undefined && { fk_chr_priority_id: updateData.strPriorityId }),
-          ...(updateData.intEstimatedValue !== undefined && { flt_estimated_value: updateData.intEstimatedValue }),
-          ...(updateData.strCurrency !== undefined && { chr_currency: updateData.strCurrency }),
-          ...(updateData.strDepartmentId !== undefined && { fk_chr_department_id: updateData.strDepartmentId }),
-          ...(updateData.strCategoryId !== undefined && { fk_chr_category_id: updateData.strCategoryId }),
-          ...(updateData.strModifiedId !== undefined && { fk_chr_modified_id: updateData.strModifiedId }),
-          tim_modified: new Date(),
+          ...(updateData.strTitle !== undefined && { title: updateData.strTitle }),
+          ...(updateData.strDescription !== undefined && { description: updateData.strDescription }),
+          ...(updateData.strCurrentStatusId !== undefined && { fk_current_status_id: updateData.strCurrentStatusId }),
+          ...(updateData.strPriorityId !== undefined && { fk_priority_id: updateData.strPriorityId }),
+          ...(updateData.intEstimatedValue !== undefined && { estimated_value: updateData.intEstimatedValue }),
+          ...(updateData.strCurrency !== undefined && { currency: updateData.strCurrency }),
+          ...(updateData.strDepartmentId !== undefined && { fk_department_id: updateData.strDepartmentId }),
+          ...(updateData.strCategoryId !== undefined && { fk_category_id: updateData.strCategoryId }),
+          ...(updateData.strModifiedId !== undefined && { fk_modified_id: updateData.strModifiedId }),
+          modified: new Date(),
           ...(arrItems && {
             pr_item_mappings: {
               deleteMany: {},
               create: arrItems.map(item => ({
-                fk_chr_item_id: item.strItemId,
-                chr_item_description: '',
-                int_quantity: item.intQuantity,
+                fk_item_id: item.strItemId,
+                item_description: '',
+                quantity: item.intQuantity,
               })),
             },
           }),
@@ -224,9 +224,9 @@ export class PurchaseRequestService {
           priority: true,
           requested_by: {
             select: {
-              pk_chr_user_id: true,
-              chr_user_name: true,
-              chr_user_email: true,
+              pk_user_id: true,
+              user_name: true,
+              user_email: true,
             }
           },
           department: true,
@@ -257,7 +257,7 @@ export class PurchaseRequestService {
     try {
       this.logger.log(`${PurchaseRequestProperties.service.delete.start}: ${strId}`);
       const purchaseRequest = await this.prisma.tbl_purchase_request.findUnique({
-        where: { pk_chr_request_id: strId },
+        where: { pk_request_id: strId },
       });
 
       if (!purchaseRequest) {
@@ -265,7 +265,7 @@ export class PurchaseRequestService {
       }
 
       const deletedPurchaseRequest = await this.prisma.tbl_purchase_request.delete({
-        where: { pk_chr_request_id: strId },
+        where: { pk_request_id: strId },
       });
       
       this.logger.log(`${PurchaseRequestProperties.service.delete.success}: ${strId}`);

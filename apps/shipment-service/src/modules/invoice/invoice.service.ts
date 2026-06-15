@@ -25,7 +25,7 @@ export class InvoiceService {
       return (this.prisma as any).tbl_invoice.create({
         data: {
           ...dto,
-          fk_chr_created_id: userId,
+          fk_created_id: userId,
         },
         include: {
           vendor: true,
@@ -50,14 +50,14 @@ export class InvoiceService {
     if (search && search.trim()) {
       where.OR = [
         {
-          chr_invoice_number: {
+          invoice_number: {
             contains: search.trim(),
             mode: 'insensitive',
           },
         },
         {
           vendor: {
-            chr_vendor_name: {
+            vendor_name: {
               contains: search.trim(),
               mode: 'insensitive',
             },
@@ -81,7 +81,7 @@ export class InvoiceService {
           goods_receipt: true,
         },
         orderBy: {
-          tim_created: 'desc',
+          created: 'desc',
         },
         skip,
         take,
@@ -106,7 +106,7 @@ export class InvoiceService {
     const invoice =
       await this.prisma.tbl_invoice.findUnique({
         where: {
-          pk_chr_invoice_id: id,
+          pk_invoice_id: id,
         },
         include: {
           vendor: true,
@@ -134,12 +134,12 @@ export class InvoiceService {
 
     return this.prisma.tbl_invoice.update({
       where: {
-        pk_chr_invoice_id: id,
+        pk_invoice_id: id,
       },
       data: {
         ...dto,
-        tim_modified: new Date(),
-        fk_chr_modified_id: userId,
+        modified: new Date(),
+        fk_modified_id: userId,
       },
     });
   }
@@ -152,13 +152,13 @@ export class InvoiceService {
 
     return this.prisma.tbl_invoice.update({
       where: {
-        pk_chr_invoice_id: id,
+        pk_invoice_id: id,
       },
       data: {
-        chr_status: 'PAID',
-        dt_paid_at: new Date(),
-        tim_modified: new Date(),
-        fk_chr_modified_id: userId,
+        status: 'PAID',
+        paid_at: new Date(),
+        modified: new Date(),
+        fk_modified_id: userId,
       },
     });
   }
@@ -168,7 +168,7 @@ export class InvoiceService {
 
     return this.prisma.tbl_invoice.delete({
       where: {
-        pk_chr_invoice_id: id,
+        pk_invoice_id: id,
       },
     });
   }
@@ -181,7 +181,7 @@ export class InvoiceService {
   const [data, total] = await Promise.all([
     this.prisma.tbl_invoice.findMany({
       where: {
-        fk_chr_vendor_id: vendorId,
+        fk_vendor_id: vendorId,
       },
       include: {
         vendor: true,
@@ -190,7 +190,7 @@ export class InvoiceService {
         goods_receipt: true,
       },
       orderBy: {
-        tim_created: 'desc',
+        created: 'desc',
       },
       skip,
       take,
@@ -198,7 +198,7 @@ export class InvoiceService {
 
     this.prisma.tbl_invoice.count({
       where: {
-        fk_chr_vendor_id: vendorId,
+        fk_vendor_id: vendorId,
       },
     }),
   ]);

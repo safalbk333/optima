@@ -17,7 +17,7 @@ export class CategoryService {
       this.logger.log(CategoryProperties.service.findAll.start);
       const arrCategories = await this.prisma.tbl_category.findMany({
         where: {
-          bln_is_active: true,
+          is_active: true,
         },
       });
 
@@ -39,10 +39,10 @@ export class CategoryService {
     try {
       this.logger.log(`${CategoryProperties.service.findOne.start}: ${strId}`);
       const objCategory = await this.prisma.tbl_category.findUnique({
-        where: { pk_chr_category_id: strId },
+        where: { pk_category_id: strId },
       });
 
-      if (!objCategory || objCategory.dt_deleted_at !== null) {
+      if (!objCategory || objCategory.deleted_at !== null) {
         throw new NotFoundException("Category not found");
       }
 
@@ -62,10 +62,10 @@ export class CategoryService {
       this.logger.log(CategoryProperties.service.create.start);
       const objCategory = await this.prisma.tbl_category.create({
         data: {
-          chr_category_name: objData.strCategoryName,
+          category_name: objData.strCategoryName,
         },
       });
-      this.logger.log(`${CategoryProperties.service.create.success}: ${objCategory.pk_chr_category_id}`);
+      this.logger.log(`${CategoryProperties.service.create.success}: ${objCategory.pk_category_id}`);
       return objCategory;
     } catch (error) {
       this.logger.error(
@@ -80,23 +80,23 @@ export class CategoryService {
     try {
       this.logger.log(`${CategoryProperties.service.update.start}: ${strId}`);
       const objCategory = await this.prisma.tbl_category.findUnique({
-        where: { pk_chr_category_id: strId },
+        where: { pk_category_id: strId },
       });
 
-      if (!objCategory || objCategory.dt_deleted_at !== null) {
+      if (!objCategory || objCategory.deleted_at !== null) {
         throw new NotFoundException("Category not found");
       }
 
       const updateData: any = {};
       if (objData.strCategoryName !== undefined) {
-        updateData.chr_category_name = objData.strCategoryName;
+        updateData.category_name = objData.strCategoryName;
       }
       if (objData.blnIsActive !== undefined) {
-        updateData.bln_is_active = objData.blnIsActive;
+        updateData.is_active = objData.blnIsActive;
       }
 
       const objUpdatedCategory = await this.prisma.tbl_category.update({
-        where: { pk_chr_category_id: strId },
+        where: { pk_category_id: strId },
         data: updateData,
       });
       this.logger.log(`${CategoryProperties.service.update.success}: ${strId}`);
@@ -114,18 +114,18 @@ export class CategoryService {
     try {
       this.logger.log(`${CategoryProperties.service.delete.start}: ${strId}`);
       const objCategory = await this.prisma.tbl_category.findUnique({
-        where: { pk_chr_category_id: strId },
+        where: { pk_category_id: strId },
       });
 
-      if (!objCategory || objCategory.dt_deleted_at !== null) {
+      if (!objCategory || objCategory.deleted_at !== null) {
         throw new NotFoundException("Category not found");
       }
 
       const objDeletedCategory = await this.prisma.tbl_category.update({
-        where: { pk_chr_category_id: strId },
+        where: { pk_category_id: strId },
         data: {
-          dt_deleted_at: new Date(),
-          bln_is_active: false,
+          deleted_at: new Date(),
+          is_active: false,
         },
       });
       this.logger.log(`${CategoryProperties.service.delete.success}: ${strId}`);

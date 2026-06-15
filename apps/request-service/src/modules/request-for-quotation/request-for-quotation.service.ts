@@ -19,24 +19,24 @@ export class RequestForQuotationService {
         include: {
           request: {
             select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
+              pk_request_id: true,
+              request_number: true,
+              title: true,
             },
           },
           eoi: {
             select: {
-              pk_chr_eoi_id: true,
-              chr_eoi_code: true,
-              chr_eoi_title: true,
+              pk_eoi_id: true,
+              eoi_code: true,
+              eoi_title: true,
             },
           },
           quotations: {
             include: {
               vendor: {
                 select: {
-                  pk_chr_vendor_id: true,
-                  chr_vendor_name: true,
+                  pk_vendor_id: true,
+                  vendor_name: true,
                 },
               },
             },
@@ -48,7 +48,7 @@ export class RequestForQuotationService {
           },
         },
         orderBy: {
-          tim_created: 'desc',
+          created: 'desc',
         },
       });
 
@@ -70,31 +70,31 @@ export class RequestForQuotationService {
     try {
       this.logger.log(`${RequestForQuotationProperties.service.findOne.start}: ${strId}`);
       const rfq = await this.prisma.tbl_request_for_quotation.findUnique({
-        where: { pk_chr_rfq_id: strId },
+        where: { pk_rfq_id: strId },
         include: {
           request: {
             select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
+              pk_request_id: true,
+              request_number: true,
+              title: true,
               requested_by: {
                 select: {
-                  pk_chr_user_id: true,
-                  chr_user_name: true,
-                  chr_user_email: true,
+                  pk_user_id: true,
+                  user_name: true,
+                  user_email: true,
                 },
               },
             },
           },
           eoi: {
             select: {
-              pk_chr_eoi_id: true,
-              chr_eoi_code: true,
-              chr_eoi_title: true,
+              pk_eoi_id: true,
+              eoi_code: true,
+              eoi_title: true,
               vendor: {
                 select: {
-                  pk_chr_vendor_id: true,
-                  chr_vendor_name: true,
+                  pk_vendor_id: true,
+                  vendor_name: true,
                 },
               },
             },
@@ -103,9 +103,9 @@ export class RequestForQuotationService {
             include: {
               vendor: {
                 select: {
-                  pk_chr_vendor_id: true,
-                  chr_vendor_name: true,
-                  chr_vendor_email: true,
+                  pk_vendor_id: true,
+                  vendor_name: true,
+                  vendor_email: true,
                 },
               },
               quotation_items: true,
@@ -143,23 +143,23 @@ export class RequestForQuotationService {
       const { arrItems, ...rfqData } = objData;
       const rfq = await this.prisma.tbl_request_for_quotation.create({
         data: {
-          chr_rfq_code: rfqData.strRfqCode,
-          chr_rfq_title: rfqData.strRfqTitle,
-          fk_chr_request_id: rfqData.strRequestId,
-          fk_chr_eoi_id: rfqData.strEoiId,
-          chr_status: rfqData.strStatus || 'DRAFT',
-          dt_issue_date: new Date(rfqData.strIssueDate),
-          dt_due_date: new Date(rfqData.strDueDate),
-          dt_submission_deadline: new Date(rfqData.strSubmissionDeadline),
-          txt_notes: rfqData.strNotes,
-          fk_chr_created_id: rfqData.strCreatedId,
-          ...(rfqData.strHtmlContent && { txt_rendered_html: rfqData.strHtmlContent }),
+          rfq_code: rfqData.strRfqCode,
+          rfq_title: rfqData.strRfqTitle,
+          fk_request_id: rfqData.strRequestId,
+          fk_eoi_id: rfqData.strEoiId,
+          status: rfqData.strStatus || 'DRAFT',
+          issue_date: new Date(rfqData.strIssueDate),
+          due_date: new Date(rfqData.strDueDate),
+          submission_deadline: new Date(rfqData.strSubmissionDeadline),
+          notes: rfqData.strNotes,
+          fk_created_id: rfqData.strCreatedId,
+          ...(rfqData.strHtmlContent && { rendered_html: rfqData.strHtmlContent }),
           ...(arrItems && arrItems.length > 0 && {
             rfq_item_mappings: {
               create: arrItems.map(item => ({
-                fk_chr_item_id: item.strItemId,
-                chr_item_description: '',
-                int_quantity: item.intQuantity,
+                fk_item_id: item.strItemId,
+                item_description: '',
+                quantity: item.intQuantity,
               })),
             },
           }),
@@ -167,16 +167,16 @@ export class RequestForQuotationService {
         include: {
           request: {
             select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
+              pk_request_id: true,
+              request_number: true,
+              title: true,
             },
           },
           eoi: {
             select: {
-              pk_chr_eoi_id: true,
-              chr_eoi_code: true,
-              chr_eoi_title: true,
+              pk_eoi_id: true,
+              eoi_code: true,
+              eoi_title: true,
             },
           },
           rfq_item_mappings: {
@@ -187,7 +187,7 @@ export class RequestForQuotationService {
         },
       });
       
-      this.logger.log(`${RequestForQuotationProperties.service.create.success}: ${rfq.pk_chr_rfq_id}`);
+      this.logger.log(`${RequestForQuotationProperties.service.create.success}: ${rfq.pk_rfq_id}`);
       return ResponseHelper.success(
         rfq,
         "RFQ created successfully",
@@ -205,7 +205,7 @@ export class RequestForQuotationService {
     try {
       this.logger.log(`${RequestForQuotationProperties.service.update.start}: ${strId}`);
       const rfq = await this.prisma.tbl_request_for_quotation.findUnique({
-        where: { pk_chr_rfq_id: strId },
+        where: { pk_rfq_id: strId },
       });
 
       if (!rfq) {
@@ -215,51 +215,51 @@ export class RequestForQuotationService {
       const { arrItems, ...restData } = objData;
 
       const updateData: any = {
-        chr_rfq_title: restData.strRfqTitle,
-        fk_chr_eoi_id: restData.strEoiId,
-        chr_status: restData.strStatus,
-        txt_notes: restData.strNotes,
-        fk_chr_modified_id: restData.strModifiedId,
-        tim_modified: new Date(),
+        rfq_title: restData.strRfqTitle,
+        fk_eoi_id: restData.strEoiId,
+        status: restData.strStatus,
+        notes: restData.strNotes,
+        fk_modified_id: restData.strModifiedId,
+        modified: new Date(),
       };
 
       if (restData.strIssueDate) {
-        updateData.dt_issue_date = new Date(restData.strIssueDate);
+        updateData.issue_date = new Date(restData.strIssueDate);
       }
       if (restData.strDueDate) {
-        updateData.dt_due_date = new Date(restData.strDueDate);
+        updateData.due_date = new Date(restData.strDueDate);
       }
       if (restData.strSubmissionDeadline) {
-        updateData.dt_submission_deadline = new Date(restData.strSubmissionDeadline);
+        updateData.submission_deadline = new Date(restData.strSubmissionDeadline);
       }
 
       if (arrItems) {
         updateData.rfq_item_mappings = {
           deleteMany: {},
           create: arrItems.map(item => ({
-            fk_chr_item_id: item.strItemId,
-            chr_item_description: '',
-            int_quantity: item.intQuantity,
+            fk_item_id: item.strItemId,
+            item_description: '',
+            quantity: item.intQuantity,
           })),
         };
       }
 
       const updatedRfq = await this.prisma.tbl_request_for_quotation.update({
-        where: { pk_chr_rfq_id: strId },
+        where: { pk_rfq_id: strId },
         data: updateData,
         include: {
           request: {
             select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
+              pk_request_id: true,
+              request_number: true,
+              title: true,
             },
           },
           eoi: {
             select: {
-              pk_chr_eoi_id: true,
-              chr_eoi_code: true,
-              chr_eoi_title: true,
+              pk_eoi_id: true,
+              eoi_code: true,
+              eoi_title: true,
             },
           },
           rfq_item_mappings: {
@@ -288,7 +288,7 @@ export class RequestForQuotationService {
     try {
       this.logger.log(RequestForQuotationProperties.service.findByVendorId.start);
       const vendor = await this.prisma.tbl_vendor.findUnique({
-        where: { pk_chr_vendor_id: strVendorId },
+        where: { pk_vendor_id: strVendorId },
       });
 
       if (!vendor) {
@@ -298,30 +298,30 @@ export class RequestForQuotationService {
       const rfqs = await this.prisma.tbl_request_for_quotation.findMany({
         where: {
           eoi: {
-            fk_chr_vendor_id: strVendorId,
+            fk_vendor_id: strVendorId,
           },
         },
         include: {
           request: {
             select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
+              pk_request_id: true,
+              request_number: true,
+              title: true,
             },
           },
           eoi: {
             select: {
-              pk_chr_eoi_id: true,
-              chr_eoi_code: true,
-              chr_eoi_title: true,
+              pk_eoi_id: true,
+              eoi_code: true,
+              eoi_title: true,
             },
           },
           quotations: {
             include: {
               vendor: {
                 select: {
-                  pk_chr_vendor_id: true,
-                  chr_vendor_name: true,
+                  pk_vendor_id: true,
+                  vendor_name: true,
                 },
               },
             },
@@ -332,7 +332,7 @@ export class RequestForQuotationService {
             },
           },
         },
-        orderBy: { tim_created: 'desc' },
+        orderBy: { created: 'desc' },
       });
 
       this.logger.log(RequestForQuotationProperties.service.findByVendorId.success);
@@ -347,7 +347,7 @@ export class RequestForQuotationService {
     try {
       this.logger.log(`${RequestForQuotationProperties.service.delete.start}: ${strId}`);
       const rfq = await this.prisma.tbl_request_for_quotation.findUnique({
-        where: { pk_chr_rfq_id: strId },
+        where: { pk_rfq_id: strId },
       });
 
       if (!rfq) {
@@ -355,7 +355,7 @@ export class RequestForQuotationService {
       }
 
       const deletedRfq = await this.prisma.tbl_request_for_quotation.delete({
-        where: { pk_chr_rfq_id: strId },
+        where: { pk_rfq_id: strId },
       });
       
       this.logger.log(`${RequestForQuotationProperties.service.delete.success}: ${strId}`);

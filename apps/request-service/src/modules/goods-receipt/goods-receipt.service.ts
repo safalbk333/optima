@@ -19,23 +19,23 @@ export class GoodsReceiptService {
 
       const goodsReceipt = await this.prisma.tbl_goods_receipt.create({
         data: {
-          chr_grn_code: receiptData.strGrnCode,
-          chr_status: receiptData.strStatus || 'PENDING',
-          dt_received_at: new Date(receiptData.strReceivedAt),
-          chr_delivery_note_no: receiptData.strDeliveryNoteNo,
-          txt_notes: receiptData.strNotes,
-          fk_chr_purchase_order_id: receiptData.strPurchaseOrderId,
-          ...(receiptData.strHtmlContent && { txt_rendered_html: receiptData.strHtmlContent }),
-          ...(receiptData.strCreatedId && { fk_chr_created_id: receiptData.strCreatedId }),
+          grn_code: receiptData.strGrnCode,
+          status: receiptData.strStatus || 'PENDING',
+          received_at: new Date(receiptData.strReceivedAt),
+          delivery_note_no: receiptData.strDeliveryNoteNo,
+          notes: receiptData.strNotes,
+          fk_purchase_order_id: receiptData.strPurchaseOrderId,
+          ...(receiptData.strHtmlContent && { rendered_html: receiptData.strHtmlContent }),
+          ...(receiptData.strCreatedId && { fk_created_id: receiptData.strCreatedId }),
           ...(arrItems?.length > 0 && {
             goods_receipt_items: {
               create: arrItems.map(item => ({
-                fk_chr_item_id: item.strItemId,
-                int_quantity_ordered: item.intQuantityOrdered,
-                int_quantity_received: item.intQuantityReceived,
-                int_quantity_rejected: item.intQuantityRejected || 0,
-                chr_unit_of_measure: item.strUnitOfMeasure,
-                txt_rejection_reason: item.strRejectionReason,
+                fk_item_id: item.strItemId,
+                quantity_ordered: item.intQuantityOrdered,
+                quantity_received: item.intQuantityReceived,
+                quantity_rejected: item.intQuantityRejected || 0,
+                unit_of_measure: item.strUnitOfMeasure,
+                rejection_reason: item.strRejectionReason,
               })),
             },
           }),
@@ -43,8 +43,8 @@ export class GoodsReceiptService {
         include: {
           purchase_order: {
             select: {
-              pk_chr_purchase_order_id: true,
-              chr_po_number: true,
+              pk_purchase_order_id: true,
+              po_number: true,
             },
           },
           goods_receipt_items: {
@@ -55,7 +55,7 @@ export class GoodsReceiptService {
         },
       });
 
-      this.logger.log(`${GoodsReceiptProperties.service.create.success}: ${goodsReceipt.pk_chr_goods_receipt_id}`);
+      this.logger.log(`${GoodsReceiptProperties.service.create.success}: ${goodsReceipt.pk_goods_receipt_id}`);
       return ResponseHelper.success(goodsReceipt, "Goods receipt created successfully");
     } catch (error) {
       this.logger.error(GoodsReceiptProperties.service.create.error, error.stack);
@@ -70,8 +70,8 @@ export class GoodsReceiptService {
         include: {
           purchase_order: {
             select: {
-              pk_chr_purchase_order_id: true,
-              chr_po_number: true,
+              pk_purchase_order_id: true,
+              po_number: true,
             },
           },
           goods_receipt_items: {
@@ -80,7 +80,7 @@ export class GoodsReceiptService {
             },
           },
         },
-        orderBy: { tim_created: 'desc' },
+        orderBy: { created: 'desc' },
       });
 
       this.logger.log(GoodsReceiptProperties.service.findAll.success);
@@ -95,12 +95,12 @@ export class GoodsReceiptService {
     try {
       this.logger.log(`${GoodsReceiptProperties.service.findOne.start}: ${strId}`);
       const goodsReceipt = await this.prisma.tbl_goods_receipt.findUnique({
-        where: { pk_chr_goods_receipt_id: strId },
+        where: { pk_goods_receipt_id: strId },
         include: {
           purchase_order: {
             select: {
-              pk_chr_purchase_order_id: true,
-              chr_po_number: true,
+              pk_purchase_order_id: true,
+              po_number: true,
             },
           },
           goods_receipt_items: {
@@ -127,7 +127,7 @@ export class GoodsReceiptService {
     try {
       this.logger.log(`${GoodsReceiptProperties.service.update.start}: ${strId}`);
       const goodsReceipt = await this.prisma.tbl_goods_receipt.findUnique({
-        where: { pk_chr_goods_receipt_id: strId },
+        where: { pk_goods_receipt_id: strId },
       });
 
       if (!goodsReceipt) {
@@ -137,24 +137,24 @@ export class GoodsReceiptService {
       const { arrItems, ...updateData } = objData;
 
       const updatedGoodsReceipt = await this.prisma.tbl_goods_receipt.update({
-        where: { pk_chr_goods_receipt_id: strId },
+        where: { pk_goods_receipt_id: strId },
         data: {
-          ...(updateData.strStatus !== undefined && { chr_status: updateData.strStatus }),
-          ...(updateData.strReceivedAt !== undefined && { dt_received_at: new Date(updateData.strReceivedAt) }),
-          ...(updateData.strDeliveryNoteNo !== undefined && { chr_delivery_note_no: updateData.strDeliveryNoteNo }),
-          ...(updateData.strNotes !== undefined && { txt_notes: updateData.strNotes }),
-          ...(updateData.strModifiedId && { fk_chr_modified_id: updateData.strModifiedId }),
-          tim_modified: new Date(),
+          ...(updateData.strStatus !== undefined && { status: updateData.strStatus }),
+          ...(updateData.strReceivedAt !== undefined && { received_at: new Date(updateData.strReceivedAt) }),
+          ...(updateData.strDeliveryNoteNo !== undefined && { delivery_note_no: updateData.strDeliveryNoteNo }),
+          ...(updateData.strNotes !== undefined && { notes: updateData.strNotes }),
+          ...(updateData.strModifiedId && { fk_modified_id: updateData.strModifiedId }),
+          modified: new Date(),
           ...(arrItems && {
             goods_receipt_items: {
               deleteMany: {},
               create: arrItems.map(item => ({
-                fk_chr_item_id: item.strItemId,
-                int_quantity_ordered: item.intQuantityOrdered,
-                int_quantity_received: item.intQuantityReceived,
-                int_quantity_rejected: item.intQuantityRejected || 0,
-                chr_unit_of_measure: item.strUnitOfMeasure,
-                txt_rejection_reason: item.strRejectionReason,
+                fk_item_id: item.strItemId,
+                quantity_ordered: item.intQuantityOrdered,
+                quantity_received: item.intQuantityReceived,
+                quantity_rejected: item.intQuantityRejected || 0,
+                unit_of_measure: item.strUnitOfMeasure,
+                rejection_reason: item.strRejectionReason,
               })),
             },
           }),
@@ -162,8 +162,8 @@ export class GoodsReceiptService {
         include: {
           purchase_order: {
             select: {
-              pk_chr_purchase_order_id: true,
-              chr_po_number: true,
+              pk_purchase_order_id: true,
+              po_number: true,
             },
           },
           goods_receipt_items: {
@@ -186,7 +186,7 @@ export class GoodsReceiptService {
     try {
       this.logger.log(`${GoodsReceiptProperties.service.delete.start}: ${strId}`);
       const goodsReceipt = await this.prisma.tbl_goods_receipt.findUnique({
-        where: { pk_chr_goods_receipt_id: strId },
+        where: { pk_goods_receipt_id: strId },
       });
 
       if (!goodsReceipt) {
@@ -194,7 +194,7 @@ export class GoodsReceiptService {
       }
 
       const deletedGoodsReceipt = await this.prisma.tbl_goods_receipt.delete({
-        where: { pk_chr_goods_receipt_id: strId },
+        where: { pk_goods_receipt_id: strId },
       });
 
       this.logger.log(`${GoodsReceiptProperties.service.delete.success}: ${strId}`);

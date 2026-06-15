@@ -9,7 +9,7 @@ export class UpdateEoiStatusDto {
     example: EoiStatus.SENT,
   })
   @IsEnum(EoiStatus)
-  chr_status: EoiStatus;
+  status: EoiStatus;
 
   @ApiPropertyOptional({
     description: 'Notes associated with status update',
@@ -17,5 +17,5 @@ export class UpdateEoiStatusDto {
   })
   @IsOptional()
   @IsString()
-  txt_notes?: string;
+  notes?: string;
 }

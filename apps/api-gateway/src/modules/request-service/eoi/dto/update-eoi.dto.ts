@@ -12,7 +12,7 @@ export class UpdateEoiDto {
   })
   @IsOptional()
   @IsString()
-  chr_eoi_title?: string;
+  eoi_title?: string;
 
   @ApiPropertyOptional({
     description: 'Additional notes for the EOI',
@@ -20,7 +20,7 @@ export class UpdateEoiDto {
   })
   @IsOptional()
   @IsString()
-  txt_notes?: string;
+  notes?: string;
 
   @ApiPropertyOptional({
     description: 'Submission deadline (ISO 8601 date string)',
@@ -28,5 +28,5 @@ export class UpdateEoiDto {
   })
   @IsOptional()
   @IsDateString()
-  dt_submission_deadline?: string;
+  submission_deadline?: string;
 }

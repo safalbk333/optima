@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { AuthService } from 'apps/api-gateway/src/modules/auth/auth.service';
+import { AuthService } from 'apps/api-gateway/src/modules/auth-service/auth/auth.service';
 import { ClientTokenDto } from './dto/client-token.dto';
 import { KeycloakUtil } from './util/keycloak.util';
 import { formatResponse } from './common/response/format-response';

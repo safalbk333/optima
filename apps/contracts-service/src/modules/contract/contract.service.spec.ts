@@ -57,8 +57,8 @@ describe('ContractService', () => {
     it('should return all contracts', async () => {
       const result = [
         {
-          pk_chr_contract_id: '1',
-          chr_title: 'Contract 1',
+          pk_contract_id: '1',
+          title: 'Contract 1',
         },
       ];
 
@@ -82,8 +82,8 @@ describe('ContractService', () => {
   describe('findOne', () => {
     it('should return a contract by id', async () => {
       const result = {
-        pk_chr_contract_id: '1',
-        chr_title: 'Contract 1',
+        pk_contract_id: '1',
+        title: 'Contract 1',
       };
 
       mockPrismaService.tbl_contract.findUnique.mockResolvedValue(
@@ -97,7 +97,7 @@ describe('ContractService', () => {
         prisma.tbl_contract.findUnique,
       ).toHaveBeenCalledWith({
         where: {
-          pk_chr_contract_id: '1',
+          pk_contract_id: '1',
         },
       });
 
@@ -123,11 +123,11 @@ describe('ContractService', () => {
   describe('create', () => {
     it('should create a contract', async () => {
       const dto = {
-        chr_title: 'New Contract',
+        title: 'New Contract',
       };
 
       const result = {
-        pk_chr_contract_id: '1',
+        pk_contract_id: '1',
         ...dto,
       };
 
@@ -155,17 +155,17 @@ describe('ContractService', () => {
   describe('update', () => {
     it('should update a contract', async () => {
       const contract = {
-        pk_chr_contract_id: '1',
-        chr_title: 'Old Contract',
+        pk_contract_id: '1',
+        title: 'Old Contract',
       };
 
       const dto = {
-        chr_title:
+        title:
           'Updated Contract',
       };
 
       const result = {
-        pk_chr_contract_id: '1',
+        pk_contract_id: '1',
         ...dto,
       };
 
@@ -187,7 +187,7 @@ describe('ContractService', () => {
         prisma.tbl_contract.update,
       ).toHaveBeenCalledWith({
         where: {
-          pk_chr_contract_id: '1',
+          pk_contract_id: '1',
         },
         data: dto,
       });

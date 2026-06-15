@@ -16,16 +16,16 @@ export class TemplateService {
 
       const template = await (this.prisma as any).tbl_templates.findFirst({
         where: {
-          chr_template_code: strTemplateCode,
-          bln_is_active: true,
-          chr_document_status: { not: 'D' },
+          template_code: strTemplateCode,
+          is_active: true,
+          document_status: { not: 'D' },
         },
         select: {
-          pk_chr_template_id: true,
-          chr_template_code: true,
-          chr_template_name: true,
-          chr_document_type: true,
-          txt_html_content: true,
+          pk_template_id: true,
+          template_code: true,
+          template_name: true,
+          document_type: true,
+          html_content: true,
         },
       });
 

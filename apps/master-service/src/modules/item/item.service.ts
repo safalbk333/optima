@@ -22,15 +22,15 @@ export class ItemService {
       this.logger.log(ItemProperties.service.create.start);
       const item = await this.prisma.tbl_item.create({
         data: {
-          chr_item_name: createItemDto.strItemName,
-          chr_item_code: createItemDto.strItemCode,
-          txt_description: createItemDto.strDescription,
-          fk_chr_category_id: createItemDto.strCategoryId,
-          chr_unit: createItemDto.strUnit,
-          chr_documents: createItemDto.strDocuments,
+          item_name: createItemDto.strItemName,
+          item_code: createItemDto.strItemCode,
+          description: createItemDto.strDescription,
+          fk_category_id: createItemDto.strCategoryId,
+          unit: createItemDto.strUnit,
+          documents: createItemDto.strDocuments,
         },
       });
-      this.logger.log(`${ItemProperties.service.create.success}: ${item.pk_chr_item_id}`);
+      this.logger.log(`${ItemProperties.service.create.success}: ${item.pk_item_id}`);
       return ResponseHelper.success(
         item,
         'Item created successfully',
@@ -76,7 +76,7 @@ export class ItemService {
     try {
       this.logger.log(`${ItemProperties.service.findOne.start}: ${id}`);
       const item = await this.prisma.tbl_item.findUnique({
-        where: { pk_chr_item_id: id },
+        where: { pk_item_id: id },
         include: {
           category: true,
         },

@@ -141,7 +141,7 @@ export class KeycloakController {
     required: false,
     description: 'The client ID (e.g., client, travelapp)',
   })
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('/signout')
   @ApiResponse({ status: 200, description: 'Success' })
   @ApiResponse({ status: 400, description: 'Bad Request' })

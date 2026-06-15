@@ -19,39 +19,39 @@ export class QuotationService {
 
       const quotation = await this.prisma.tbl_quotation.create({
         data: {
-          vendor: { connect: { pk_chr_vendor_id: quotationData.strVendorId } },
-          rfq: { connect: { pk_chr_rfq_id: quotationData.strRfqId } },
+          vendor: { connect: { pk_vendor_id: quotationData.strVendorId } },
+          rfq: { connect: { pk_rfq_id: quotationData.strRfqId } },
           ...(quotationData.strCategoryId && {
-            category: { connect: { pk_chr_category_id: quotationData.strCategoryId } },
+            category: { connect: { pk_category_id: quotationData.strCategoryId } },
           }),
           ...(quotationData.strBuyerId && {
-            buyer: { connect: { pk_chr_user_id: quotationData.strBuyerId } },
+            buyer: { connect: { pk_user_id: quotationData.strBuyerId } },
           }),
-          chr_buyer_details: quotationData.strBuyerDetails,
-          chr_seller_details: quotationData.strSellerDetails,
-          chr_status: quotationData.strStatus || 'DRAFT',
-          flt_total_amount: quotationData.intTotalAmount,
-          chr_currency: quotationData.strCurrency || 'USD',
-          dt_issue_date: new Date(quotationData.strIssueDate),
-          dt_due_date: new Date(quotationData.strDueDate),
-          txt_notes: quotationData.strNotes,
+          buyer_details: quotationData.strBuyerDetails,
+          seller_details: quotationData.strSellerDetails,
+          status: quotationData.strStatus || 'DRAFT',
+          total_amount: quotationData.intTotalAmount,
+          currency: quotationData.strCurrency || 'USD',
+          issue_date: new Date(quotationData.strIssueDate),
+          due_date: new Date(quotationData.strDueDate),
+          notes: quotationData.strNotes,
           ...(quotationData.strCreatedId && {
-            created_by: { connect: { pk_chr_user_id: quotationData.strCreatedId } },
+            created_by: { connect: { pk_user_id: quotationData.strCreatedId } },
           }),
-          ...(quotationData.strHtmlContent && { txt_rendered_html: quotationData.strHtmlContent }),
+          ...(quotationData.strHtmlContent && { rendered_html: quotationData.strHtmlContent }),
           ...(arrItems && arrItems.length > 0 && {
             quotation_items: {
               create: arrItems.map(item => ({
-                fk_chr_item_id: item.strItemId,
-                chr_item_description: item.strItemDescription,
-                int_quantity: item.intQuantity,
-                chr_unit_of_measure: item.strUnitOfMeasure,
-                flt_unit_price: item.intUnitPrice,
-                flt_tax_percentage: item.intTaxPercentage || 0,
-                flt_tax_amount: item.intTaxAmount || 0,
-                flt_total_price: item.intTotalPrice,
-                chr_currency: item.strCurrency || 'USD',
-                txt_notes: item.strNotes,
+                fk_item_id: item.strItemId,
+                item_description: item.strItemDescription,
+                quantity: item.intQuantity,
+                unit_of_measure: item.strUnitOfMeasure,
+                unit_price: item.intUnitPrice,
+                tax_percentage: item.intTaxPercentage || 0,
+                tax_amount: item.intTaxAmount || 0,
+                total_price: item.intTotalPrice,
+                currency: item.strCurrency || 'USD',
+                notes: item.strNotes,
               })) as any,
             },
           }),
@@ -65,7 +65,7 @@ export class QuotationService {
         },
       });
 
-      this.logger.log(`${QuotationProperties.service.create.success}: ${quotation.pk_chr_quotation_id}`);
+      this.logger.log(`${QuotationProperties.service.create.success}: ${quotation.pk_quotation_id}`);
       return ResponseHelper.success(quotation, "Quotation created successfully");
     } catch (error) {
       this.logger.error(QuotationProperties.service.create.error, error.stack);
@@ -80,29 +80,29 @@ export class QuotationService {
         include: {
           vendor: {
             select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
+              pk_vendor_id: true,
+              vendor_name: true,
+              vendor_email: true,
             },
           },
           rfq: {
             select: {
-              pk_chr_rfq_id: true,
-              chr_rfq_code: true,
-              chr_rfq_title: true,
+              pk_rfq_id: true,
+              rfq_code: true,
+              rfq_title: true,
             },
           },
           category: true,
           buyer: {
             select: {
-              pk_chr_user_id: true,
-              chr_user_name: true,
-              chr_user_email: true,
+              pk_user_id: true,
+              user_name: true,
+              user_email: true,
             },
           },
           quotation_items: true,
         },
-        orderBy: { tim_created: 'desc' },
+        orderBy: { created: 'desc' },
       });
 
       this.logger.log(QuotationProperties.service.findAll.success);
@@ -117,28 +117,28 @@ export class QuotationService {
     try {
       this.logger.log(`${QuotationProperties.service.findOne.start}: ${strId}`);
       const quotation = await this.prisma.tbl_quotation.findUnique({
-        where: { pk_chr_quotation_id: strId },
+        where: { pk_quotation_id: strId },
         include: {
           vendor: {
             select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
+              pk_vendor_id: true,
+              vendor_name: true,
+              vendor_email: true,
             },
           },
           rfq: {
             select: {
-              pk_chr_rfq_id: true,
-              chr_rfq_code: true,
-              chr_rfq_title: true,
+              pk_rfq_id: true,
+              rfq_code: true,
+              rfq_title: true,
             },
           },
           category: true,
           buyer: {
             select: {
-              pk_chr_user_id: true,
-              chr_user_name: true,
-              chr_user_email: true,
+              pk_user_id: true,
+              user_name: true,
+              user_email: true,
             },
           },
           quotation_items: true,
@@ -161,7 +161,7 @@ export class QuotationService {
     try {
       this.logger.log(`${QuotationProperties.service.update.start}: ${strId}`);
       const quotation = await this.prisma.tbl_quotation.findUnique({
-        where: { pk_chr_quotation_id: strId },
+        where: { pk_quotation_id: strId },
       });
 
       if (!quotation) {
@@ -171,43 +171,43 @@ export class QuotationService {
       const { arrItems, ...updateData } = objData;
 
       const updatedQuotation = await this.prisma.tbl_quotation.update({
-        where: { pk_chr_quotation_id: strId },
+        where: { pk_quotation_id: strId },
         data: {
           ...(updateData.strVendorId !== undefined && {
-            vendor: { connect: { pk_chr_vendor_id: updateData.strVendorId } },
+            vendor: { connect: { pk_vendor_id: updateData.strVendorId } },
           }),
           ...(updateData.strCategoryId !== undefined && {
-            category: { connect: { pk_chr_category_id: updateData.strCategoryId } },
+            category: { connect: { pk_category_id: updateData.strCategoryId } },
           }),
           ...(updateData.strBuyerId !== undefined && {
-            buyer: { connect: { pk_chr_user_id: updateData.strBuyerId } },
+            buyer: { connect: { pk_user_id: updateData.strBuyerId } },
           }),
-          ...(updateData.strBuyerDetails !== undefined && { chr_buyer_details: updateData.strBuyerDetails }),
-          ...(updateData.strSellerDetails !== undefined && { chr_seller_details: updateData.strSellerDetails }),
-          ...(updateData.strStatus !== undefined && { chr_status: updateData.strStatus }),
-          ...(updateData.intTotalAmount !== undefined && { flt_total_amount: updateData.intTotalAmount }),
-          ...(updateData.strCurrency !== undefined && { chr_currency: updateData.strCurrency }),
-          ...(updateData.strIssueDate !== undefined && { dt_issue_date: new Date(updateData.strIssueDate) }),
-          ...(updateData.strDueDate !== undefined && { dt_due_date: new Date(updateData.strDueDate) }),
-          ...(updateData.strNotes !== undefined && { txt_notes: updateData.strNotes }),
+          ...(updateData.strBuyerDetails !== undefined && { buyer_details: updateData.strBuyerDetails }),
+          ...(updateData.strSellerDetails !== undefined && { seller_details: updateData.strSellerDetails }),
+          ...(updateData.strStatus !== undefined && { status: updateData.strStatus }),
+          ...(updateData.intTotalAmount !== undefined && { total_amount: updateData.intTotalAmount }),
+          ...(updateData.strCurrency !== undefined && { currency: updateData.strCurrency }),
+          ...(updateData.strIssueDate !== undefined && { issue_date: new Date(updateData.strIssueDate) }),
+          ...(updateData.strDueDate !== undefined && { due_date: new Date(updateData.strDueDate) }),
+          ...(updateData.strNotes !== undefined && { notes: updateData.strNotes }),
           ...(updateData.strModifiedId !== undefined && {
-            modified_by: { connect: { pk_chr_user_id: updateData.strModifiedId } },
+            modified_by: { connect: { pk_user_id: updateData.strModifiedId } },
           }),
-          tim_modified: new Date(),
+          modified: new Date(),
           ...(arrItems && {
             quotation_items: {
               deleteMany: {},
               create: arrItems.map(item => ({
-                fk_chr_item_id: item.strItemId,
-                chr_item_description: item.strItemDescription,
-                int_quantity: item.intQuantity,
-                chr_unit_of_measure: item.strUnitOfMeasure,
-                flt_unit_price: item.intUnitPrice,
-                flt_tax_percentage: item.intTaxPercentage || 0,
-                flt_tax_amount: item.intTaxAmount || 0,
-                flt_total_price: item.intTotalPrice,
-                chr_currency: item.strCurrency || 'USD',
-                txt_notes: item.strNotes,
+                fk_item_id: item.strItemId,
+                item_description: item.strItemDescription,
+                quantity: item.intQuantity,
+                unit_of_measure: item.strUnitOfMeasure,
+                unit_price: item.intUnitPrice,
+                tax_percentage: item.intTaxPercentage || 0,
+                tax_amount: item.intTaxAmount || 0,
+                total_price: item.intTotalPrice,
+                currency: item.strCurrency || 'USD',
+                notes: item.strNotes,
               })) as any,
             },
           }),
@@ -233,7 +233,7 @@ export class QuotationService {
     try {
       this.logger.log(`${QuotationProperties.service.delete.start}: ${strId}`);
       const quotation = await this.prisma.tbl_quotation.findUnique({
-        where: { pk_chr_quotation_id: strId },
+        where: { pk_quotation_id: strId },
       });
 
       if (!quotation) {
@@ -241,7 +241,7 @@ export class QuotationService {
       }
 
       const deletedQuotation = await this.prisma.tbl_quotation.delete({
-        where: { pk_chr_quotation_id: strId },
+        where: { pk_quotation_id: strId },
       });
 
       this.logger.log(`${QuotationProperties.service.delete.success}: ${strId}`);

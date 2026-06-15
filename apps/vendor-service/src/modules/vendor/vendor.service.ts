@@ -42,7 +42,7 @@ async findOne(vendor_id: string) {
   const vendor =
     await this.prisma.tbl_vendor.findUnique({
       where: {
-        pk_chr_vendor_id: vendor_id,
+        pk_vendor_id: vendor_id,
       },
     });
 
@@ -62,13 +62,13 @@ async create(createVendorDto: CreateVendorDto) {
   const vendor =
     await this.prisma.tbl_vendor.create({
       data: {
-        chr_vendor_name:
+        vendor_name:
           createVendorDto.name,
 
-        chr_vendor_email:
+        vendor_email:
           createVendorDto.email,
 
-        chr_vendor_phone:
+        vendor_phone:
           createVendorDto.phone,
       },
     });

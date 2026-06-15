@@ -19,7 +19,7 @@ model tbl_tenant_registry {
   modified        DateTime?
   fk_created_id   String?
   fk_modified_id  String?
-  is_delete       Boolean     @default("false") 
+  is_delete       Boolean     @default(false) 
   users               tbl_user[]
 
   @@map("tbl_tenant_registry")
@@ -37,7 +37,7 @@ model tbl_user {
   fk_created_id            String?
   fk_modified_id           String?
   fk_company_id           String?
-  is_delete               Boolean                              @default("false") 
+  is_delete               Boolean                              @default(false) 
   activations_created          tbl_activations[]                   @relation("activations_created_by")
   activations_modified         tbl_activations[]                   @relation("activations_modified_by")
   activations                  tbl_activations[]                   @relation("activations_user")
@@ -126,7 +126,7 @@ model tbl_user_role {
   modified        DateTime?
   fk_created_id   String?
   fk_modified_id  String?
-  is_delete       Boolean                  @default("false") 
+  is_delete       Boolean                  @default(false) 
   created_by          tbl_user?               @relation("user_role_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?               @relation("user_role_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   user_role_mappings  tbl_user_role_mapping[]
@@ -143,7 +143,7 @@ model tbl_user_role_mapping {
   modified                DateTime?
   fk_created_id           String?
   fk_modified_id          String?
-  is_delete               Boolean        @default("false") 
+  is_delete               Boolean        @default(false) 
   created_by                  tbl_user?     @relation("user_role_mapping_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by                 tbl_user?     @relation("user_role_mapping_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   role                        tbl_user_role @relation(fields: [fk_role_id], references: [pk_role_id])
@@ -167,7 +167,7 @@ model tbl_activations {
   modified               DateTime?
   fk_created_id          String?
   fk_modified_id         String?
-  is_delete              Boolean    @default("false")
+  is_delete              Boolean    @default(false)
   created_by                 tbl_user? @relation("activations_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by                tbl_user? @relation("activations_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   user                       tbl_user  @relation("activations_user", fields: [fk_user_id], references: [pk_user_id], onDelete: Cascade)
@@ -187,7 +187,7 @@ model tbl_country {
   modified        DateTime?
   fk_created_id   String?
   fk_modified_id  String?
-  is_delete       Boolean       @default("false")
+  is_delete       Boolean       @default(false)
   cities              tbl_city[]
   created_by          tbl_user?    @relation("country_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?    @relation("country_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
@@ -205,7 +205,7 @@ model tbl_city {
   modified        DateTime?
   fk_created_id   String?
   fk_modified_id  String?
-  is_delete       Boolean       @default("false")
+  is_delete       Boolean       @default(false)
   country             tbl_country  @relation(fields: [fk_country_id], references: [pk_country_id])
   created_by          tbl_user?    @relation("city_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?    @relation("city_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
@@ -225,7 +225,7 @@ model tbl_department {
   modified         DateTime?
   fk_created_id    String?
   fk_modified_id   String?
-  is_delete        Boolean                 @default("false") 
+  is_delete        Boolean                 @default(false) 
   created_by           tbl_user?              @relation("department_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by          tbl_user?              @relation("department_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   purchase_requests    tbl_purchase_request[]
@@ -237,7 +237,7 @@ model tbl_category {
   pk_category_id  String                 @id @default(uuid())
   category_name   String
   is_active       Boolean                @default(true)
-  is_delete       Boolean                 @default("false")
+  is_delete       Boolean                 @default(false)
   deleted_at      DateTime?
   created         DateTime               @default(now())
   modified        DateTime?
@@ -264,7 +264,7 @@ model tbl_request_phase {
   modified            DateTime?
   fk_created_id       String?
   fk_modified_id      String?
-  is_delete           Boolean                          @default("false")
+  is_delete           Boolean                          @default(false)
   attachment_masters      tbl_request_attachment_master[]
   attachments             tbl_request_attachments[]
   request_histories_from  tbl_request_history[]           @relation("request_history_from_phase")
@@ -287,7 +287,7 @@ model tbl_notification_type {
   modified                DateTime?
   fk_created_id           String?
   fk_modified_id          String?
-  is_delete               Boolean             @default("false")
+  is_delete               Boolean             @default(false)
   notifications               tbl_notification[]
   created_by                  tbl_user?          @relation("notification_type_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by                 tbl_user?          @relation("notification_type_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
@@ -309,7 +309,7 @@ model tbl_sla_policy {
   modified             DateTime?
   fk_created_id        String?
   fk_modified_id       String?
-  is_delete            Boolean       @default("false")
+  is_delete            Boolean       @default(false)
   created_by               tbl_user?    @relation("sla_policy_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by              tbl_user?    @relation("sla_policy_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)               
 
@@ -320,7 +320,7 @@ model tbl_sla_policy {
 model tbl_vendor {
   pk_vendor_id              String            @id @default(uuid())
   company_legal_name        String
-  trading_name?             String
+  trading_name              String?
   company_type              String
   year_of_establishment     DateTime
   office_address            String
@@ -340,7 +340,7 @@ model tbl_vendor {
   fk_created_id             String?
   fk_modified_id            String?
   fk_company_id             String?
-  is_delete                 Boolean                  @default("false")
+  is_delete                 Boolean                  @default(false)
   chat_room_members         tbl_chat_room_member[]
   contracts                 tbl_contract[]
   eois                      tbl_expression_of_interest[]
@@ -369,11 +369,12 @@ model tbl_item {
   modified            DateTime?
   fk_created_id       String?
   fk_modified_id      String?
-  is_active           Boolean                              @default("D")
+  is_active           Boolean                              @default(false)
   category            tbl_category                        @relation(fields: [fk_category_id], references: [pk_category_id])
   created_by          tbl_user?                           @relation("item_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?                           @relation("item_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   pr_item_mappings    tbl_purchase_request_item_mapping[]
+  goods_receipt_items tbl_goods_receipt_item[]
 
   @@index([fk_category_id])
   @@map("tbl_item")
@@ -394,7 +395,7 @@ model tbl_purchase_request {
   modified             DateTime?
   fk_created_id        String?
   fk_modified_id       String?
-  is_delete            Boolean                              @default("false") 
+  is_delete            Boolean                              @default(false) 
   approvals                tbl_approval[]
   chat_rooms               tbl_chat_room[]
   contracts                tbl_contract[]
@@ -402,6 +403,7 @@ model tbl_purchase_request {
   invoices                 tbl_invoice[]
   notifications            tbl_notification[]
   purchase_orders          tbl_purchase_order[]
+  quotations               tbl_quotation[]
   category                 tbl_category?                       @relation(fields: [fk_category_id], references: [pk_category_id])
   created_by               tbl_user?                           @relation("purchase_request_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   department               tbl_department?                     @relation(fields: [fk_department_id], references: [pk_department_id])
@@ -412,7 +414,6 @@ model tbl_purchase_request {
   rfqs                     tbl_request_for_quotation[]
   request_histories        tbl_request_history[]
 
-  @@index([fk_current_status_id])
   @@index([fk_requested_by_id])
   @@index([request_number])
   @@map("tbl_purchase_request")
@@ -431,7 +432,7 @@ model tbl_purchase_request_item_mapping {
   modified              DateTime?
   fk_created_id         String?
   fk_modified_id        String?
-  is_delete             Boolean               @default("false")
+  is_delete             Boolean               @default(false)
   created_by            tbl_user?             @relation("pr_item_mapping_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   item                  tbl_item              @relation(fields: [fk_item_id], references: [pk_item_id])
   modified_by           tbl_user?             @relation("pr_item_mapping_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
@@ -454,7 +455,7 @@ model tbl_approval {
   modified             DateTime?
   fk_created_id        String?
   fk_modified_id       String?
-  is_delete            Boolean               @default("false")
+  is_delete            Boolean               @default(false)
   approval_level           tbl_approval_level   @relation(fields: [fk_approval_level_id], references: [pk_approval_level_id])
   approver                 tbl_user             @relation("approval_approver", fields: [fk_approver_id], references: [pk_user_id])
   created_by               tbl_user?            @relation("approval_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
@@ -480,7 +481,7 @@ model tbl_approval_level {
   modified             DateTime?
   fk_created_id        String?
   fk_modified_id       String?
-  is_delete            Boolean         @default("false")
+  is_delete            Boolean         @default(false)
   approvals                tbl_approval[]
   created_by               tbl_user?      @relation("approval_level_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by              tbl_user?      @relation("approval_level_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
@@ -521,7 +522,7 @@ model tbl_request_attachment_master {
   modified               DateTime?
   fk_created_id          String?
   fk_modified_id         String?
-  is_delete              Boolean                    @default("false")
+  is_delete              Boolean                    @default(false)
   created_by                 tbl_user?                 @relation("attachment_master_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by                tbl_user?                 @relation("attachment_master_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   phase                      tbl_request_phase?        @relation(fields: [fk_phase_id], references: [pk_request_phase_id])
@@ -549,7 +550,7 @@ model tbl_request_attachments {
   modified                DateTime?
   fk_created_id           String?
   fk_modified_id          String?
-  is_delete               Boolean                        @default("false")
+  is_delete               Boolean                        @default(false)
   attachment_master           tbl_request_attachment_master @relation(fields: [fk_attchment_master_id], references: [pk_attchment_master_id], onDelete: Cascade)
   created_by                  tbl_user?                     @relation("attachments_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by                 tbl_user?                     @relation("attachments_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
@@ -581,7 +582,7 @@ model tbl_contract {
   fk_created_id   String?
   fk_modified_id  String?
   rendered_html   String?
-  is_delete       Boolean                @default("false") 
+  is_delete       Boolean                @default(false) 
   created_by          tbl_user?             @relation("contract_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?             @relation("contract_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   request             tbl_purchase_request? @relation(fields: [fk_request_id], references: [pk_request_id])
@@ -607,7 +608,7 @@ model tbl_expression_of_interest {
   modified           DateTime?
   fk_created_id      String?
   fk_modified_id     String?
-  is_delete          Boolean                      @default("false") 
+  is_delete          Boolean                      @default(false) 
   created_by             tbl_user?                   @relation("eoi_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by            tbl_user?                   @relation("eoi_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   request                tbl_purchase_request        @relation(fields: [fk_request_id], references: [pk_request_id], onDelete: Cascade)
@@ -637,7 +638,7 @@ model tbl_request_for_quotation {
   fk_created_id      String?
   fk_modified_id     String?
   rendered_html      String?
-  is_delete          Boolean                      @default("false")
+  is_delete          Boolean                      @default(false)
   quotations             tbl_quotation[]
   created_by             tbl_user?                   @relation("rfq_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   eoi                    tbl_expression_of_interest? @relation(fields: [fk_eoi_id], references: [pk_eoi_id])
@@ -670,7 +671,7 @@ model tbl_quotation {
   modified        DateTime?
   fk_created_id   String?
   fk_modified_id  String?
-  is_delete       Boolean                    @default("false")
+  is_delete       Boolean                    @default(false)
   buyer_details   String?
   seller_details  String?
   rendered_html   String?
@@ -713,7 +714,7 @@ model tbl_purchase_order {
   modified             DateTime?
   fk_created_id        String?
   fk_modified_id       String?
-  is_delete            Boolean               @default("false")
+  is_delete            Boolean               @default(false)
   fk_quotation_id      String
   rendered_html        String?
   goods_receipts           tbl_goods_receipt[]
@@ -772,7 +773,7 @@ model tbl_goods_receipt {
   fk_created_id        String?
   fk_modified_id       String?
   rendered_html        String?
-  is_delete            Boolean                   @default("false")
+  is_delete            Boolean                   @default(false)
   created_by               tbl_user?                @relation("goods_receipt_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by              tbl_user?                @relation("goods_receipt_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   purchase_order           tbl_purchase_order       @relation(fields: [fk_purchase_order_id], references: [pk_purchase_order_id])
@@ -799,7 +800,7 @@ model tbl_goods_receipt_item {
   modified            DateTime?
   fk_created_id       String?
   fk_modified_id      String?
-  is_delete           Boolean            @default("false")
+  is_delete           Boolean            @default(false)
   created_by              tbl_user?         @relation("goods_receipt_item_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   goods_receipt           tbl_goods_receipt @relation(fields: [fk_goods_receipt_id], references: [pk_goods_receipt_id], onDelete: Cascade)
   item                    tbl_item          @relation(fields: [fk_item_id], references: [pk_item_id])
@@ -831,7 +832,7 @@ model tbl_invoice {
   fk_created_id        String?
   fk_modified_id       String?
   rendered_html        String?
-  is_delete            Boolean               @default("false")
+  is_delete            Boolean               @default(false)
   created_by               tbl_user?            @relation("invoice_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   goods_receipt            tbl_goods_receipt?   @relation(fields: [fk_goods_receipt_id], references: [pk_goods_receipt_id])
   modified_by              tbl_user?            @relation("invoice_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
@@ -858,7 +859,7 @@ model tbl_chat_room {
   modified        DateTime?
   fk_created_id   String?
   fk_modified_id  String?
-  is_delete       Boolean                 @default("false")
+  is_delete       Boolean                 @default(false)
   messages            tbl_chat_message[]
   created_by          tbl_user?              @relation("chat_room_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?              @relation("chat_room_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
@@ -922,7 +923,7 @@ model tbl_notification {
   modified                DateTime?
   fk_created_id           String?
   fk_modified_id          String?
-  is_delete               Boolean                @default("false")
+  is_delete               Boolean                @default(false)
   created_by                  tbl_user?             @relation("notification_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by                 tbl_user?             @relation("notification_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   notification_type           tbl_notification_type @relation(fields: [fk_notification_type_id], references: [pk_notification_type_id])
@@ -950,7 +951,7 @@ model tbl_templates {
   is_active       Boolean   @default(true)
   created         DateTime  @default(now())
   modified        DateTime?
-  is_delete       Boolean    @default("false")
+  is_delete       Boolean    @default(false)
 
   @@index([template_code])
   @@index([document_type])
@@ -976,7 +977,7 @@ model tbl_company {
   is_active       Boolean   @default(true)
   created         DateTime  @default(now())
   modified        DateTime?
-  is_delete       Boolean    @default("false")
+  is_delete       Boolean    @default(false)
 
   users    tbl_user[]    @relation("user_company")
   vendors  tbl_vendor[]  @relation("vendor_company")

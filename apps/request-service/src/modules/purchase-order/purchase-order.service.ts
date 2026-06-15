@@ -17,47 +17,47 @@ export class PurchaseOrderService {
       this.logger.log(PurchaseOrderProperties.service.create.start);
       const purchaseOrder = await this.prisma.tbl_purchase_order.create({
         data: {
-          chr_po_number: objData.strPoNumber,
-          flt_total_value: objData.intTotalValue,
-          chr_currency: objData.strCurrency || 'USD',
-          dt_issued_at: objData.strIssuedAt ? new Date(objData.strIssuedAt) : undefined,
-          chr_delivery_address: objData.strDeliveryAddress,
-          dt_expected_delivery: objData.strExpectedDelivery ? new Date(objData.strExpectedDelivery) : undefined,
-          request: { connect: { pk_chr_request_id: objData.strRequestId } },
-          vendor: { connect: { pk_chr_vendor_id: objData.strVendorId } },
-          quotation: { connect: { pk_chr_quotation_id: objData.strQuotationId } },
-          ...(objData.strHtmlContent && { txt_rendered_html: objData.strHtmlContent }),
+          po_number: objData.strPoNumber,
+          total_value: objData.intTotalValue,
+          currency: objData.strCurrency || 'USD',
+          issued_at: objData.strIssuedAt ? new Date(objData.strIssuedAt) : undefined,
+          delivery_address: objData.strDeliveryAddress,
+          expected_delivery: objData.strExpectedDelivery ? new Date(objData.strExpectedDelivery) : undefined,
+          request: { connect: { pk_request_id: objData.strRequestId } },
+          vendor: { connect: { pk_vendor_id: objData.strVendorId } },
+          quotation: { connect: { pk_quotation_id: objData.strQuotationId } },
+          ...(objData.strHtmlContent && { rendered_html: objData.strHtmlContent }),
           ...(objData.strCreatedId && {
             created_by: {
-              connect: { pk_chr_user_id: objData.strCreatedId },
+              connect: { pk_user_id: objData.strCreatedId },
             },
           }),
         },
         include: {
           request: {
             select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
+              pk_request_id: true,
+              request_number: true,
+              title: true,
             },
           },
           vendor: {
             select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
+              pk_vendor_id: true,
+              vendor_name: true,
+              vendor_email: true,
             },
           },
           quotation: {
             select: {
-              pk_chr_quotation_id: true,
-              chr_status: true,
+              pk_quotation_id: true,
+              status: true,
             },
           },
         },
       });
 
-      this.logger.log(`${PurchaseOrderProperties.service.create.success}: ${purchaseOrder.pk_chr_purchase_order_id}`);
+      this.logger.log(`${PurchaseOrderProperties.service.create.success}: ${purchaseOrder.pk_purchase_order_id}`);
       return ResponseHelper.success(
         purchaseOrder,
         "Purchase order created successfully",
@@ -78,27 +78,27 @@ export class PurchaseOrderService {
         include: {
           request: {
             select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
+              pk_request_id: true,
+              request_number: true,
+              title: true,
             },
           },
           vendor: {
             select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
+              pk_vendor_id: true,
+              vendor_name: true,
+              vendor_email: true,
             },
           },
           quotation: {
             select: {
-              pk_chr_quotation_id: true,
-              chr_status: true,
+              pk_quotation_id: true,
+              status: true,
             },
           },
         },
         orderBy: {
-          tim_created: 'desc',
+          created: 'desc',
         },
       });
 
@@ -120,26 +120,26 @@ export class PurchaseOrderService {
     try {
       this.logger.log(`${PurchaseOrderProperties.service.findOne.start}: ${strId}`);
       const purchaseOrder = await this.prisma.tbl_purchase_order.findUnique({
-        where: { pk_chr_purchase_order_id: strId },
+        where: { pk_purchase_order_id: strId },
         include: {
           request: {
             select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
+              pk_request_id: true,
+              request_number: true,
+              title: true,
             },
           },
           vendor: {
             select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
+              pk_vendor_id: true,
+              vendor_name: true,
+              vendor_email: true,
             },
           },
           quotation: {
             select: {
-              pk_chr_quotation_id: true,
-              chr_status: true,
+              pk_quotation_id: true,
+              status: true,
             },
           },
         },
@@ -167,7 +167,7 @@ export class PurchaseOrderService {
     try {
       this.logger.log(`${PurchaseOrderProperties.service.findByVendorId.start}: ${strVendorId}`);
       const vendor = await this.prisma.tbl_vendor.findUnique({
-        where: { pk_chr_vendor_id: strVendorId },
+        where: { pk_vendor_id: strVendorId },
       });
 
       if (!vendor) {
@@ -175,30 +175,30 @@ export class PurchaseOrderService {
       }
 
       const purchaseOrders = await this.prisma.tbl_purchase_order.findMany({
-        where: { fk_chr_vendor_id: strVendorId },
+        where: { fk_vendor_id: strVendorId },
         include: {
           request: {
             select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
+              pk_request_id: true,
+              request_number: true,
+              title: true,
             },
           },
           vendor: {
             select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
+              pk_vendor_id: true,
+              vendor_name: true,
+              vendor_email: true,
             },
           },
           quotation: {
             select: {
-              pk_chr_quotation_id: true,
-              chr_status: true,
+              pk_quotation_id: true,
+              status: true,
             },
           },
         },
-        orderBy: { tim_created: 'desc' },
+        orderBy: { created: 'desc' },
       });
 
       this.logger.log(PurchaseOrderProperties.service.findByVendorId.success);
@@ -213,7 +213,7 @@ export class PurchaseOrderService {
     try {
       this.logger.log(`${PurchaseOrderProperties.service.update.start}: ${strId}`);
       const purchaseOrder = await this.prisma.tbl_purchase_order.findUnique({
-        where: { pk_chr_purchase_order_id: strId },
+        where: { pk_purchase_order_id: strId },
       });
 
       if (!purchaseOrder) {
@@ -221,38 +221,38 @@ export class PurchaseOrderService {
       }
 
       const updatedPurchaseOrder = await this.prisma.tbl_purchase_order.update({
-        where: { pk_chr_purchase_order_id: strId },
+        where: { pk_purchase_order_id: strId },
         data: {
-          ...(objData.strPoNumber !== undefined && { chr_po_number: objData.strPoNumber }),
-          ...(objData.intTotalValue !== undefined && { flt_total_value: objData.intTotalValue }),
-          ...(objData.strCurrency !== undefined && { chr_currency: objData.strCurrency }),
-          ...(objData.strIssuedAt !== undefined && { dt_issued_at: new Date(objData.strIssuedAt) }),
-          ...(objData.strDeliveryAddress !== undefined && { chr_delivery_address: objData.strDeliveryAddress }),
-          ...(objData.strExpectedDelivery !== undefined && { dt_expected_delivery: new Date(objData.strExpectedDelivery) }),
-          ...(objData.strVendorId !== undefined && { vendor: { connect: { pk_chr_vendor_id: objData.strVendorId } } }),
-          ...(objData.strQuotationId !== undefined && { quotation: { connect: { pk_chr_quotation_id: objData.strQuotationId } } }),
-          ...(objData.strModifiedId && { modified_by: { connect: { pk_chr_user_id: objData.strModifiedId } } }),
-          tim_modified: new Date(),
+          ...(objData.strPoNumber !== undefined && { po_number: objData.strPoNumber }),
+          ...(objData.intTotalValue !== undefined && { total_value: objData.intTotalValue }),
+          ...(objData.strCurrency !== undefined && { currency: objData.strCurrency }),
+          ...(objData.strIssuedAt !== undefined && { issued_at: new Date(objData.strIssuedAt) }),
+          ...(objData.strDeliveryAddress !== undefined && { delivery_address: objData.strDeliveryAddress }),
+          ...(objData.strExpectedDelivery !== undefined && { expected_delivery: new Date(objData.strExpectedDelivery) }),
+          ...(objData.strVendorId !== undefined && { vendor: { connect: { pk_vendor_id: objData.strVendorId } } }),
+          ...(objData.strQuotationId !== undefined && { quotation: { connect: { pk_quotation_id: objData.strQuotationId } } }),
+          ...(objData.strModifiedId && { modified_by: { connect: { pk_user_id: objData.strModifiedId } } }),
+          modified: new Date(),
         },
         include: {
           request: {
             select: {
-              pk_chr_request_id: true,
-              chr_request_number: true,
-              chr_title: true,
+              pk_request_id: true,
+              request_number: true,
+              title: true,
             },
           },
           vendor: {
             select: {
-              pk_chr_vendor_id: true,
-              chr_vendor_name: true,
-              chr_vendor_email: true,
+              pk_vendor_id: true,
+              vendor_name: true,
+              vendor_email: true,
             },
           },
           quotation: {
             select: {
-              pk_chr_quotation_id: true,
-              chr_status: true,
+              pk_quotation_id: true,
+              status: true,
             },
           },
         },
@@ -276,7 +276,7 @@ export class PurchaseOrderService {
     try {
       this.logger.log(`${PurchaseOrderProperties.service.delete.start}: ${strId}`);
       const purchaseOrder = await this.prisma.tbl_purchase_order.findUnique({
-        where: { pk_chr_purchase_order_id: strId },
+        where: { pk_purchase_order_id: strId },
       });
 
       if (!purchaseOrder) {
@@ -284,7 +284,7 @@ export class PurchaseOrderService {
       }
 
       const deletedPurchaseOrder = await this.prisma.tbl_purchase_order.delete({
-        where: { pk_chr_purchase_order_id: strId },
+        where: { pk_purchase_order_id: strId },
       });
 
       this.logger.log(`${PurchaseOrderProperties.service.delete.success}: ${strId}`);

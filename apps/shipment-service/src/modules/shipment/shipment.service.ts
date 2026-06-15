@@ -25,31 +25,31 @@ export class ShipmentService {
             fk_po_number:
               createShipmentDto.poNumber,
   
-            fk_chr_vendor_id:
+            fk_vendor_id:
               createShipmentDto.vendorId,
   
-            chr_asn_id:
+            asn_id:
               createShipmentDto.asnNumber,
             
-              dt_dispatch_date:
+              dispatch_date:
               createShipmentDto.dispatchDate,
 
-              dt_delivery_date:
+              delivery_date:
               createShipmentDto.deliveryDate,
 
-              chr_logistics_provider:
+              logistics_provider:
               createShipmentDto.logistics_provider,
 
-              fk_chr_tracking_no:
+              fk_tracking_no:
               createShipmentDto.tracking_no,
 
-              int_quantity:
+              quantity:
               createShipmentDto.quantity,
 
-              int_status:
+              status:
               createShipmentDto.status,
 
-              chr_notes:
+              notes:
               createShipmentDto.notes,
           },
         });
@@ -156,7 +156,7 @@ export class ShipmentService {
       this.logger.log(`${ShipmentProperties.service.findOne.start}: ${shipment_id}`);
       const shipment =
         await this.prisma.tbl_shipment.findUnique({
-          where: { pk_chr_shipment_id: shipment_id },
+          where: { pk_shipment_id: shipment_id },
           include: {
             tracking: true,
           },

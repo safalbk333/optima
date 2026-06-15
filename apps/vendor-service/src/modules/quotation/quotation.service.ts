@@ -29,14 +29,14 @@ export class QuotationService {
           data: {
             vendor: {
               connect: {
-                pk_chr_vendor_id:
+                pk_vendor_id:
                   createQuotationDto.vendorId,
               },
             },
 
             rfq: {
               connect: {
-                pk_chr_rfq_id:
+                pk_rfq_id:
                   createQuotationDto.rfqId,
               },
             },
@@ -44,7 +44,7 @@ export class QuotationService {
             ...(createQuotationDto.category && {
               category: {
                 connect: {
-                  pk_chr_category_id:
+                  pk_category_id:
                     createQuotationDto.category,
                 },
               },
@@ -53,27 +53,27 @@ export class QuotationService {
             ...(createQuotationDto.buyer && {
               buyer: {
                 connect: {
-                  pk_chr_user_id:
+                  pk_user_id:
                     createQuotationDto.buyer,
                 },
               },
             }),
-              ...(createQuotationDto.strHtmlContent && { txt_rendered_html: createQuotationDto.strHtmlContent }),
+              ...(createQuotationDto.strHtmlContent && { rendered_html: createQuotationDto.strHtmlContent }),
 
-            chr_status: createQuotationDto.status.toUpperCase(),
+            status: createQuotationDto.status.toUpperCase(),
 
-            dt_issue_date: new Date(
+            issue_date: new Date(
               createQuotationDto.issueDate,
             ),
 
-            dt_due_date: new Date(
+            due_date: new Date(
               createQuotationDto.dueDate,
             ),
           },
         });
 
       this.logger.log(
-        `${QuotationProperties.service.create.success}: ${quotation.pk_chr_quotation_id}`,
+        `${QuotationProperties.service.create.success}: ${quotation.pk_quotation_id}`,
       );
 
       return ResponseHelper.success(
@@ -179,7 +179,7 @@ export class QuotationService {
       const quotation =
         await this.prisma.tbl_quotation.findUnique({
           where: {
-            pk_chr_quotation_id: quotation_id,
+            pk_quotation_id: quotation_id,
           },
         });
 
@@ -225,18 +225,18 @@ export class QuotationService {
       const lastQuotation =
         await this.prisma.tbl_request_for_quotation.findFirst({
           orderBy: {
-            tim_created: 'desc',
+            created: 'desc',
           },
           select: {
-            pk_chr_rfq_id: true,
+            pk_rfq_id: true,
           },
         });
 
       let nextNumber = 1;
 
-      if (lastQuotation?.pk_chr_rfq_id) {
+      if (lastQuotation?.pk_rfq_id) {
         const parts =
-          lastQuotation.pk_chr_rfq_id.split('-');
+          lastQuotation.pk_rfq_id.split('-');
 
         const lastSequence = parseInt(
           parts[3],
