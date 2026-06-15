@@ -13,7 +13,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { catchError } from 'rxjs';
-import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 
 @ApiTags('Permissions')
 @Controller('/auth/permissions')

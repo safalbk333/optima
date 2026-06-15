@@ -22,9 +22,9 @@ import { ShipmentController } from './modules/shipment-service/shipment/shipment
 import { ShipmentGatewayService } from './modules/shipment-service/shipment/shipment.service';
 import { GoodsReceivedController } from './modules/shipment-service/goods-received/goods-reveived.controller';
 import { GoodsReceivedGatewayService } from './modules/shipment-service/goods-received/goods-received.service';
-import { KeycloakController } from './modules/authentication/keycloak/keycloak.controller';
-import { PermissionsController } from './modules/authentication/permissions/permissions.controller';
-import { GroupRolesController } from './modules/authentication/roles/roles.controller';
+import { KeycloakController } from './modules/auth-service/authentication/keycloak/keycloak.controller';
+import { PermissionsController } from './modules/auth-service/authentication/permissions/permissions.controller';
+import { GroupRolesController } from './modules/auth-service/authentication/roles/roles.controller';
 import { PurchaseRequestController } from './modules/request-service/purchase-request/purchase-request.controller';
 import { PurchaseRequestGatewayService } from './modules/request-service/purchase-request/purchase-request.service';
 import { EoiController } from './modules/request-service/eoi/eoi.controller';

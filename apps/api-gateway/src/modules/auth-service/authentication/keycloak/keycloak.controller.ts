@@ -22,7 +22,7 @@ import {
   ApiQuery,
   ApiBody,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { catchError } from 'rxjs';
 import {
   AuthDto,
@@ -141,7 +141,7 @@ export class KeycloakController {
     required: false,
     description: 'The client ID (e.g., client, travelapp)',
   })
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('/signout')
   @ApiResponse({ status: 200, description: 'Success' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
