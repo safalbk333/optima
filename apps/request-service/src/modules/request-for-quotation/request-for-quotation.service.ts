@@ -36,14 +36,9 @@ export class RequestForQuotationService {
               vendor: {
                 select: {
                   pk_vendor_id: true,
-                  vendor_name: true,
+                  company_legal_name: true,
                 },
               },
-            },
-          },
-          rfq_item_mappings: {
-            include: {
-              item: true,
             },
           },
         },
@@ -94,7 +89,7 @@ export class RequestForQuotationService {
               vendor: {
                 select: {
                   pk_vendor_id: true,
-                  vendor_name: true,
+                  company_legal_name: true,
                 },
               },
             },
@@ -104,16 +99,10 @@ export class RequestForQuotationService {
               vendor: {
                 select: {
                   pk_vendor_id: true,
-                  vendor_name: true,
-                  vendor_email: true,
+                  company_legal_name: true,
+                  email: true,
                 },
               },
-              quotation_items: true,
-            },
-          },
-          rfq_item_mappings: {
-            include: {
-              item: true,
             },
           },
         },
@@ -155,7 +144,7 @@ export class RequestForQuotationService {
           fk_created_id: rfqData.strCreatedId,
           ...(rfqData.strHtmlContent && { rendered_html: rfqData.strHtmlContent }),
           ...(arrItems && arrItems.length > 0 && {
-            rfq_item_mappings: {
+            rfq_item_mappings_disabled: {
               create: arrItems.map(item => ({
                 fk_item_id: item.strItemId,
                 item_description: '',
@@ -179,14 +168,9 @@ export class RequestForQuotationService {
               eoi_title: true,
             },
           },
-          rfq_item_mappings: {
-            include: {
-              item: true,
-            },
-          },
         },
       });
-      
+
       this.logger.log(`${RequestForQuotationProperties.service.create.success}: ${rfq.pk_rfq_id}`);
       return ResponseHelper.success(
         rfq,
@@ -262,14 +246,9 @@ export class RequestForQuotationService {
               eoi_title: true,
             },
           },
-          rfq_item_mappings: {
-            include: {
-              item: true,
-            },
-          },
         },
       });
-      
+
       this.logger.log(`${RequestForQuotationProperties.service.update.success}: ${strId}`);
       return ResponseHelper.success(
         updatedRfq,
@@ -321,14 +300,9 @@ export class RequestForQuotationService {
               vendor: {
                 select: {
                   pk_vendor_id: true,
-                  vendor_name: true,
+                  company_legal_name: true,
                 },
               },
-            },
-          },
-          rfq_item_mappings: {
-            include: {
-              item: true,
             },
           },
         },
