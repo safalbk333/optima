@@ -37,10 +37,10 @@ export class ContractController {
   ) { }
 
   @Get()
-  // @UseGuards(JwtAuthGuard, PermissionsGuard)
-  // @Permissions(
-  //   HOME_READ,
-  // )
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(
+    HOME_READ,
+  )
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get all contracts',
