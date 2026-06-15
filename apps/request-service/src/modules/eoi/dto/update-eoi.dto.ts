@@ -7,13 +7,13 @@ import {
 export class UpdateEoiDto {
   @IsOptional()
   @IsString()
-  chr_eoi_title?: string;
+  eoi_title?: string;
 
   @IsOptional()
   @IsString()
-  txt_notes?: string;
+  notes?: string;
 
   @IsOptional()
   @IsDateString()
-  dt_submission_deadline?: string;
+  submission_deadline?: string;
 }

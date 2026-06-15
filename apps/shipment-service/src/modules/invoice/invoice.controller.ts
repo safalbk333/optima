@@ -17,7 +17,7 @@ export class InvoiceController {
   async handleCreate(
     @Payload() payload: { data: CreateInvoiceDto },
   ) {
-    const userId = payload.data['fk_chr_created_id'] || 'SYSTEM';
+    const userId = payload.data['fk_created_id'] || 'SYSTEM';
     return this.invoiceService.create(payload.data, userId);
   }
 

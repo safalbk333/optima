@@ -7,18 +7,18 @@ import {
 
 export class CreateEoiDto {
   @IsString()
-  chr_eoi_title: string;
+  eoi_title: string;
 
   @IsUUID()
-  fk_chr_request_id: string;
+  fk_request_id: string;
 
   @IsUUID()
-  fk_chr_vendor_id: string;
+  fk_vendor_id: string;
 
   @IsOptional()
   @IsString()
-  txt_notes?: string;
+  notes?: string;
 
   @IsDateString()
-  dt_submission_deadline: string;
+  submission_deadline: string;
 }

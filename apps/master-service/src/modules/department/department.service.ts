@@ -17,12 +17,12 @@ export class DepartmentService {
       this.logger.log(DepartmentProperties.service.create.start);
       const objDepartment = await this.prisma.tbl_department.create({
         data: {
-          chr_department_name: createDepartmentDto.departmentName,
-          chr_department_code: createDepartmentDto.departmentCode,
-          txt_description: createDepartmentDto.description,
+          department_name: createDepartmentDto.departmentName,
+          department_code: createDepartmentDto.departmentCode,
+          description: createDepartmentDto.description,
         },
       });
-      this.logger.log(`${DepartmentProperties.service.create.success}: ${objDepartment.pk_chr_department_id}`);
+      this.logger.log(`${DepartmentProperties.service.create.success}: ${objDepartment.pk_department_id}`);
       return objDepartment;
     } catch (error) {
       this.logger.error(
@@ -38,7 +38,7 @@ export class DepartmentService {
       this.logger.log(DepartmentProperties.service.findAll.start);
       const arrDepartments = await this.prisma.tbl_department.findMany({
         where: {
-          bln_is_active: true,
+          is_active: true,
         },
       });
 
@@ -60,7 +60,7 @@ export class DepartmentService {
     try {
       this.logger.log(`${DepartmentProperties.service.findOne.start}: ${id}`);
       const objDepartment = await this.prisma.tbl_department.findUnique({
-        where: { pk_chr_department_id: id },
+        where: { pk_department_id: id },
       });
 
       if (!objDepartment) {
@@ -82,11 +82,11 @@ export class DepartmentService {
     try {
       this.logger.log(`${DepartmentProperties.service.update.start}: ${id}`);
       const objDepartment = await this.prisma.tbl_department.update({
-        where: { pk_chr_department_id: id },
+        where: { pk_department_id: id },
         data: {
-          chr_department_name: updateDepartmentDto.departmentName,
-          chr_department_code: updateDepartmentDto.departmentCode,
-          txt_description: updateDepartmentDto.description,
+          department_name: updateDepartmentDto.departmentName,
+          department_code: updateDepartmentDto.departmentCode,
+          description: updateDepartmentDto.description,
         },
       });
 

@@ -16,18 +16,18 @@ import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 const vendorInclude = {
   vendor: {
     select: {
-      pk_chr_vendor_id: true,
-      chr_vendor_name: true,
-      chr_vendor_email: true,
-      chr_vendor_phone: true,
+      pk_vendor_id: true,
+      vendor_name: true,
+      vendor_email: true,
+      vendor_phone: true,
       company: {
         select: {
-          pk_chr_company_id: true,
-          chr_company_name: true,
-          chr_company_code: true,
-          chr_company_email: true,
-          chr_company_phone: true,
-          chr_company_address: true,
+          pk_company_id: true,
+          company_name: true,
+          company_code: true,
+          company_email: true,
+          company_phone: true,
+          company_address: true,
         },
       },
     },
@@ -84,7 +84,7 @@ export class ContractService {
       const objContract =
         await this.prisma.tbl_contract.findUnique({
           where: {
-            pk_chr_contract_id: strId,
+            pk_contract_id: strId,
           },
           include: vendorInclude,
         });
@@ -125,20 +125,20 @@ export class ContractService {
       const objContract =
         await this.prisma.tbl_contract.create({
           data: {
-            chr_title: objData.title,
-            chr_contract_code: objData.contractCode,
-            txt_description: objData.description,
-            dt_start_date: new Date(objData.startDate),
-            dt_end_date: new Date(objData.endDate),
-            flt_value: objData.value,
-            fk_chr_vendor_id: objData.vendorId,
-            ...(objData.strHtmlContent && { txt_rendered_html: objData.strHtmlContent }),
+            title: objData.title,
+            contract_code: objData.contractCode,
+            description: objData.description,
+            start_date: new Date(objData.startDate),
+            end_date: new Date(objData.endDate),
+            value: objData.value,
+            fk_vendor_id: objData.vendorId,
+            ...(objData.strHtmlContent && { rendered_html: objData.strHtmlContent }),
           },
           include: vendorInclude,
         });
 
       this.logger.log(
-        `${ContractProperties.service.create.success}: ${objContract.pk_chr_contract_id}`,
+        `${ContractProperties.service.create.success}: ${objContract.pk_contract_id}`,
       );
 
       return ResponseHelper.success(
@@ -165,7 +165,7 @@ export class ContractService {
       );
 
       const objVendor = await this.prisma.tbl_vendor.findUnique({
-        where: { pk_chr_vendor_id: strVendorId },
+        where: { pk_vendor_id: strVendorId },
       });
 
       if (!objVendor) {
@@ -174,9 +174,9 @@ export class ContractService {
 
       const arrContracts =
         await this.prisma.tbl_contract.findMany({
-          where: { fk_chr_vendor_id: strVendorId },
+          where: { fk_vendor_id: strVendorId },
           include: vendorInclude,
-          orderBy: { tim_created: 'desc' },
+          orderBy: { created: 'desc' },
         });
 
       this.logger.log(
@@ -206,7 +206,7 @@ export class ContractService {
       const objContract =
         await this.prisma.tbl_contract.findUnique({
           where: {
-            pk_chr_contract_id: strId,
+            pk_contract_id: strId,
           },
         });
 
@@ -219,26 +219,26 @@ export class ContractService {
       const objUpdatedContract =
         await this.prisma.tbl_contract.update({
           where: {
-            pk_chr_contract_id: strId,
+            pk_contract_id: strId,
           },
           data: {
             ...(objData.title && {
-              chr_title: objData.title,
+              title: objData.title,
             }),
             ...(objData.description && {
-              txt_description: objData.description,
+              description: objData.description,
             }),
             ...(objData.startDate && {
-              dt_start_date: new Date(objData.startDate),
+              start_date: new Date(objData.startDate),
             }),
             ...(objData.endDate && {
-              dt_end_date: new Date(objData.endDate),
+              end_date: new Date(objData.endDate),
             }),
             ...(objData.value && {
-              flt_value: objData.value,
+              value: objData.value,
             }),
             ...(objData.vendorId && {
-              fk_chr_vendor_id: objData.vendorId,
+              fk_vendor_id: objData.vendorId,
             }),
           },
           include: vendorInclude,

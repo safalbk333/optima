@@ -37,7 +37,7 @@ export class EoiService {
 
     const eoi = await this.prisma.tbl_expression_of_interest.findMany({
       where: {
-        chr_document_status: {
+        document_status: {
           not: 'D',
         },
       },
@@ -48,7 +48,7 @@ export class EoiService {
       },
 
       orderBy: {
-        tim_created: 'desc',
+        created: 'desc',
       },
     });
 
@@ -72,9 +72,9 @@ export class EoiService {
     const eoi =
       await this.prisma.tbl_expression_of_interest.findFirst({
         where: {
-          pk_chr_eoi_id: eoiId,
+          pk_eoi_id: eoiId,
 
-          chr_document_status: {
+          document_status: {
             not: 'D',
           },
         },
@@ -115,7 +115,7 @@ export class EoiService {
     const vendor =
       await this.prisma.tbl_vendor.findUnique({
         where: {
-          pk_chr_vendor_id: vendorId,
+          pk_vendor_id: vendorId,
         },
       });
 
@@ -127,8 +127,8 @@ export class EoiService {
 
     const vendor_eoi = await this.prisma.tbl_expression_of_interest.findMany({
       where: {
-        fk_chr_vendor_id: vendorId,
-        chr_document_status: {
+        fk_vendor_id: vendorId,
+        document_status: {
           not: 'D',
         },
       },
@@ -136,25 +136,25 @@ export class EoiService {
       include: {
         request: {
           select: {
-            pk_chr_request_id: true,
-            chr_request_number: true,
-            chr_title: true,
-            chr_currency: true,
-            flt_estimated_value: true,
+            pk_request_id: true,
+            request_number: true,
+            title: true,
+            currency: true,
+            estimated_value: true,
           },
         },
 
         vendor: {
           select: {
-            pk_chr_vendor_id: true,
-            chr_vendor_name: true,
-            chr_vendor_email: true,
+            pk_vendor_id: true,
+            vendor_name: true,
+            vendor_email: true,
           },
         },
       },
 
       orderBy: {
-        tim_created: 'desc',
+        created: 'desc',
       },
     });
     return ResponseHelper.success(
@@ -174,20 +174,20 @@ export class EoiService {
     );
 
     await this.validateRequestAndVendor(
-      dto.fk_chr_request_id,
-      dto.fk_chr_vendor_id,
+      dto.fk_request_id,
+      dto.fk_vendor_id,
     );
 
     const existingEoi =
       await this.prisma.tbl_expression_of_interest.findFirst({
         where: {
-          fk_chr_request_id:
-            dto.fk_chr_request_id,
+          fk_request_id:
+            dto.fk_request_id,
 
-          fk_chr_vendor_id:
-            dto.fk_chr_vendor_id,
+          fk_vendor_id:
+            dto.fk_vendor_id,
 
-          chr_document_status: {
+          document_status: {
             not: 'D',
           },
         },
@@ -203,26 +203,26 @@ export class EoiService {
 
     const eoi = await this.prisma.tbl_expression_of_interest.create({
       data: {
-        chr_eoi_code: eoiCode,
+        eoi_code: eoiCode,
 
-        chr_eoi_title:
-          dto.chr_eoi_title,
+        eoi_title:
+          dto.eoi_title,
 
-        fk_chr_request_id:
-          dto.fk_chr_request_id,
+        fk_request_id:
+          dto.fk_request_id,
 
-        fk_chr_vendor_id:
-          dto.fk_chr_vendor_id,
+        fk_vendor_id:
+          dto.fk_vendor_id,
 
-        txt_notes:
-          dto.txt_notes,
+        notes:
+          dto.notes,
 
-        dt_submission_deadline:
+        submission_deadline:
           new Date(
-            dto.dt_submission_deadline,
+            dto.submission_deadline,
           ),
 
-        chr_status:
+        status:
           EoiStatus.DRAFT,
       },
     });
@@ -248,7 +248,7 @@ export class EoiService {
       await this.findOne(eoiId);
 
     if (
-      eoi.data.chr_status ===
+      eoi.data.status ===
       EoiStatus.ACCEPTED
     ) {
       throw new BadRequestException(
@@ -258,24 +258,24 @@ export class EoiService {
 
     const eoi_data = await this.prisma.tbl_expression_of_interest.update({
       where: {
-        pk_chr_eoi_id: eoiId,
+        pk_eoi_id: eoiId,
       },
 
       data: {
-        chr_eoi_title:
-          dto.chr_eoi_title,
+        eoi_title:
+          dto.eoi_title,
 
-        txt_notes:
-          dto.txt_notes,
+        notes:
+          dto.notes,
 
-        dt_submission_deadline:
-          dto.dt_submission_deadline
+        submission_deadline:
+          dto.submission_deadline
             ? new Date(
-              dto.dt_submission_deadline,
+              dto.submission_deadline,
             )
             : undefined,
 
-        tim_modified:
+        modified:
           new Date(),
       },
     });
@@ -301,9 +301,9 @@ export class EoiService {
       await this.findOne(eoiId);
 
     if (
-      eoi.data.chr_status ===
+      eoi.data.status ===
       EoiStatus.ACCEPTED &&
-      dto.chr_status !==
+      dto.status !==
       EoiStatus.ACCEPTED
     ) {
       throw new BadRequestException(
@@ -313,23 +313,23 @@ export class EoiService {
 
     return this.prisma.tbl_expression_of_interest.update({
       where: {
-        pk_chr_eoi_id: eoiId,
+        pk_eoi_id: eoiId,
       },
 
       data: {
-        chr_status:
-          dto.chr_status,
+        status:
+          dto.status,
 
-        txt_notes:
-          dto.txt_notes,
+        notes:
+          dto.notes,
 
-        dt_submitted_at:
-          dto.chr_status ===
+        submitted_at:
+          dto.status ===
             EoiStatus.ACCEPTED
             ? new Date()
-            : eoi.data.dt_submitted_at,
+            : eoi.data.submitted_at,
 
-        tim_modified:
+        modified:
           new Date(),
       },
     });
@@ -350,13 +350,13 @@ export class EoiService {
 
     return this.prisma.tbl_expression_of_interest.update({
       where: {
-        pk_chr_eoi_id: eoiId,
+        pk_eoi_id: eoiId,
       },
 
       data: {
-        chr_document_status: 'D',
+        document_status: 'D',
 
-        tim_modified:
+        modified:
           new Date(),
       },
     });
@@ -373,7 +373,7 @@ export class EoiService {
     const request =
       await this.prisma.tbl_purchase_request.findUnique({
         where: {
-          pk_chr_request_id:
+          pk_request_id:
             requestId,
         },
       });
@@ -387,7 +387,7 @@ export class EoiService {
     const vendor =
       await this.prisma.tbl_vendor.findUnique({
         where: {
-          pk_chr_vendor_id:
+          pk_vendor_id:
             vendorId,
         },
       });

@@ -12,21 +12,21 @@ export class CreateEoiDto {
     example: 'EOI for Office Supplies',
   })
   @IsString()
-  chr_eoi_title: string;
+  eoi_title: string;
 
   @ApiProperty({
     description: 'Purchase Request ID (UUID)',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @IsUUID()
-  fk_chr_request_id: string;
+  fk_request_id: string;
 
   @ApiProperty({
     description: 'Vendor ID (UUID)',
     example: '123e4567-e89b-12d3-a456-426614174001',
   })
   @IsUUID()
-  fk_chr_vendor_id: string;
+  fk_vendor_id: string;
 
   @ApiPropertyOptional({
     description: 'Additional notes for the EOI',
@@ -34,12 +34,12 @@ export class CreateEoiDto {
   })
   @IsOptional()
   @IsString()
-  txt_notes?: string;
+  notes?: string;
 
   @ApiProperty({
     description: 'Submission deadline (ISO 8601 date string)',
     example: '2026-06-30T23:59:59Z',
   })
   @IsDateString()
-  dt_submission_deadline: string;
+  submission_deadline: string;
 }

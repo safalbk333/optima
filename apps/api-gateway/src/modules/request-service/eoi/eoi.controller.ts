@@ -82,11 +82,11 @@ export class EoiController {
         examples: {
             example1: {
                 value: {
-                    chr_eoi_title: 'EOI for Office Supplies',
-                    fk_chr_request_id: '123e4567-e89b-12d3-a456-426614174000',
-                    fk_chr_vendor_id: '123e4567-e89b-12d3-a456-426614174001',
-                    txt_notes: 'Please include shipping cost in your quote',
-                    dt_submission_deadline: '2026-06-30T23:59:59Z',
+                    eoi_title: 'EOI for Office Supplies',
+                    fk_request_id: '123e4567-e89b-12d3-a456-426614174000',
+                    fk_vendor_id: '123e4567-e89b-12d3-a456-426614174001',
+                    notes: 'Please include shipping cost in your quote',
+                    submission_deadline: '2026-06-30T23:59:59Z',
                 },
             },
         },
@@ -104,14 +104,14 @@ export class EoiController {
         examples: {
             example1: {
                 value: {
-                    chr_eoi_title: 'EOI for Office Supplies - Updated',
-                    txt_notes: 'Updated notes with new requirements',
-                    dt_submission_deadline: '2026-07-15T23:59:59Z',
+                    eoi_title: 'EOI for Office Supplies - Updated',
+                    notes: 'Updated notes with new requirements',
+                    submission_deadline: '2026-07-15T23:59:59Z',
                 },
             },
             example2: {
                 value: {
-                    chr_eoi_title: 'Updated Title Only',
+                    eoi_title: 'Updated Title Only',
                 },
             },
         },
@@ -129,20 +129,20 @@ export class EoiController {
         examples: {
             example1: {
                 value: {
-                    chr_status: 'SENT',
-                    txt_notes: 'Sent to vendor on 2026-05-26',
+                    status: 'SENT',
+                    notes: 'Sent to vendor on 2026-05-26',
                 },
             },
             example2: {
                 value: {
-                    chr_status: 'INTERESTED',
-                    txt_notes: 'Vendor has accepted the EOI',
+                    status: 'INTERESTED',
+                    notes: 'Vendor has accepted the EOI',
                 },
             },
             example3: {
                 value: {
-                    chr_status: 'DECLINED',
-                    txt_notes: 'Vendor rejected the quote',
+                    status: 'DECLINED',
+                    notes: 'Vendor rejected the quote',
                 },
             },
         },

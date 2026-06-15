@@ -12,14 +12,14 @@ export class CreateInvoiceDto {
     example: 'INV-2026-001',
   })
   @IsString()
-  chr_invoice_number: string;
+  invoice_number: string;
 
   @ApiProperty({
     description: 'Purchase order ID (Foreign Key)',
     example: 'po-123456',
   })
   @IsString()
-  fk_chr_purchase_order_id: string;
+  fk_purchase_order_id: string;
 
   @ApiPropertyOptional({
     description: 'Goods receipt ID (Foreign Key)',
@@ -27,21 +27,21 @@ export class CreateInvoiceDto {
   })
   @IsOptional()
   @IsString()
-  fk_chr_goods_receipt_id?: string;
+  fk_goods_receipt_id?: string;
 
   @ApiProperty({
     description: 'Request ID (Foreign Key)',
     example: 'req-123456',
   })
   @IsString()
-  fk_chr_request_id: string;
+  fk_request_id: string;
 
   @ApiProperty({
     description: 'Vendor ID (Foreign Key)',
     example: 'vendor-001',
   })
   @IsString()
-  fk_chr_vendor_id: string;
+  fk_vendor_id: string;
 
   @ApiProperty({
     description: 'Subtotal amount',
@@ -49,7 +49,7 @@ export class CreateInvoiceDto {
     type: Number,
   })
   @IsNumber()
-  flt_subtotal: number;
+  subtotal: number;
 
   @ApiPropertyOptional({
     description: 'Tax amount',
@@ -58,7 +58,7 @@ export class CreateInvoiceDto {
   })
   @IsOptional()
   @IsNumber()
-  flt_tax_amount?: number;
+  tax_amount?: number;
 
   @ApiProperty({
     description: 'Total amount',
@@ -66,7 +66,7 @@ export class CreateInvoiceDto {
     type: Number,
   })
   @IsNumber()
-  flt_total_amount: number;
+  total_amount: number;
 
   @ApiPropertyOptional({
     description: 'Currency code',
@@ -74,21 +74,21 @@ export class CreateInvoiceDto {
   })
   @IsOptional()
   @IsString()
-  chr_currency?: string;
+  currency?: string;
 
   @ApiProperty({
     description: 'Invoice date (ISO 8601 format)',
     example: '2026-06-04T00:00:00Z',
   })
   @IsDateString()
-  dt_invoice_date: Date;
+  invoice_date: Date;
 
   @ApiProperty({
     description: 'Due date (ISO 8601 format)',
     example: '2026-07-04T00:00:00Z',
   })
   @IsDateString()
-  dt_due_date: Date;
+  due_date: Date;
 
   @ApiPropertyOptional({
     description: 'Additional notes',
@@ -96,5 +96,5 @@ export class CreateInvoiceDto {
   })
   @IsOptional()
   @IsString()
-  txt_notes?: string;
+  notes?: string;
 }
