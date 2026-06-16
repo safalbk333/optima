@@ -7,23 +7,13 @@ import {
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
-  constructor() {
-    super({
-      datasources: {
-        db: {
-          url: `${process.env.DATABASE_URL}?schema=econet`,
-        },
-      },
-    });
-  }
+export class PrismaService extends PrismaClient
+ implements OnModuleInit, OnModuleDestroy {
+  private readonly clients = new Map<string, PrismaClient>();
 
-  async onModuleInit() {
+async onModuleInit() {
     await this.$connect();
-    console.log('Master Prisma connected');
+    console.log('Prisma connected');
   }
 
   async onModuleDestroy() {
