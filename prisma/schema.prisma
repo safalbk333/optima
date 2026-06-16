@@ -117,18 +117,18 @@ model tbl_user {
 }
 
 model tbl_user_role {
-  pk_role_id      String                  @id @default(uuid())
-  role_name       String                  @unique
-  role_code       String                  @unique
-  description     String?
-  is_active       Boolean                 @default(true)
-  created         DateTime                @default(now())
-  modified        DateTime?
-  fk_created_id   String?
-  fk_modified_id  String?
-  is_delete       Boolean                  @default(false) 
-  created_by          tbl_user?               @relation("user_role_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by         tbl_user?               @relation("user_role_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
+  pk_role_id          String                  @id @default(uuid())
+  role_name           String                  @unique
+  role_code           String                  @unique
+  description         String?
+  is_active           Boolean                 @default(true)
+  created             DateTime                @default(now())
+  modified            DateTime?
+  fk_created_id       String?
+  fk_modified_id      String?
+  is_delete           Boolean                  @default(false) 
+  created_by          tbl_user?                @relation("user_role_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?                @relation("user_role_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   user_role_mappings  tbl_user_role_mapping[]
 
   @@map("tbl_user_role")

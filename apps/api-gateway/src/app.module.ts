@@ -24,7 +24,7 @@ import { GoodsReceivedController } from './modules/shipment-service/goods-receiv
 import { GoodsReceivedGatewayService } from './modules/shipment-service/goods-received/goods-received.service';
 import { KeycloakController } from './modules/auth-service/authentication/keycloak/keycloak.controller';
 import { PermissionsController } from './modules/auth-service/authentication/permissions/permissions.controller';
-import { GroupRolesController } from './modules/auth-service/authentication/roles/roles.controller';
+import { RolesController } from './modules/auth-service/authentication/roles/roles.controller';
 import { PurchaseRequestController } from './modules/request-service/purchase-request/purchase-request.controller';
 import { PurchaseRequestGatewayService } from './modules/request-service/purchase-request/purchase-request.service';
 import { EoiController } from './modules/request-service/eoi/eoi.controller';
@@ -42,6 +42,7 @@ import { TemplateController } from './modules/template/template.controller';
 import { TemplateGatewayService } from './modules/template/template.service';
 import { InvoiceController } from './modules/shipment-service/invoice/invoice.controller';
 import { InvoiceGatewayService } from './modules/shipment-service/invoice/invoice.service';
+import { RoleGatewayService } from './modules/auth-service/authentication/roles/roles.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
  
@@ -118,7 +119,7 @@ ConfigModule.forRoot({
     GoodsReceivedController,
     KeycloakController,
     PermissionsController,
-    GroupRolesController,
+    RolesController,
     PurchaseRequestController,
     EoiController,
     RequestForQuotationController,
@@ -146,7 +147,8 @@ ConfigModule.forRoot({
     GoodsReceiptGatewayService,
     DepartmentGatewayService,
     TemplateGatewayService,
-    InvoiceGatewayService
+    InvoiceGatewayService,
+    RoleGatewayService
   ],
 })
 export class AppModule {
