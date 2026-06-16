@@ -13,14 +13,14 @@ import { PermissionsService } from './permissions/permissions.service';
 @Module({
   imports: [ // ✅ ENV Configuration
     ConfigModule.forRoot({
-  isGlobal: true,
-  envFilePath: `apps/auth-service/.env.${process.env.NODE_ENV || 'development'}`,
-}),
-  KeycloakModule,
+      isGlobal: true,
+      envFilePath: `apps/auth-service/.env.${process.env.NODE_ENV || 'development'}`,
+    }),
+    KeycloakModule,
     PermissionsModule,
     RolesModule,
-],
-  controllers: [AuthServiceController,KeycloakController,PermissionsController],
-  providers: [AuthServiceService,KeycloakService,PermissionsService],
+  ],
+  controllers: [AuthServiceController, KeycloakController, PermissionsController,],
+  providers: [AuthServiceService, KeycloakService, PermissionsService,],
 })
-export class AuthServiceModule {}
+export class AuthServiceModule { }
