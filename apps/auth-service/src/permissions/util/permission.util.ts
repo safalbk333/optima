@@ -19,15 +19,20 @@ export class PermissionUtil {
 
 
   
-  public static getAxiosInstance(): AxiosInstance {
+public static getAxiosInstance(): AxiosInstance {
+  if (!this.axiosInstance) {
     const bypassSsl = process.env.BYPASS_SSL === 'true';
-    return axios.create({
+
+    this.axiosInstance = axios.create({
       httpsAgent: bypassSsl
         ? new Agent({ rejectUnauthorized: false })
         : undefined,
       timeout: 60000,
     });
   }
+
+  return this.axiosInstance;
+}
   static getConfig(origin: string, client: string): KeycloakConfig {
     const allowedClients = (process.env.ALLOWED_CLIENTS || '')
       .split(',')

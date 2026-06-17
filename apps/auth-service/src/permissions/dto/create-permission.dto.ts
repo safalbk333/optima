@@ -18,7 +18,7 @@ export class IsAllowedOriginConstraint implements ValidatorConstraintInterface {
       .map((origin) => origin.trim())
       .filter(Boolean);
     if (!allowedOrigins.length) {
-      throw new Error('ALLOWED_ORIGINS environment variable is not set');
+      return false;
     }
     return typeof value === 'string' && allowedOrigins.includes(value);
   }
@@ -72,11 +72,13 @@ export function IsAllowedClient(validationOptions?: ValidationOptions) {
 
 export class CreatePermissionDto {
   @IsString()
+  @IsNotEmpty()
   permissionName: string;
 
   @IsString()
+  @IsNotEmpty()
   description: string;
-
+  
   @IsString()
   @IsNotEmpty()
   @IsAllowedClient()
