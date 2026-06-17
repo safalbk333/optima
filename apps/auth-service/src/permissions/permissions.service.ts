@@ -2,6 +2,10 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import * as PermissionsMap from '../common/permissions-map';
 import { AppLogger } from '../common/logger/app.logger';
 import { formatResponse, ResponseOptions } from '../common/response.helper';
+import { PermissionUtil } from './util/permission.util';
+import { CreatePermissionDto } from './dto/create-permission.dto';
+import { UpdatePermissionDto } from './dto/update-permission.dto';
+import { DeletePermissionDto } from './dto/delete-permission.dto';
 
 @Injectable()
 export class PermissionsService {
@@ -36,4 +40,76 @@ export class PermissionsService {
       throw new Error(error.message || 'Failed to retrieve permissions');
     }
   }
+  async createPermission(permission: CreatePermissionDto) {
+  try {
+    const config = PermissionUtil.getConfig(
+      permission.origin,
+      permission.client,
+    );
+
+    await PermissionUtil.createPermission(
+      config,
+      permission.permissionName,
+      permission.description,
+      false,
+    );
+
+    return formatResponse({
+      data: permission,
+      message: 'Permission created successfully',
+      statusCode: HttpStatus.CREATED,
+    });
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+async updatePermission(
+  permission: UpdatePermissionDto,
+) {
+  try {
+    const config = PermissionUtil.getConfig(
+      permission.origin,
+      permission.client,
+    );
+
+    await PermissionUtil.updatePermission(
+      config,
+      permission.currentPermissionName,
+      permission.permissionName,
+      permission.description,
+    );
+
+    return formatResponse({
+      data: permission,
+      message: 'Permission updated successfully',
+      statusCode: HttpStatus.OK,
+    });
+  } catch (error: any) {
+    throw error;
+  }
+}
+async deletePermission(
+  permission: DeletePermissionDto,
+) {
+  try {
+    const config = PermissionUtil.getConfig(
+      permission.origin,
+      permission.client,
+    );
+
+    await PermissionUtil.deletePermission(
+      config,
+      permission.permissionName,
+    );
+
+    return formatResponse({
+      data: null,
+      message: 'Permission deleted successfully',
+      statusCode: HttpStatus.OK,
+    });
+  } catch (error: any) {
+    throw error;
+  }
+}
 }
