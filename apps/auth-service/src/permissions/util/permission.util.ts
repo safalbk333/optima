@@ -185,4 +185,68 @@ static async createPermission(
     );
   }
 }
+
+static async getPermission(
+  config: KeycloakConfig,
+  roleName: string,
+) {
+  const token = await this.getClientToken(config);
+
+  const url =
+    `${config.keycloakUrl}/admin/realms/${config.realmName}/roles/${roleName}`;
+
+  const response = await this.getAxiosInstance().get(
+    url,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  return response.data;
+}
+static async updatePermission(
+  config: KeycloakConfig,
+  currentRoleName: string,
+  newRoleName: string,
+  description: string,
+): Promise<void> {
+  const token = await this.getClientToken(config);
+
+  const url =
+    `${config.keycloakUrl}/admin/realms/${config.realmName}/roles/${currentRoleName}`;
+
+  await this.getAxiosInstance().put(
+    url,
+    {
+      name: newRoleName,
+      description,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+}
+static async deletePermission(
+  config: KeycloakConfig,
+  roleName: string,
+): Promise<void> {
+  const token = await this.getClientToken(config);
+
+  const url =
+    `${config.keycloakUrl}/admin/realms/${config.realmName}/roles/${roleName}`;
+
+  await this.getAxiosInstance().delete(
+    url,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+}
 }
