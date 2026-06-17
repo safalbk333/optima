@@ -1,29 +1,24 @@
 import {
-  IsArray,
+  IsString,
   IsEmail,
   IsOptional,
-  IsString,
-  Matches,
+  IsUUID,
 } from 'class-validator';
 
 export class CreateUserDto {
-  @Matches(/^OPT\d+$/)
-  optimaId: string;
+  @IsString()
+  userName: string;
 
   @IsEmail()
-  email: string;
+  userEmail: string;
 
   @IsString()
-  firstName: string;
+  userPhone: string;
+
+  @IsUUID()
+  fkTenantId: string;
 
   @IsOptional()
-  @IsString()
-  middleName?: string;
-
-  @IsString()
-  lastName: string;
-
-  @IsArray()
-  @IsString({ each: true })
-  roles: string[];
+  @IsUUID()
+  fkCompanyId?: string;
 }

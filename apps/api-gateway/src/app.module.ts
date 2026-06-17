@@ -43,6 +43,8 @@ import { TemplateGatewayService } from './modules/template/template.service';
 import { InvoiceController } from './modules/shipment-service/invoice/invoice.controller';
 import { InvoiceGatewayService } from './modules/shipment-service/invoice/invoice.service';
 import { RoleGatewayService } from './modules/auth-service/authentication/roles/roles.service';
+import { UsersController } from './modules/user-service/users/users.controller';
+import { UsersGatewayService } from './modules/user-service/users/users.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
  
@@ -104,6 +106,14 @@ ConfigModule.forRoot({
           port: Number(process.env.CONTRACTS_SERVICE_PORT) || 3005,
         },
       },
+      {
+        name: 'USER_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: process.env.USER_SERVICE_HOST || 'localhost',
+          port: Number(process.env.USER_SERVICE_PORT) || 3007,
+        },
+      },
     ]),
   ],
  
@@ -127,7 +137,8 @@ ConfigModule.forRoot({
     GoodsReceiptController,
     DepartmentController,
     TemplateController,
-    InvoiceController
+    InvoiceController,
+    UsersController
   ],
  
   providers: [
@@ -148,7 +159,8 @@ ConfigModule.forRoot({
     DepartmentGatewayService,
     TemplateGatewayService,
     InvoiceGatewayService,
-    RoleGatewayService
+    RoleGatewayService,
+    UsersGatewayService
   ],
 })
 export class AppModule {
@@ -177,6 +189,9 @@ export class AppModule {
       'CONTRACTS_SERVICE_PORT =>',
       process.env.CONTRACTS_SERVICE_PORT,
     );
- 
+
+    console.log('USER_SERVICE_HOST =>', process.env.USER_SERVICE_HOST);
+    console.log('USER_SERVICE_PORT =>', process.env.USER_SERVICE_PORT);
+
   }
  }
