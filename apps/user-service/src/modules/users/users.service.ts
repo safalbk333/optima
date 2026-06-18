@@ -6,18 +6,18 @@ import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findAll() {
     try {
       const arrUsers = await this.prisma.tbl_user.findMany({
-  where: {
-    is_delete: false,
-  },
-  include: {
-    roles: true,
-  },
-});
+        where: {
+          is_delete: false,
+        },
+        include: {
+          roles: true,
+        },
+      });
       return ResponseHelper.success(arrUsers, 'Users fetched successfully');
     } catch (error) {
       return ResponseHelper.error('Failed to fetch users', error.message);
@@ -28,6 +28,9 @@ export class UsersService {
     try {
       const objUser = await this.prisma.tbl_user.findUnique({
         where: { pk_user_id: id },
+        include: {
+          roles: true,
+        },
       });
       if (!objUser || objUser.is_delete) {
         throw new NotFoundException('User not found');
