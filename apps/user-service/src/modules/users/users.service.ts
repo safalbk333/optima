@@ -11,8 +11,13 @@ export class UsersService {
   async findAll() {
     try {
       const arrUsers = await this.prisma.tbl_user.findMany({
-        where: { is_delete: false },
-      });
+  where: {
+    is_delete: false,
+  },
+  include: {
+    roles: true,
+  },
+});
       return ResponseHelper.success(arrUsers, 'Users fetched successfully');
     } catch (error) {
       return ResponseHelper.error('Failed to fetch users', error.message);
@@ -42,6 +47,7 @@ export class UsersService {
           user_phone: dto.userPhone,
           fk_tenant_id: dto.fkTenantId,
           fk_company_id: dto.fkCompanyId,
+          fk_role_id: dto.fkRoleId,
         },
       });
       return ResponseHelper.success(objUser, 'User created successfully');
@@ -66,6 +72,7 @@ export class UsersService {
       if (dto.fkTenantId !== undefined) updateData.fk_tenant_id = dto.fkTenantId;
       if (dto.fkCompanyId !== undefined) updateData.fk_company_id = dto.fkCompanyId;
       if (dto.isActive !== undefined) updateData.is_active = dto.isActive;
+      if (dto.fkRoleId !== undefined) updateData.fk_role_id = dto.fkRoleId;
       updateData.modified = new Date();
 
       const objUser = await this.prisma.tbl_user.update({

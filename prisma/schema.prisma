@@ -28,6 +28,7 @@ model tbl_tenant_registry {
 model tbl_user {
   pk_user_id               String                              @id @default(uuid())
   fk_tenant_id             String
+  fk_role_id               String
   user_name                String
   user_email               String                              @unique
   user_phone               String
@@ -36,8 +37,8 @@ model tbl_user {
   modified                 DateTime?
   fk_created_id            String?
   fk_modified_id           String?
-  fk_company_id           String?
-  is_delete               Boolean                              @default(false) 
+  fk_company_id            String?
+  is_delete                Boolean                              @default(false) 
   activations_created          tbl_activations[]                   @relation("activations_created_by")
   activations_modified         tbl_activations[]                   @relation("activations_modified_by")
   activations                  tbl_activations[]                   @relation("activations_user")
@@ -103,11 +104,9 @@ model tbl_user {
   modified_by                  tbl_user?                           @relation("user_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   users_modified               tbl_user[]                          @relation("user_modified_by")
   tenant                       tbl_tenant_registry                 @relation(fields: [fk_tenant_id], references: [pk_tenant_id])
+  roles                        tbl_user_role                       @relation(fields: [fk_role_id], references: [pk_role_id])
   user_roles_created           tbl_user_role[]                     @relation("user_role_created_by")
   user_roles_modified          tbl_user_role[]                     @relation("user_role_modified_by")
-  user_role_mappings_created   tbl_user_role_mapping[]             @relation("user_role_mapping_created_by")
-  user_role_mappings_modified  tbl_user_role_mapping[]             @relation("user_role_mapping_modified_by")
-  user_role_mappings           tbl_user_role_mapping[]             @relation("user_role_mapping_user")
   vendors_created              tbl_vendor[]                        @relation("vendor_created_by")
   vendors_modified             tbl_vendor[]                        @relation("vendor_modified_by")
   company                      tbl_company?                        @relation("user_company", fields: [fk_company_id], references: [pk_company_id]) 
@@ -129,31 +128,9 @@ model tbl_user_role {
   is_delete           Boolean                  @default(false) 
   created_by          tbl_user?                @relation("user_role_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?                @relation("user_role_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
-  user_role_mappings  tbl_user_role_mapping[]
+  user                tbl_user[]
 
   @@map("tbl_user_role")
-}
-
-model tbl_user_role_mapping {
-  pk_user_role_mapping_id String        @id @default(uuid())
-  fk_user_id              String
-  fk_role_id              String
-  is_active               Boolean       @default(true)
-  created                 DateTime      @default(now())
-  modified                DateTime?
-  fk_created_id           String?
-  fk_modified_id          String?
-  is_delete               Boolean        @default(false) 
-  created_by                  tbl_user?     @relation("user_role_mapping_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by                 tbl_user?     @relation("user_role_mapping_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
-  role                        tbl_user_role @relation(fields: [fk_role_id], references: [pk_role_id])
-  user                        tbl_user      @relation("user_role_mapping_user", fields: [fk_user_id], references: [pk_user_id], onDelete: Cascade)
-
-  @@unique([fk_user_id, fk_role_id])
-  @@index([fk_user_id])
-  @@index([fk_role_id])
-  @@index([is_active])
-  @@map("tbl_user_role_mapping")
 }
 
 model tbl_activations {

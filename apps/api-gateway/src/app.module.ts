@@ -20,8 +20,6 @@ import { CategoryController } from './modules/master-service/category/category.c
 import { CategoryGatewayService } from './modules/master-service/category/category.service';
 import { ShipmentController } from './modules/shipment-service/shipment/shipment.controller';
 import { ShipmentGatewayService } from './modules/shipment-service/shipment/shipment.service';
-import { GoodsReceivedController } from './modules/shipment-service/goods-received/goods-reveived.controller';
-import { GoodsReceivedGatewayService } from './modules/shipment-service/goods-received/goods-received.service';
 import { KeycloakController } from './modules/auth-service/authentication/keycloak/keycloak.controller';
 import { PermissionsController } from './modules/auth-service/authentication/permissions/permissions.controller';
 import { RolesController } from './modules/auth-service/authentication/roles/roles.controller';
@@ -126,7 +124,6 @@ ConfigModule.forRoot({
     ContractController,
     CategoryController,
     ShipmentController,
-    GoodsReceivedController,
     KeycloakController,
     PermissionsController,
     RolesController,
@@ -150,7 +147,6 @@ ConfigModule.forRoot({
     ContractGatewayService,
     CategoryGatewayService,
     ShipmentGatewayService,
-    GoodsReceivedGatewayService,
     PurchaseRequestGatewayService,
     EoiGatewayService,
     RequestForQuotationGatewayService,

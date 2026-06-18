@@ -27,4 +27,8 @@ export class CreateUserDto {
   @IsOptional()
   @IsUUID()
   fkCompanyId?: string;
+
+  @ApiProperty({ description: 'Role ID the user belongs to' })
+  @IsUUID()
+  fkRoleId: string;
 }
