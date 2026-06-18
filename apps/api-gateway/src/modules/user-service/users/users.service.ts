@@ -6,6 +6,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ActivateDeactivateUserDto } from './dto/activate-deactivate-user.dto';
 import { USERS_PATTERN } from './users.pattern';
 
 @Injectable()
@@ -42,6 +43,12 @@ export class UsersGatewayService {
   async delete(id: string) {
     return await firstValueFrom(
       this.client.send(USERS_PATTERN.DELETE, id),
+    );
+  }
+
+  async activateDeactivate(id: string, data: ActivateDeactivateUserDto) {
+    return await firstValueFrom(
+      this.client.send(USERS_PATTERN.ACTIVATE_DEACTIVATE, { id, data }),
     );
   }
 }

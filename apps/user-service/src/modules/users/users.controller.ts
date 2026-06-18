@@ -3,6 +3,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ActivateDeactivateUserDto } from './dto/activate-deactivate-user.dto';
 
 @Controller()
 export class UsersController {
@@ -31,5 +32,10 @@ export class UsersController {
   @MessagePattern('users.delete')
   delete(@Payload() id: string) {
     return this.usersService.delete(id);
+  }
+
+  @MessagePattern('users.activateDeactivate')
+  activateDeactivate(@Payload() payload: { id: string; data: ActivateDeactivateUserDto }) {
+    return this.usersService.activateDeactivate(payload.id, payload.data);
   }
 }

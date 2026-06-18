@@ -1,0 +1,56 @@
+export const UserProperties = {
+  controller: {
+    start: 'User Controller started successfully',
+    findAll: 'Received request to find all users',
+    findOne: 'Received request to find user with id',
+    create: 'Received request to create user',
+    update: 'Received request to update user with id',
+    delete: 'Received request to delete user with id',
+    activateDeactivate: 'Received request to activate/deactivate user with id',
+  },
+  service: {
+    findAll: {
+      start: 'Fetching all users',
+      success: 'Users fetched successfully',
+      error: 'Failed to fetch users',
+    },
+    findOne: {
+      start: 'Fetching user with id',
+      success: 'User found with id',
+      notFound: 'User not found with id',
+      error: 'Failed to fetch user with ID',
+    },
+    create: {
+      start: 'Creating new user',
+      keycloakStart: 'Creating user in Keycloak',
+      keycloakSuccess: 'User created in Keycloak with id',
+      dbStart: 'Creating user in database',
+      success: 'User created with id',
+      error: 'Failed to create user',
+    },
+    update: {
+      start: 'Updating user with id',
+      keycloakStart: 'Updating user in Keycloak',
+      keycloakSuccess: 'User updated in Keycloak',
+      success: 'User updated with id',
+      notFound: 'User not found with id',
+      error: 'Failed to update user with ID',
+    },
+    delete: {
+      start: 'Deleting user with id',
+      keycloakStart: 'Disabling user in Keycloak',
+      keycloakSuccess: 'User disabled in Keycloak',
+      success: 'User deleted with id',
+      notFound: 'User not found with id',
+      error: 'Failed to delete user with ID',
+    },
+    activateDeactivate: {
+      start: 'Activating/Deactivating user with id',
+      keycloakStart: 'Updating user status in Keycloak',
+      keycloakSuccess: 'User status updated in Keycloak',
+      success: 'User status updated with id',
+      notFound: 'User not found with id',
+      error: 'Failed to activate/deactivate user with ID',
+    },
+  },
+};

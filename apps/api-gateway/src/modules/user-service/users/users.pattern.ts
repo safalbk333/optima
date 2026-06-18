@@ -4,4 +4,5 @@ export const USERS_PATTERN = {
   CREATE: 'users.create',
   UPDATE: 'users.update',
   DELETE: 'users.delete',
+  ACTIVATE_DEACTIVATE: 'users.activateDeactivate',
 };

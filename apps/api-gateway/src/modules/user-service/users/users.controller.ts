@@ -4,6 +4,7 @@ import {
   Post,
   Put,
   Delete,
+  Patch,
   Param,
   Body,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import {
 import { UsersGatewayService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ActivateDeactivateUserDto } from './dto/activate-deactivate-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -56,5 +58,12 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   delete(@Param('id') id: string) {
     return this.usersService.delete(id);
+  }
+
+  @Patch(':id/activate-deactivate')
+  @ApiOperation({ summary: 'Activate or deactivate a user' })
+  @ApiResponse({ status: 200, description: 'User status updated successfully' })
+  activateDeactivate(@Param('id') id: string, @Body() data: ActivateDeactivateUserDto) {
+    return this.usersService.activateDeactivate(id, data);
   }
 }
