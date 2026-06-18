@@ -1,7 +1,6 @@
 import { HttpStatus, Logger } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
 import { Agent } from 'https';
-import { RpcException } from '@nestjs/microservices';
 
 export interface KeycloakConfig {
   realmName: string;
@@ -17,22 +16,21 @@ export class PermissionUtil {
   private static logger = new Logger(PermissionUtil.name);
   private static axiosInstance: AxiosInstance | null = null;
 
+  public static getAxiosInstance(): AxiosInstance {
+    if (!this.axiosInstance) {
+      const bypassSsl = process.env.BYPASS_SSL === 'true';
 
-  
-public static getAxiosInstance(): AxiosInstance {
-  if (!this.axiosInstance) {
-    const bypassSsl = process.env.BYPASS_SSL === 'true';
+      this.axiosInstance = axios.create({
+        httpsAgent: bypassSsl
+          ? new Agent({ rejectUnauthorized: false })
+          : undefined,
+        timeout: 60000,
+      });
+    }
 
-    this.axiosInstance = axios.create({
-      httpsAgent: bypassSsl
-        ? new Agent({ rejectUnauthorized: false })
-        : undefined,
-      timeout: 60000,
-    });
+    return this.axiosInstance;
   }
 
-  return this.axiosInstance;
-}
   static getConfig(origin: string, client: string): KeycloakConfig {
     const allowedClients = (process.env.ALLOWED_CLIENTS || '')
       .split(',')
@@ -67,7 +65,7 @@ public static getAxiosInstance(): AxiosInstance {
       keycloakUrl: process.env.KEYCLOAK_URL,
       authClientId: process.env.AUTH_CLIENT_ID,
       authClientSecret: process.env.AUTH_CLIENT_SECRET,
-      clientId:process.env.HRMS_CLIENT,
+      clientId: process.env.HRMS_CLIENT,
       clientSecret: process.env.HRMS_CLIENT_SECRET,
       audience: process.env.AUDIENCE,
     };
@@ -127,7 +125,7 @@ public static getAxiosInstance(): AxiosInstance {
         this.logger.error(
           'Failed to obtain client token: No access token in response',
         );
-        throw new RpcException('Failed to obtain client token');
+        throw new Error('Failed to obtain client token: No access token in response');
       }
     } catch (error: any) {
       this.logger.error(
@@ -138,115 +136,269 @@ public static getAxiosInstance(): AxiosInstance {
           url,
         }),
       );
-      throw new RpcException(`Failed to obtain client token: ${error.message}`);
+      throw new Error(`Failed to obtain client token: ${error.message}`);
     }
   }
 
+  static async createPermission(
+    config: KeycloakConfig,
+    roleName: string,
+    roleDescription: string,
+    clientRole: boolean,
+  ): Promise<void> {
+    const token = await this.getClientToken(config);
 
-static async createPermission(
-  config: KeycloakConfig,
-  roleName: string,
-  roleDescription:string,
-  clientRole:boolean
-): Promise<void> {
-  const token = await this.getClientToken(config);
+    const url = `${config.keycloakUrl}/admin/realms/${config.realmName}/roles`;
+    try {
+      const response = await this.getAxiosInstance().post(
+        url,
+        {
+          name: roleName,
+          description: roleDescription,
+          clientRole: clientRole,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
 
-  const url = `${config.keycloakUrl}/admin/realms/${config.realmName}/roles`;
-  try {
-    const response = await this.getAxiosInstance().post(
-      url,
-      {
-        name: roleName,
-        description: roleDescription,
-        clientRole:clientRole
-      },
-      {
+      this.logger.log(
+        `Role '${roleName}' created successfully. Status: ${response.status}`,
+      );
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to create role '${roleName}'`,
+        JSON.stringify({
+          status: error.response?.status,
+          data: error.response?.data,
+        }),
+      );
+      throw new Error(`Failed to create role '${roleName}': ${error.message}`);
+    }
+  }
+
+  static async getPermission(config: KeycloakConfig, roleName: string) {
+    const token = await this.getClientToken(config);
+
+    const url = `${config.keycloakUrl}/admin/realms/${config.realmName}/roles/${roleName}`;
+
+    try {
+      const response = await this.getAxiosInstance().get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
-      },
-    );
-
-    this.logger.log(
-      `Role ${roleName} created successfully. Status: ${response.status}`,
-    );
-  } catch (error: any) {
-    this.logger.error(
-      'Failed to create role',
-      JSON.stringify({
-        status: error.response?.status,
-        data: error.response?.data,
-      }),
-    );
-
-    throw new RpcException(
-      error.response?.data || 'Failed to create role',
-    );
+      });
+      return response.data;
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to retrieve role '${roleName}'`,
+        JSON.stringify({
+          status: error.response?.status,
+          data: error.response?.data,
+        }),
+      );
+      throw new Error(`Role '${roleName}' not found or could not be retrieved`);
+    }
   }
-}
 
-static async getPermission(
-  config: KeycloakConfig,
-  roleName: string,
-) {
-  const token = await this.getClientToken(config);
+  static async updatePermission(
+    config: KeycloakConfig,
+    currentRoleName: string,
+    newRoleName: string,
+    description: string,
+  ): Promise<void> {
+    const token = await this.getClientToken(config);
 
-  const url =
-    `${config.keycloakUrl}/admin/realms/${config.realmName}/roles/${roleName}`;
+    const url = `${config.keycloakUrl}/admin/realms/${config.realmName}/roles/${currentRoleName}`;
 
-  const response = await this.getAxiosInstance().get(
-    url,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
+    try {
+      await this.getAxiosInstance().put(
+        url,
+        { name: newRoleName, description },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
 
-  return response.data;
-}
-static async updatePermission(
-  config: KeycloakConfig,
-  currentRoleName: string,
-  newRoleName: string,
-  description: string,
-): Promise<void> {
-  const token = await this.getClientToken(config);
+      this.logger.log(
+        `Role '${currentRoleName}' updated successfully to '${newRoleName}'`,
+      );
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to update role '${currentRoleName}'`,
+        JSON.stringify({
+          status: error.response?.status,
+          data: error.response?.data,
+        }),
+      );
+      throw new Error(`Failed to update role '${currentRoleName}': ${error.message}`);
+    }
+  }
 
-  const url =
-    `${config.keycloakUrl}/admin/realms/${config.realmName}/roles/${currentRoleName}`;
+  static async deletePermission(
+    config: KeycloakConfig,
+    roleName: string,
+  ): Promise<void> {
+    const token = await this.getClientToken(config);
 
-  await this.getAxiosInstance().put(
-    url,
-    {
-      name: newRoleName,
-      description,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    },
-  );
-}
-static async deletePermission(
-  config: KeycloakConfig,
-  roleName: string,
-): Promise<void> {
-  const token = await this.getClientToken(config);
+    const url = `${config.keycloakUrl}/admin/realms/${config.realmName}/roles/${roleName}`;
 
-  const url =
-    `${config.keycloakUrl}/admin/realms/${config.realmName}/roles/${roleName}`;
+    try {
+      await this.getAxiosInstance().delete(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  await this.getAxiosInstance().delete(
-    url,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
-}
+      this.logger.log(`Role '${roleName}' deleted successfully`);
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to delete role '${roleName}'`,
+        JSON.stringify({
+          status: error.response?.status,
+          data: error.response?.data,
+        }),
+      );
+      throw new Error(`Failed to delete role '${roleName}': ${error.message}`);
+    }
+  }
+
+  static async assignRealmRoleToUser(
+    config: KeycloakConfig,
+    userId: string,
+    roleName: string,
+  ): Promise<void> {
+    const token = await this.getClientToken(config);
+
+    let role: any;
+    try {
+      role = await this.getPermission(config, roleName);
+    } catch (error: any) {
+      this.logger.error(
+        `Role '${roleName}' not found or could not be retrieved`,
+        JSON.stringify({
+          status: error.response?.status,
+          data: error.response?.data,
+        }),
+      );
+      throw new Error(`Role '${roleName}' not found or could not be retrieved`);
+    }
+
+    try {
+      const url = `${config.keycloakUrl}/admin/realms/${config.realmName}/users/${userId}/role-mappings/realm`;
+
+      await this.getAxiosInstance().post(
+        url,
+        [{ id: role.id, name: role.name }],
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      this.logger.log(
+        `Realm role '${roleName}' assigned successfully to user '${userId}'`,
+      );
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to assign realm role '${roleName}' to user '${userId}'`,
+        JSON.stringify({
+          status: error.response?.status,
+          data: error.response?.data,
+        }),
+      );
+      throw new Error(
+        `Failed to assign realm role '${roleName}' to user '${userId}': ${error.message}`,
+      );
+    }
+  }
+
+  static async removeRealmRoleFromUser(
+    config: KeycloakConfig,
+    userId: string,
+    roleName: string,
+  ): Promise<void> {
+    const token = await this.getClientToken(config);
+
+    let role: any;
+    try {
+      role = await this.getPermission(config, roleName);
+    } catch (error: any) {
+      this.logger.error(
+        `Role '${roleName}' not found or could not be retrieved`,
+        JSON.stringify({
+          status: error.response?.status,
+          data: error.response?.data,
+        }),
+      );
+      throw new Error(`Role '${roleName}' not found or could not be retrieved`);
+    }
+
+    try {
+      await this.getAxiosInstance().delete(
+        `${config.keycloakUrl}/admin/realms/${config.realmName}/users/${userId}/role-mappings/realm`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          data: [{ id: role.id, name: role.name }],
+        },
+      );
+
+      this.logger.log(
+        `Realm role '${roleName}' removed successfully from user '${userId}'`,
+      );
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to remove realm role '${roleName}' from user '${userId}'`,
+        JSON.stringify({
+          status: error.response?.status,
+          data: error.response?.data,
+        }),
+      );
+      throw new Error(
+        `Failed to remove realm role '${roleName}' from user '${userId}': ${error.message}`,
+      );
+    }
+  }
+
+  static async getUserRealmRoles(
+    config: KeycloakConfig,
+    userId: string,
+  ): Promise<any[]> {
+    const token = await this.getClientToken(config);
+
+    try {
+      const response = await this.getAxiosInstance().get(
+        `${config.keycloakUrl}/admin/realms/${config.realmName}/users/${userId}/role-mappings/realm`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      return response.data;
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to fetch realm roles for user '${userId}'`,
+        JSON.stringify({
+          status: error.response?.status,
+          data: error.response?.data,
+        }),
+      );
+      throw new Error(
+        `Failed to fetch realm roles for user '${userId}': ${error.message}`,
+      );
+    }
+  }
 }

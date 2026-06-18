@@ -4,6 +4,8 @@ import { PermissionsService } from './permissions.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { DeletePermissionDto } from './dto/delete-permission.dto';
+import { AssignRoleDto } from './dto/assign-role-permission.dto.';
+import { GetUserRolesDto } from './dto/get-user-roles.dto';
 
 @Controller('permissions')
 export class PermissionsController {
@@ -37,4 +39,35 @@ export class PermissionsController {
       permission,
     );
   }
+
+    @MessagePattern('authentication.permissions.assign-role')
+  async assignRole(
+    dto: AssignRoleDto,
+  ) {
+    return await this.permissionsService.assignRole(
+      dto,
+    );
+  }
+
+  @MessagePattern('authentication.permissions.remove-role')
+  async removeRole(
+    dto: AssignRoleDto,
+  ) {
+    return await this.permissionsService.removeRole(
+      dto,
+    );
+  }
+
+  @MessagePattern('authentication.permissions.user-roles')
+  async getUserRoles(
+    dto: GetUserRolesDto
+,
+  ) {
+    return await this.permissionsService.getUserRoles(
+      dto.userId,
+      dto.origin,
+      dto.client,
+    );
+  }
+
 }
