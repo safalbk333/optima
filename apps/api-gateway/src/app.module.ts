@@ -12,8 +12,7 @@ import { QuotationController } from './modules/vendor-service/vendor/quotation/q
 import { QuotationGatewayService } from './modules/vendor-service/vendor/quotation/quotation.service';
 import { ItemGatewayService } from './modules/master-service/item/item.service';
 import { ItemController } from './modules/master-service/item/item.controller';
-import { AuthController } from './modules/auth-service/auth/auth.controller';
-import { AuthService } from './modules/auth-service/auth/auth.service';
+
 import { ContractController } from './modules/contract-service/contract/contract.controller';
 import { ContractGatewayService } from './modules/contract-service/contract/contract.service';
 import { CategoryController } from './modules/master-service/category/category.controller';
@@ -121,7 +120,6 @@ ConfigModule.forRoot({
     AppController,
     VendorController,
     QuotationController,
-    AuthController,
     ItemController,
     ContractController,
     CategoryController,
@@ -146,7 +144,6 @@ ConfigModule.forRoot({
     VendorGatewayService,
     QuotationGatewayService,
     ItemGatewayService,
-    AuthService,
     ContractGatewayService,
     CategoryGatewayService,
     ShipmentGatewayService,
