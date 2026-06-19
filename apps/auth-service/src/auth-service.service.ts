@@ -1,5 +1,4 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { AuthService } from 'apps/api-gateway/src/modules/auth-service/auth/auth.service';
 import { ClientTokenDto } from './dto/client-token.dto';
 import { formatResponse } from './common/response/format-response';
 import { ResponseOptions } from './common/response/response.interface';
@@ -11,7 +10,7 @@ import { ClientCodeExchangeDto } from './dto/client-code-exchange.dto';
 @Injectable()
 export class AuthServiceService {
   
-  private readonly logger = new AppLogger(AuthService.name);
+  private readonly logger = new AppLogger(AuthServiceService.name);
 
   getHello(): string {
     return 'Hello World!';
