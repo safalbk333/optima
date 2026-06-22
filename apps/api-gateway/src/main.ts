@@ -41,7 +41,16 @@ async function bootstrap() {
       appDescription || 'API Documentation',
     )
     .setVersion(appVersion || '1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+        name: 'Authorization',
+      },
+      'Auth-Token',
+    )
     .build();
 
   const document =
@@ -50,11 +59,11 @@ async function bootstrap() {
       config,
     );
 
-  SwaggerModule.setup(
-    'api',
-    app,
-    document,
-  );
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   await app.listen(port);
 
