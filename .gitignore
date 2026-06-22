@@ -39,3 +39,4 @@ temp/
 # NestJS
 *.tsbuildinfo
 scripts/python/create-role.py
+.continue/mcpServers/new-mcp-server.yaml

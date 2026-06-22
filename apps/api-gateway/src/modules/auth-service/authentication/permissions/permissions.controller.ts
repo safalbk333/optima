@@ -28,6 +28,7 @@ import { AssignRoleRequestDto } from './dto/assign-role-request.dto';
 import { GetUserRolesRequestDto } from './dto/get-user-roles-request.dto';
 
 @ApiTags('Permissions')
+@ApiBearerAuth('Auth-Token')
 @Controller('/auth/permissions')
 export class PermissionsController {
   constructor(@Inject('AUTH_SERVICE') private readonly client: ClientProxy) {}

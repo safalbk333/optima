@@ -41,7 +41,7 @@ export class ContractController {
   @Permissions(
     HOME_READ,
   )
-  @ApiBearerAuth()
+  @ApiBearerAuth('Auth-Token')
   @ApiOperation({
     summary: 'Get all contracts',
   })

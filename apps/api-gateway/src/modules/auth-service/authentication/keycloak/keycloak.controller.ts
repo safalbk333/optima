@@ -33,16 +33,28 @@ import {
   UpdateClientAttributesDto,
 } from './dto/auth.dto';
 
+
+
 @ApiTags('AUTH Keycloak')
 @Controller('auth')
 export class KeycloakController {
-  constructor(@Inject('AUTH_SERVICE') private readonly client: ClientProxy) {}
+  constructor(@Inject('AUTH_SERVICE') private readonly client: ClientProxy) { }
 
   // @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'User Authentication',
     description:
       'Endpoint for user authentication using issuer, code, and client ID.',
+  })
+  @ApiHeader({
+    name: 'client',
+    required: false,
+    description: 'The client ID (e.g., client, travelapp)',
+  })
+  @ApiHeader({
+    name: 'origin',
+    required: false,
+    description: 'The origin of the request',
   })
   @Get()
   @ApiQuery({
