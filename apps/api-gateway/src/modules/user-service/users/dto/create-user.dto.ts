@@ -15,13 +15,13 @@ export class CreateUserDto {
   @IsEmail()
   userEmail: string;
 
+  @ApiProperty({ example: 'Password@123' })
+  @IsString()
+  password: string;
+
   @ApiProperty({ description: 'Phone number of the user' })
   @IsString()
   userPhone: string;
-
-  @ApiProperty({ description: 'Tenant ID the user belongs to' })
-  @IsUUID()
-  fkTenantId: string;
 
   @ApiPropertyOptional({ description: 'Company ID the user belongs to' })
   @IsOptional()

@@ -7,27 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model tbl_tenant_registry {
-  pk_tenant_id    String     @id @default(uuid())
-  tenant_name     String     @unique
-  tenant_code     String     @unique
-  email           String     @unique
-  phone           String
-  is_active       Boolean    @default(true)
-  status          String     @default("ACTIVE")
-  created         DateTime   @default(now())
-  modified        DateTime?
-  fk_created_id   String?
-  fk_modified_id  String?
-  is_delete       Boolean     @default(false) 
-  users               tbl_user[]
-
-  @@map("tbl_tenant_registry")
-}
-
 model tbl_user {
   pk_user_id               String                              @id @default(uuid())
-  fk_tenant_id             String
+  keycloak_id              String
   fk_role_id               String
   user_name                String
   user_email               String                              @unique
@@ -103,7 +85,6 @@ model tbl_user {
   users_created                tbl_user[]                          @relation("user_created_by")
   modified_by                  tbl_user?                           @relation("user_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   users_modified               tbl_user[]                          @relation("user_modified_by")
-  tenant                       tbl_tenant_registry                 @relation(fields: [fk_tenant_id], references: [pk_tenant_id])
   roles                        tbl_user_role                       @relation(fields: [fk_role_id], references: [pk_role_id])
   user_roles_created           tbl_user_role[]                     @relation("user_role_created_by")
   user_roles_modified          tbl_user_role[]                     @relation("user_role_modified_by")
@@ -111,7 +92,6 @@ model tbl_user {
   vendors_modified             tbl_vendor[]                        @relation("vendor_modified_by")
   company                      tbl_company?                        @relation("user_company", fields: [fk_company_id], references: [pk_company_id]) 
   
-  @@index([fk_tenant_id])
   @@map("tbl_user")
 }
 
