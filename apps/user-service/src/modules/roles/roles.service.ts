@@ -5,6 +5,11 @@ import { KeycloakService } from '../../integrations/keycloak/keycloak.service';
 export class RolesService {
   constructor(private readonly keycloakService: KeycloakService) {}
 
+  async addPermissions(roleName: string, permissions: { id: string; name: string }[]) {
+    const token = await this.keycloakService.getToken();
+    await this.keycloakService.assignComposites(token, roleName, permissions);
+  }
+
   async createJobRole(roleName: string, groups: string[]) {
     const token = await this.keycloakService.getToken();
     const fullRoleName = `job_${roleName}`;
