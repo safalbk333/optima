@@ -9,20 +9,33 @@ import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 
 @Injectable()
 export class InvoiceService {
+  private schemaClient: any;
+
   constructor(
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
+
+  private async getSchemaClient() {
+    if (!this.schemaClient) {
+      this.schemaClient =
+        await this.prisma.getClient('public');
+    }
+    return this.schemaClient;
+  }
 
   async create(
     dto: CreateInvoiceDto,
     userId: string,
   ) {
     try {
+      const prisma =
+        await this.getSchemaClient();
+
       if (typeof (this.prisma as any).tbl_invoice === 'undefined') {
         throw new Error('Prisma client missing model `tbl_invoice`');
       }
 
-      return (this.prisma as any).tbl_invoice.create({
+      return prisma.tbl_invoice.create({
         data: {
           ...dto,
           fk_created_id: userId,
@@ -45,6 +58,9 @@ export class InvoiceService {
     take: number = 10,
     search?: string,
   ) {
+    const prisma =
+      await this.getSchemaClient();
+
     const where: any = {};
 
     if (search && search.trim()) {
@@ -72,19 +88,19 @@ export class InvoiceService {
       }
 
       const [data, total] = await Promise.all([
-        (this.prisma as any).tbl_invoice.findMany({
-        where,
-        include: {
-          vendor: true,
-          request: true,
-          purchase_order: true,
-          goods_receipt: true,
-        },
-        orderBy: {
-          created: 'desc',
-        },
-        skip,
-        take,
+        prisma.tbl_invoice.findMany({
+          where,
+          include: {
+            vendor: true,
+            request: true,
+            purchase_order: true,
+            goods_receipt: true,
+          },
+          orderBy: {
+            created: 'desc',
+          },
+          skip,
+          take,
         }),
         (this.prisma as any).tbl_invoice.count({ where }),
       ]);
@@ -103,8 +119,11 @@ export class InvoiceService {
   }
 
   async findOne(id: string) {
+    const prisma =
+      await this.getSchemaClient();
+
     const invoice =
-      await this.prisma.tbl_invoice.findUnique({
+      await prisma.tbl_invoice.findUnique({
         where: {
           pk_invoice_id: id,
         },
@@ -130,9 +149,12 @@ export class InvoiceService {
     dto: UpdateInvoiceDto,
     userId: string,
   ) {
+    const prisma =
+      await this.getSchemaClient();
+
     await this.findOne(id);
 
-    return this.prisma.tbl_invoice.update({
+    return prisma.tbl_invoice.update({
       where: {
         pk_invoice_id: id,
       },
@@ -148,9 +170,12 @@ export class InvoiceService {
     id: string,
     userId: string,
   ) {
+    const prisma =
+      await this.getSchemaClient();
+
     await this.findOne(id);
 
-    return this.prisma.tbl_invoice.update({
+    return prisma.tbl_invoice.update({
       where: {
         pk_invoice_id: id,
       },
@@ -164,9 +189,12 @@ export class InvoiceService {
   }
 
   async remove(id: string) {
+    const prisma =
+      await this.getSchemaClient();
+
     await this.findOne(id);
 
-    return this.prisma.tbl_invoice.delete({
+    return prisma.tbl_invoice.delete({
       where: {
         pk_invoice_id: id,
       },
@@ -174,41 +202,44 @@ export class InvoiceService {
   }
 
   async findByVendorId(
-  vendorId: string,
-  skip: number = 0,
-  take: number = 10,
-) {
-  const [data, total] = await Promise.all([
-    this.prisma.tbl_invoice.findMany({
-      where: {
-        fk_vendor_id: vendorId,
-      },
-      include: {
-        vendor: true,
-        request: true,
-        purchase_order: true,
-        goods_receipt: true,
-      },
-      orderBy: {
-        created: 'desc',
-      },
+    vendorId: string,
+    skip: number = 0,
+    take: number = 10,
+  ) {
+    const prisma =
+      await this.getSchemaClient();
+
+    const [data, total] = await Promise.all([
+      prisma.tbl_invoice.findMany({
+        where: {
+          fk_vendor_id: vendorId,
+        },
+        include: {
+          vendor: true,
+          request: true,
+          purchase_order: true,
+          goods_receipt: true,
+        },
+        orderBy: {
+          created: 'desc',
+        },
+        skip,
+        take,
+      }),
+
+      this.prisma.tbl_invoice.count({
+        where: {
+          fk_vendor_id: vendorId,
+        },
+      }),
+    ]);
+
+    return {
+      data,
+      total,
       skip,
       take,
-    }),
-
-    this.prisma.tbl_invoice.count({
-      where: {
-        fk_vendor_id: vendorId,
-      },
-    }),
-  ]);
-
-  return {
-    data,
-    total,
-    skip,
-    take,
-    hasMore: skip + take < total,
-  };
-}
+      hasMore: skip + take < total,
+    };
+  }
 }

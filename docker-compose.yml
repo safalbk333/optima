@@ -107,19 +107,19 @@ services:
       - postgres
     restart: always
 
-  # user-service:
-  #   build:
-  #     context: .
-  #     dockerfile: apps/user-service/Dockerfile
-  #   container_name: user-service
-  #   ports:
-  #     - "3007:3007"
-  #   env_file:
-  #     - ./.env
-  #     - ./apps/user-service/.env.production
-  #   environment:
-  #     NODE_ENV: production
-  #   restart: always
+  user-service:
+    build:
+      context: .
+      dockerfile: apps/user-service/Dockerfile
+    container_name: user-service
+    ports:
+      - "3007:3007"
+    env_file:
+      - ./.env
+      - ./apps/user-service/.env.production
+    environment:
+      NODE_ENV: production
+    restart: always
 
   postgres:
     image: postgres:16

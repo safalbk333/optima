@@ -22,7 +22,6 @@ export class VendorService {
       this.schemaClient =
         await this.prisma.getClient('public');
     }
-
     return this.schemaClient;
   }
 
