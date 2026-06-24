@@ -9,13 +9,26 @@ import { CategoryProperties } from '../../common/properties/category.properties'
 @Injectable()
 export class CategoryService {
   private readonly logger = new AppLogger(CategoryService.name);
+  private schemaClient: any;
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
+
+  private async getSchemaClient() {
+    if (!this.schemaClient) {
+      this.schemaClient =
+        await this.prisma.getClient('public');
+    }
+    return this.schemaClient;
+  }
 
   async findAll() {
     try {
       this.logger.log(CategoryProperties.service.findAll.start);
-      const arrCategories = await this.prisma.tbl_category.findMany({
+
+      const prisma =
+        await this.getSchemaClient();
+
+      const arrCategories = await prisma.tbl_category.findMany({
         where: {
           is_active: true,
         },
@@ -34,11 +47,14 @@ export class CategoryService {
       return ResponseHelper.error("Failed to fetch categories", error.message);
     }
   }
-  
+
   async findOne(strId: string) {
     try {
       this.logger.log(`${CategoryProperties.service.findOne.start}: ${strId}`);
-      const objCategory = await this.prisma.tbl_category.findUnique({
+      const prisma =
+        await this.getSchemaClient();
+
+      const objCategory = await prisma.tbl_category.findUnique({
         where: { pk_category_id: strId },
       });
 
@@ -60,7 +76,10 @@ export class CategoryService {
   async create(objData: CreateCategoryDto) {
     try {
       this.logger.log(CategoryProperties.service.create.start);
-      const objCategory = await this.prisma.tbl_category.create({
+      const prisma =
+        await this.getSchemaClient();
+
+      const objCategory = await prisma.tbl_category.create({
         data: {
           category_name: objData.strCategoryName,
         },
@@ -79,7 +98,10 @@ export class CategoryService {
   async update(strId: string, objData: UpdateCategoryDto) {
     try {
       this.logger.log(`${CategoryProperties.service.update.start}: ${strId}`);
-      const objCategory = await this.prisma.tbl_category.findUnique({
+      const prisma =
+        await this.getSchemaClient();
+
+      const objCategory = await prisma.tbl_category.findUnique({
         where: { pk_category_id: strId },
       });
 
@@ -95,7 +117,7 @@ export class CategoryService {
         updateData.is_active = objData.blnIsActive;
       }
 
-      const objUpdatedCategory = await this.prisma.tbl_category.update({
+      const objUpdatedCategory = await prisma.tbl_category.update({
         where: { pk_category_id: strId },
         data: updateData,
       });
@@ -113,7 +135,10 @@ export class CategoryService {
   async delete(strId: string) {
     try {
       this.logger.log(`${CategoryProperties.service.delete.start}: ${strId}`);
-      const objCategory = await this.prisma.tbl_category.findUnique({
+      const prisma =
+        await this.getSchemaClient();
+
+      const objCategory = await prisma.tbl_category.findUnique({
         where: { pk_category_id: strId },
       });
 
@@ -121,7 +146,7 @@ export class CategoryService {
         throw new NotFoundException("Category not found");
       }
 
-      const objDeletedCategory = await this.prisma.tbl_category.update({
+      const objDeletedCategory = await prisma.tbl_category.update({
         where: { pk_category_id: strId },
         data: {
           deleted_at: new Date(),

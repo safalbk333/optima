@@ -7,14 +7,25 @@ import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 @Injectable()
 export class TemplateService {
   private readonly logger = new AppLogger(TemplateService.name);
+  private schemaClient: any;
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
+
+  private async getSchemaClient() {
+    if (!this.schemaClient) {
+      this.schemaClient =
+        await this.prisma.getClient('public');
+    }
+    return this.schemaClient;
+  }
 
   async getByCode(strTemplateCode: string) {
     try {
       this.logger.log(`${TemplateProperties.service.getByCode.start}: ${strTemplateCode}`);
+      const prisma =
+        await this.getSchemaClient();
 
-      const template = await (this.prisma as any).tbl_templates.findFirst({
+      const template = await (prisma as any).tbl_templates.findFirst({
         where: {
           template_code: strTemplateCode,
           is_active: true,

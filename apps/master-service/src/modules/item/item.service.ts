@@ -12,15 +12,27 @@ import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 @Injectable()
 export class ItemService {
   private readonly logger = new AppLogger(ItemService.name);
+  private schemaClient: any;
 
   constructor(
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
+
+  private async getSchemaClient() {
+    if (!this.schemaClient) {
+      this.schemaClient =
+        await this.prisma.getClient('public');
+    }
+    return this.schemaClient;
+  }
 
   async create(createItemDto: CreateItemDto) {
     try {
       this.logger.log(ItemProperties.service.create.start);
-      const item = await this.prisma.tbl_item.create({
+      const prisma =
+        await this.getSchemaClient();
+
+      const item = await prisma.tbl_item.create({
         data: {
           item_name: createItemDto.strItemName,
           item_code: createItemDto.strItemCode,
@@ -46,11 +58,14 @@ export class ItemService {
       );
     }
   }
-  
+
   async findAll() {
     try {
       this.logger.log(ItemProperties.service.findAll.start);
-      const items = await this.prisma.tbl_item.findMany({
+      const prisma =
+        await this.getSchemaClient();
+
+      const items = await prisma.tbl_item.findMany({
         include: {
           category: true,
         },
@@ -75,7 +90,10 @@ export class ItemService {
   async findOne(id: string) {
     try {
       this.logger.log(`${ItemProperties.service.findOne.start}: ${id}`);
-      const item = await this.prisma.tbl_item.findUnique({
+      const prisma =
+        await this.getSchemaClient();
+
+      const item = await prisma.tbl_item.findUnique({
         where: { pk_item_id: id },
         include: {
           category: true,

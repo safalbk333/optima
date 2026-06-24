@@ -9,13 +9,25 @@ import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 @Injectable()
 export class DepartmentService {
   private readonly logger = new AppLogger(DepartmentService.name);
+  private schemaClient: any;
 
   constructor(private readonly prisma: PrismaService) { }
-  
+
+  private async getSchemaClient() {
+    if (!this.schemaClient) {
+      this.schemaClient =
+        await this.prisma.getClient('public');
+    }
+    return this.schemaClient;
+  }
+
   async create(createDepartmentDto: CreateDepartmentDto) {
     try {
       this.logger.log(DepartmentProperties.service.create.start);
-      const objDepartment = await this.prisma.tbl_department.create({
+      const prisma =
+        await this.getSchemaClient();
+
+      const objDepartment = await prisma.tbl_department.create({
         data: {
           department_name: createDepartmentDto.departmentName,
           department_code: createDepartmentDto.departmentCode,
@@ -36,7 +48,10 @@ export class DepartmentService {
   async findAll() {
     try {
       this.logger.log(DepartmentProperties.service.findAll.start);
-      const arrDepartments = await this.prisma.tbl_department.findMany({
+      const prisma =
+        await this.getSchemaClient();
+
+      const arrDepartments = await prisma.tbl_department.findMany({
         where: {
           is_active: true,
         },
@@ -59,7 +74,10 @@ export class DepartmentService {
   async findOne(id: string) {
     try {
       this.logger.log(`${DepartmentProperties.service.findOne.start}: ${id}`);
-      const objDepartment = await this.prisma.tbl_department.findUnique({
+      const prisma =
+        await this.getSchemaClient();
+
+      const objDepartment = await prisma.tbl_department.findUnique({
         where: { pk_department_id: id },
       });
 
@@ -81,7 +99,10 @@ export class DepartmentService {
   async update(id: string, updateDepartmentDto: UpdateDepartmentDto) {
     try {
       this.logger.log(`${DepartmentProperties.service.update.start}: ${id}`);
-      const objDepartment = await this.prisma.tbl_department.update({
+      const prisma =
+        await this.getSchemaClient();
+
+      const objDepartment = await prisma.tbl_department.update({
         where: { pk_department_id: id },
         data: {
           department_name: updateDepartmentDto.departmentName,

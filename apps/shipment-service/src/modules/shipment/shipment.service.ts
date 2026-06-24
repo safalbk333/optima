@@ -7,58 +7,71 @@ import { AppLogger } from '../../common/logger/app.logger';
 import { ShipmentProperties } from '../../common/properties/shipment.properties';
 import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 import { QuotationProperties } from 'apps/vendor-service/src/common/properties/quotation.properties';
-import {Shipment_status} from '../constant/enum';
+import { Shipment_status } from '../constant/enum';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 
 
 @Injectable()
 export class ShipmentService {
   private readonly logger = new AppLogger(ShipmentService.name);
+  private schemaClient: any;
+
   constructor(
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
+
+  private async getSchemaClient() {
+    if (!this.schemaClient) {
+      this.schemaClient =
+        await this.prisma.getClient('public');
+    }
+    return this.schemaClient;
+  }
 
   async create(createShipmentDto: CreateShipmentDto) {
-      const asn =
-        await this.prisma.tbl_shipment.create({
-          data: {
-            fk_po_number:
-              createShipmentDto.poNumber,
-  
-            fk_vendor_id:
-              createShipmentDto.vendorId,
-  
-            asn_id:
-              createShipmentDto.asnNumber,
-            
-              dispatch_date:
-              createShipmentDto.dispatchDate,
+    const prisma =
+      await this.getSchemaClient();
 
-              delivery_date:
-              createShipmentDto.deliveryDate,
+    const asn =
+      await prisma.tbl_shipment.create({
+        data: {
+          fk_po_number:
+            createShipmentDto.poNumber,
 
-              logistics_provider:
-              createShipmentDto.logistics_provider,
+          fk_vendor_id:
+            createShipmentDto.vendorId,
 
-              fk_tracking_no:
-              createShipmentDto.tracking_no,
+          asn_id:
+            createShipmentDto.asnNumber,
 
-              quantity:
-              createShipmentDto.quantity,
+          dispatch_date:
+            createShipmentDto.dispatchDate,
 
-              status:
-              createShipmentDto.status,
+          delivery_date:
+            createShipmentDto.deliveryDate,
 
-              notes:
-              createShipmentDto.notes,
-          },
-        });
-  
-      return ResponseHelper.success(
-        asn,
-        'ASN created successfully',
-      );
-    }
+          logistics_provider:
+            createShipmentDto.logistics_provider,
+
+          fk_tracking_no:
+            createShipmentDto.tracking_no,
+
+          quantity:
+            createShipmentDto.quantity,
+
+          status:
+            createShipmentDto.status,
+
+          notes:
+            createShipmentDto.notes,
+        },
+      });
+
+    return ResponseHelper.success(
+      asn,
+      'ASN created successfully',
+    );
+  }
 
   async findAll(payload: {
     limit?: number;
@@ -68,6 +81,9 @@ export class ShipmentService {
     carrier?: string;
   }) {
     try {
+      const prisma =
+        await this.getSchemaClient();
+
       this.logger.log(ShipmentProperties.service.findAll.start);
       let page =
         !isNaN(Number(payload?.page)) && Number(payload?.page) > 0
@@ -124,7 +140,7 @@ export class ShipmentService {
         };
       }
 
-      const shipments = await this.prisma.tbl_shipment.findMany({
+      const shipments = await prisma.tbl_shipment.findMany({
         where: whereClause,
         skip: offset,
         take: limit,
@@ -154,8 +170,11 @@ export class ShipmentService {
   async findOne(shipment_id: string) {
     try {
       this.logger.log(`${ShipmentProperties.service.findOne.start}: ${shipment_id}`);
+      const prisma =
+        await this.getSchemaClient();
+
       const shipment =
-        await this.prisma.tbl_shipment.findUnique({
+        await prisma.tbl_shipment.findUnique({
           where: { pk_shipment_id: shipment_id },
           include: {
             tracking: true,
