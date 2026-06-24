@@ -28,6 +28,9 @@ export class CreateUserDto {
   @IsUUID()
   fkCompanyId?: string;
 
+  @IsUUID()
+  fkRoleId: string;
+  
   @ApiProperty({ example: 'schema-123', required: false })
   @IsOptional()
   @IsString()

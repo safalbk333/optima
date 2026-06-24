@@ -11,17 +11,22 @@ import { UserProperties } from '../../common/properties/user.properties';
 @Injectable()
 export class UsersService {
   private readonly logger = new AppLogger(UsersService.name);
-  
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly keycloakService: KeycloakService,
-  ) {}
+  ) { }
 
   async findAll() {
     try {
       this.logger.log(UserProperties.service.findAll.start);
       const arrUsers = await this.prisma.tbl_user.findMany({
-        where: { is_delete: false },
+        where: {
+          is_delete: false,
+        },
+        include: {
+          roles: true,
+        },
       });
       this.logger.log(UserProperties.service.findAll.success);
       return ResponseHelper.success(arrUsers, 'Users fetched successfully');
@@ -36,6 +41,9 @@ export class UsersService {
       this.logger.log(`${UserProperties.service.findOne.start}: ${id}`);
       const objUser = await this.prisma.tbl_user.findUnique({
         where: { pk_user_id: id },
+        include: {
+          roles: true,
+        },
       });
       if (!objUser || objUser.is_delete) {
         throw new NotFoundException('User not found');
@@ -51,7 +59,7 @@ export class UsersService {
   async create(dto: CreateUserDto) {
     try {
       this.logger.log(UserProperties.service.create.start);
-      
+
       // Get Keycloak access token
       this.logger.log(UserProperties.service.create.keycloakStart);
       const token = await this.keycloakService.getToken();
@@ -84,13 +92,14 @@ export class UsersService {
       );
       this.logger.log(`${UserProperties.service.create.keycloakSuccess}: ${keycloakUserId}`);
 
-      // Create user in database with Keycloak user ID as primary key
+      // Create user in database with Keycloak ID
       this.logger.log(UserProperties.service.create.dbStart);
       const createData: any = {
-        pk_user_id: keycloakUserId,
+        keycloak_id: keycloakUserId,
         user_name: dto.userName,
         user_email: dto.userEmail,
         user_phone: dto.userPhone,
+        role_id: dto.fkRoleId
       };
 
       if (dto.fkCompanyId) {
@@ -150,6 +159,7 @@ export class UsersService {
       if (dto.userPhone !== undefined) updateData.user_phone = dto.userPhone;
       if (dto.fkCompanyId !== undefined) updateData.fk_company_id = dto.fkCompanyId;
       if (dto.isActive !== undefined) updateData.is_active = dto.isActive;
+      if (dto.fkRoleId !== undefined) updateData.fk_role_id = dto.fkRoleId;
       updateData.modified = new Date();
 
       const objUser = await this.prisma.tbl_user.update({
@@ -204,8 +214,8 @@ export class UsersService {
         where: { pk_user_id: id },
       });
 
-      console.log(existing) 
-      
+      console.log(existing)
+
       if (!existing || existing.is_delete) {
         throw new NotFoundException('User not found');
       }

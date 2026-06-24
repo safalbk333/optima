@@ -37,4 +37,9 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiPropertyOptional({ description: 'Role ID the user belongs to' })
+  @IsOptional()
+  @IsUUID()
+  fkRoleId?: string;
 }

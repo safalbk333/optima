@@ -47,7 +47,6 @@ export class KeycloakService {
     } catch (error) {
     //  console.log(error)
     }
-
   }
 
   async updateUser(token: string, userId: string, payload: any) {
