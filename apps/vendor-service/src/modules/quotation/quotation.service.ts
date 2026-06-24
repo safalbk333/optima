@@ -1,3 +1,4 @@
+
 import {
   Injectable,
   NotFoundException,
@@ -9,25 +10,43 @@ import { AppLogger } from '../../common/logger/app.logger';
 import { QuotationProperties } from '../../common/properties/quotation.properties';
 import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
-
 @Injectable()
 export class QuotationService {
-  private readonly logger = new AppLogger(QuotationService.name);
+  private readonly logger = new AppLogger(
+    QuotationService.name,
+  );
+
+  private schemaClient: any;
 
   constructor(
     private readonly prisma: PrismaService,
-  ) { }
+  ) {}
 
-  async create(createQuotationDto: CreateQuotationDto) {
+  private async getSchemaClient() {
+    if (!this.schemaClient) {
+      this.schemaClient =
+        await this.prisma.getClient('public');
+    }
+
+    return this.schemaClient;
+  }
+
+  async create(
+    createQuotationDto: CreateQuotationDto,
+  ) {
     try {
       this.logger.log(
         QuotationProperties.service.create.start,
       );
 
+      const prisma =
+        await this.getSchemaClient();
+
       const quotation =
-        await this.prisma.tbl_quotation.create({
+        await prisma.tbl_quotation.create({
           data: {
             title: createQuotationDto.title,
+
             vendor: {
               connect: {
                 pk_vendor_id:
@@ -66,9 +85,14 @@ export class QuotationService {
                 },
               },
             }),
-              ...(createQuotationDto.strHtmlContent && { rendered_html: createQuotationDto.strHtmlContent }),
 
-            status: createQuotationDto.status.toUpperCase(),
+            ...(createQuotationDto.strHtmlContent && {
+              rendered_html:
+                createQuotationDto.strHtmlContent,
+            }),
+
+            status:
+              createQuotationDto.status.toUpperCase(),
 
             issue_date: new Date(
               createQuotationDto.issueDate,
@@ -108,18 +132,27 @@ export class QuotationService {
     status?: string;
   }) {
     try {
-      this.logger.log(QuotationProperties.service.findAll.start);
-      let page =
-        !isNaN(Number(payload?.page)) && Number(payload?.page) > 0
+      this.logger.log(
+        QuotationProperties.service.findAll.start,
+      );
+
+      const prisma =
+        await this.getSchemaClient();
+
+      const page =
+        !isNaN(Number(payload?.page)) &&
+        Number(payload?.page) > 0
           ? Number(payload.page)
           : 1;
 
       const limit =
-        !isNaN(Number(payload?.limit)) && Number(payload?.limit) > 0
+        !isNaN(Number(payload?.limit)) &&
+        Number(payload?.limit) > 0
           ? Number(payload.limit)
           : 10;
 
       const offset = (page - 1) * limit;
+
       const whereClause: any = {};
 
       if (payload.search) {
@@ -140,28 +173,32 @@ export class QuotationService {
       }
 
       if (payload.status) {
-        const statusKey = payload.status.toUpperCase() as keyof typeof Quotation_status;
+        const statusKey =
+          payload.status.toUpperCase() as keyof typeof Quotation_status;
 
-        const statusValue = Quotation_status[statusKey];
+        const statusValue =
+          Quotation_status[statusKey];
 
         if (!statusValue) {
-          throw new Error('Invalid quotation status');
+          throw new Error(
+            'Invalid quotation status',
+          );
         }
 
         whereClause.status = statusValue;
       }
 
-      const quotations = await this.prisma.tbl_quotation.findMany({
-        where: whereClause,
-        skip: offset,
-        take: limit,
-      });
-      if (!quotations) {
-        throw new NotFoundException(
-          'No quotations found',
-        );
-      }
-      this.logger.log(QuotationProperties.service.findAll.success);
+      const quotations =
+        await prisma.tbl_quotation.findMany({
+          where: whereClause,
+          skip: offset,
+          take: limit,
+        });
+
+      this.logger.log(
+        QuotationProperties.service.findAll.success,
+      );
+
       return ResponseHelper.success(
         quotations,
         'Quotations fetched successfully',
@@ -171,6 +208,7 @@ export class QuotationService {
         QuotationProperties.service.findAll.error,
         error.stack,
       );
+
       return ResponseHelper.error(
         'Failed to fetch quotations',
         error.message,
@@ -178,16 +216,22 @@ export class QuotationService {
     }
   }
 
-  async findOne(quotation_id: string) {
+  async findOne(
+    quotation_id: string,
+  ) {
     try {
       this.logger.log(
         `${QuotationProperties.service.findOne.start}: ${quotation_id}`,
       );
 
+      const prisma =
+        await this.getSchemaClient();
+
       const quotation =
-        await this.prisma.tbl_quotation.findUnique({
+        await prisma.tbl_quotation.findUnique({
           where: {
-            pk_quotation_id: quotation_id,
+            pk_quotation_id:
+              quotation_id,
           },
         });
 
@@ -214,11 +258,15 @@ export class QuotationService {
       throw error;
     }
   }
+
   async generateRfqNo(): Promise<string> {
     try {
       this.logger.log(
-        QuotationProperties.service.generateRfqNo.start,
+        QuotationProperties.service
+          .generateRfqNo.start,
       );
+
+      const prisma = await this.getSchemaClient();
 
       const now = new Date();
 
@@ -231,7 +279,7 @@ export class QuotationService {
         .toUpperCase();
 
       const lastQuotation =
-        await this.prisma.tbl_request_for_quotation.findFirst({
+        await prisma.tbl_request_for_quotation.findFirst({
           orderBy: {
             created: 'desc',
           },
@@ -244,20 +292,20 @@ export class QuotationService {
 
       if (lastQuotation?.pk_rfq_id) {
         const parts =
-          lastQuotation.pk_rfq_id.split('-');
+          lastQuotation.pk_rfq_id.split(
+            '-',
+          );
 
-        const lastSequence = parseInt(
-          parts[3],
-          10,
-        );
+        const lastSequence =
+          parseInt(parts[3], 10);
 
-        nextNumber = lastSequence + 1;
+        nextNumber =
+          lastSequence + 1;
       }
 
-      const sequence = String(nextNumber).padStart(
-        3,
-        '0',
-      );
+      const sequence = String(
+        nextNumber,
+      ).padStart(3, '0');
 
       const rfqNo = `RFQ-${year}-${month}-${sequence}`;
 
@@ -268,7 +316,8 @@ export class QuotationService {
       return rfqNo;
     } catch (error) {
       this.logger.error(
-        QuotationProperties.service.generateRfqNo.error,
+        QuotationProperties.service
+          .generateRfqNo.error,
         error.stack,
       );
 
