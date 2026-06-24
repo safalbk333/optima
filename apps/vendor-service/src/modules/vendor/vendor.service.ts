@@ -8,82 +8,81 @@ import { AppLogger } from '../../common/logger/app.logger';
 import { VendorProperties } from '../../common/properties/vendor.properties';
 import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
-
 @Injectable()
 export class VendorService {
   private readonly logger = new AppLogger(VendorService.name);
+  private schemaClient: any;
 
   constructor(
     private readonly prisma: PrismaService,
   ) {}
 
-  async findAll() {
-    try {
-      this.logger.log(VendorProperties.service.findAll.start);
-      const vendors = await this.prisma.tbl_vendor.findMany();
-      this.logger.log(VendorProperties.service.findAll.success);
-      return ResponseHelper.success(
-        vendors,
-        'Vendors fetched successfully',
-      );
-    } catch (error) {
-      this.logger.error(
-        VendorProperties.service.findAll.error,
-        error.stack,
-      );
-      return ResponseHelper.error(
-        'Failed to fetch vendors',
-        error.message,
-      );
+  private async getSchemaClient() {
+    if (!this.schemaClient) {
+      this.schemaClient =
+        await this.prisma.getClient('public');
     }
+
+    return this.schemaClient;
   }
 
-async findOne(vendor_id: string) {
-  const vendor =
-    await this.prisma.tbl_vendor.findUnique({
-      where: {
-        pk_vendor_id: vendor_id,
-      },
-    });
+  async findAll() {
+    const prisma =
+      await this.getSchemaClient();
 
-  if (!vendor) {
-    throw new NotFoundException(
-      'Vendor not found',
+    const vendors =
+      await prisma.tbl_vendor.findMany();
+
+    return ResponseHelper.success(
+      vendors,
+      'Vendors fetched successfully',
     );
   }
 
-  return ResponseHelper.success(
-    vendor,
-    'Vendor fetched successfully',
-  );
-}
+  async findOne(vendor_id: string) {
+    const prisma =
+      await this.getSchemaClient();
 
-async create(createVendorDto: CreateVendorDto) {
-  const vendor =
-    await this.prisma.tbl_vendor.create({
-      data: {
-        company_legal_name: createVendorDto.name,
-        company_type: createVendorDto.company_type,
-        year_of_establishment: new Date(createVendorDto.year_of_establishment),
-        office_address: createVendorDto.office_address,
-        GST_number: createVendorDto.GST_number,
-        PAN_number: createVendorDto.PAN_number,
-        MSME_status: createVendorDto.MSME_status,
-        nature_of_business: createVendorDto.nature_of_business,
-        categories_of_supply: createVendorDto.categories_of_supply,
-        contact_person: createVendorDto.contact_person,
-        email: createVendorDto.email,
-        phone: createVendorDto.phone,
-        fk_country_id: createVendorDto.fk_country_id,
-        fk_city_id: createVendorDto.fk_city_id,
-        is_active: createVendorDto.is_active,
-        ...(createVendorDto.fk_created_id && { fk_created_id: createVendorDto.fk_created_id }),
-      },
-    });
+    const vendor =
+      await prisma.tbl_vendor.findUnique({
+        where: {
+          pk_vendor_id: vendor_id,
+        },
+      });
 
-  return ResponseHelper.success(
-    vendor,
-    'Vendor created successfully',
-  );
-}
+    if (!vendor) {
+      throw new NotFoundException(
+        'Vendor not found',
+      );
+    }
+
+    return ResponseHelper.success(
+      vendor,
+      'Vendor fetched successfully',
+    );
+  }
+
+  async create(
+    createVendorDto: CreateVendorDto,
+  ) {
+    const prisma =
+      await this.getSchemaClient();
+
+    const vendor =
+      await prisma.tbl_vendor.create({
+        data: {
+          vendor_name:
+            createVendorDto.name,
+          vendor_email:
+            createVendorDto.email,
+          vendor_phone:
+            createVendorDto.phone,
+        },
+      });
+
+    return ResponseHelper.success(
+      vendor,
+      'Vendor created successfully',
+    );
+  }
 }
