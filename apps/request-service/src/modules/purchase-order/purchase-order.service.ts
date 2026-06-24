@@ -17,9 +17,11 @@ export class PurchaseOrderService {
       this.logger.log(PurchaseOrderProperties.service.create.start);
       const purchaseOrder = await this.prisma.tbl_purchase_order.create({
         data: {
+          po_title: objData.strPoNumber,
           po_number: objData.strPoNumber,
           total_value: objData.intTotalValue,
           currency: objData.strCurrency || 'USD',
+          status: 'PENDING',
           issued_at: objData.strIssuedAt ? new Date(objData.strIssuedAt) : undefined,
           delivery_address: objData.strDeliveryAddress,
           expected_delivery: objData.strExpectedDelivery ? new Date(objData.strExpectedDelivery) : undefined,
@@ -44,8 +46,8 @@ export class PurchaseOrderService {
           vendor: {
             select: {
               pk_vendor_id: true,
-              vendor_name: true,
-              vendor_email: true,
+              company_legal_name: true,
+              email: true,
             },
           },
           quotation: {
@@ -86,8 +88,8 @@ export class PurchaseOrderService {
           vendor: {
             select: {
               pk_vendor_id: true,
-              vendor_name: true,
-              vendor_email: true,
+              company_legal_name: true,
+              email: true,
             },
           },
           quotation: {
@@ -132,8 +134,8 @@ export class PurchaseOrderService {
           vendor: {
             select: {
               pk_vendor_id: true,
-              vendor_name: true,
-              vendor_email: true,
+              company_legal_name: true,
+              email: true,
             },
           },
           quotation: {
@@ -187,8 +189,8 @@ export class PurchaseOrderService {
           vendor: {
             select: {
               pk_vendor_id: true,
-              vendor_name: true,
-              vendor_email: true,
+              company_legal_name: true,
+              email: true,
             },
           },
           quotation: {
@@ -245,8 +247,8 @@ export class PurchaseOrderService {
           vendor: {
             select: {
               pk_vendor_id: true,
-              vendor_name: true,
-              vendor_email: true,
+              company_legal_name: true,
+              email: true,
             },
           },
           quotation: {

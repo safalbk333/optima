@@ -6,10 +6,16 @@ import {
 
 export class CreateQuotationDto {
   @IsString()
+  title: string;
+
+  @IsString()
   vendorId: string;
 
   @IsString()
   rfqId: string;
+
+  @IsString()
+  requestId: string;
 
   @IsOptional()
   @IsString()

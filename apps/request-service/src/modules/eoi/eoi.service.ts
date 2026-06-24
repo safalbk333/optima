@@ -37,9 +37,7 @@ export class EoiService {
 
     const eoi = await this.prisma.tbl_expression_of_interest.findMany({
       where: {
-        document_status: {
-          not: 'D',
-        },
+        is_delete: false,
       },
 
       include: {
@@ -73,10 +71,7 @@ export class EoiService {
       await this.prisma.tbl_expression_of_interest.findFirst({
         where: {
           pk_eoi_id: eoiId,
-
-          document_status: {
-            not: 'D',
-          },
+          is_delete: false,
         },
 
         include: {
@@ -128,9 +123,7 @@ export class EoiService {
     const vendor_eoi = await this.prisma.tbl_expression_of_interest.findMany({
       where: {
         fk_vendor_id: vendorId,
-        document_status: {
-          not: 'D',
-        },
+        is_delete: false,
       },
 
       include: {
@@ -147,8 +140,8 @@ export class EoiService {
         vendor: {
           select: {
             pk_vendor_id: true,
-            vendor_name: true,
-            vendor_email: true,
+            company_legal_name: true,
+            email: true,
           },
         },
       },
@@ -187,9 +180,7 @@ export class EoiService {
           fk_vendor_id:
             dto.fk_vendor_id,
 
-          document_status: {
-            not: 'D',
-          },
+          is_delete: false,
         },
       });
 
@@ -354,7 +345,7 @@ export class EoiService {
       },
 
       data: {
-        document_status: 'D',
+        is_delete: true,
 
         modified:
           new Date(),

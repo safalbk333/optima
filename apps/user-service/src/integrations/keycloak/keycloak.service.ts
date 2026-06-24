@@ -4,7 +4,7 @@ import axios from 'axios';
 @Injectable()
 export class KeycloakService {
   private readonly baseUrl = process.env.KEYCLOAK_URL;
-  private readonly realm = process.env.KEYCLOAK_REALM;
+  private readonly realm = process.env.KEYCLOAK_REALM || 'optima-realm';
   private readonly clientId = process.env.KEYCLOAK_CLIENT_ID;
   private readonly clientSecret = process.env.KEYCLOAK_CLIENT_SECRET;
 
@@ -27,8 +27,31 @@ export class KeycloakService {
   }
 
   async createUser(token: string, payload: any): Promise<string> {
-    const { headers } = await axios.post(
-      `${this.baseUrl}/admin/realms/${this.realm}/users`,
+    try {
+      const { headers } = await axios.post(
+        `${this.baseUrl}/admin/realms/${this.realm}/users`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      const userId = headers.location?.split('/').pop();
+
+      console.log(userId,'///////////')
+      if (!userId) {
+        throw new BadRequestException('Failed to create user');
+      }
+      return userId;
+    } catch (error) {
+    //  console.log(error)
+    }
+  }
+
+  async updateUser(token: string, userId: string, payload: any) {
+    await axios.put(
+      `${this.baseUrl}/admin/realms/${this.realm}/users/${userId}`,
       payload,
       {
         headers: {
@@ -36,14 +59,6 @@ export class KeycloakService {
         },
       },
     );
-
-    const userId = headers.location?.split('/').pop();
-
-    if (!userId) {
-      throw new BadRequestException('Failed to create user');
-    }
-
-    return userId;
   }
 
   async createRole(

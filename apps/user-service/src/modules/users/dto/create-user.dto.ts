@@ -1,29 +1,38 @@
 import {
-  IsArray,
+  IsString,
   IsEmail,
   IsOptional,
-  IsString,
-  Matches,
+  IsUUID,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
-  @Matches(/^OPT\d+$/)
-  optimaId: string;
-
-  @IsEmail()
-  email: string;
-
+  @ApiProperty({ example: 'john' })
   @IsString()
-  firstName: string;
+  userName: string;
 
+  @ApiProperty({ example: 'john@example.com' })
+  @IsEmail()
+  userEmail: string;
+
+  @ApiProperty({ example: '1234567890' })
+  @IsString()
+  userPhone: string;
+
+  @ApiProperty({ example: 'Password@123' })
+  @IsString()
+  password: string;
+
+  @ApiProperty({ example: 'uuid-company-id', required: false })
+  @IsOptional()
+  @IsUUID()
+  fkCompanyId?: string;
+
+  @IsUUID()
+  fkRoleId: string;
+  
+  @ApiProperty({ example: 'schema-123', required: false })
   @IsOptional()
   @IsString()
-  middleName?: string;
-
-  @IsString()
-  lastName: string;
-
-  @IsArray()
-  @IsString({ each: true })
-  roles: string[];
+  schemaId?: string;
 }

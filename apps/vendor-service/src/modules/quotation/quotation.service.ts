@@ -27,6 +27,7 @@ export class QuotationService {
       const quotation =
         await this.prisma.tbl_quotation.create({
           data: {
+            title: createQuotationDto.title,
             vendor: {
               connect: {
                 pk_vendor_id:
@@ -38,6 +39,13 @@ export class QuotationService {
               connect: {
                 pk_rfq_id:
                   createQuotationDto.rfqId,
+              },
+            },
+
+            request: {
+              connect: {
+                pk_request_id:
+                  createQuotationDto.requestId,
               },
             },
 

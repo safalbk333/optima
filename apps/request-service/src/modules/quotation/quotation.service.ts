@@ -19,8 +19,10 @@ export class QuotationService {
 
       const quotation = await this.prisma.tbl_quotation.create({
         data: {
+          title: quotationData.strRfqId, // Add title field
           vendor: { connect: { pk_vendor_id: quotationData.strVendorId } },
           rfq: { connect: { pk_rfq_id: quotationData.strRfqId } },
+          request: { connect: { pk_request_id: quotationData.strRequestId } }, // Add request relation
           ...(quotationData.strCategoryId && {
             category: { connect: { pk_category_id: quotationData.strCategoryId } },
           }),
@@ -40,7 +42,7 @@ export class QuotationService {
           }),
           ...(quotationData.strHtmlContent && { rendered_html: quotationData.strHtmlContent }),
           ...(arrItems && arrItems.length > 0 && {
-            quotation_items: {
+            quotation_items_disabled: {
               create: arrItems.map(item => ({
                 fk_item_id: item.strItemId,
                 item_description: item.strItemDescription,
@@ -61,7 +63,7 @@ export class QuotationService {
           rfq: true,
           category: true,
           buyer: true,
-          quotation_items: true,
+          // quotation_items removed
         },
       });
 
@@ -81,8 +83,8 @@ export class QuotationService {
           vendor: {
             select: {
               pk_vendor_id: true,
-              vendor_name: true,
-              vendor_email: true,
+              company_legal_name: true,
+              email: true,
             },
           },
           rfq: {
@@ -100,7 +102,7 @@ export class QuotationService {
               user_email: true,
             },
           },
-          quotation_items: true,
+          // quotation_items removed
         },
         orderBy: { created: 'desc' },
       });
@@ -122,8 +124,8 @@ export class QuotationService {
           vendor: {
             select: {
               pk_vendor_id: true,
-              vendor_name: true,
-              vendor_email: true,
+              company_legal_name: true,
+              email: true,
             },
           },
           rfq: {
@@ -141,7 +143,7 @@ export class QuotationService {
               user_email: true,
             },
           },
-          quotation_items: true,
+          // quotation_items removed
         },
       });
 
@@ -195,7 +197,7 @@ export class QuotationService {
           }),
           modified: new Date(),
           ...(arrItems && {
-            quotation_items: {
+            quotation_items_disabled: {
               deleteMany: {},
               create: arrItems.map(item => ({
                 fk_item_id: item.strItemId,
@@ -217,7 +219,7 @@ export class QuotationService {
           rfq: true,
           category: true,
           buyer: true,
-          quotation_items: true,
+          // quotation_items removed
         },
       });
 

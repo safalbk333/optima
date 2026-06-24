@@ -11,11 +11,6 @@ import { ClientCodeExchangeDto } from './dto/client-code-exchange.dto';
 export class AuthServiceController {
   constructor(private readonly authServiceService: AuthServiceService) { }
 
-  @Get()
-  getHello(): string {
-    return this.authServiceService.getHello();
-  }
-  
   @MessagePattern('auth.check')
   healthCheck() {
     return this.authServiceService.getHello();

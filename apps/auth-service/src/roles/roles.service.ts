@@ -1,11 +1,19 @@
-import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException, NotFoundException } from '@nestjs/common';
 import * as RolesMap from '../common/roles-map';
 import { AppLogger } from '../common/logger/app.logger';
 import { formatResponse, ResponseOptions } from '../common/response.helper';
+import { CreateRoleDto } from './dto/create-role.dto';
+import { PrismaService } from 'libs/database/prisma-service';
+import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
+import { RoleProperties } from '../common/properties/role.properties';
 
 @Injectable()
-export class GroupRolesService {
-  private readonly logger = new AppLogger(GroupRolesService.name);
+export class RolesService {
+  private readonly logger = new AppLogger(RolesService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+  ) { }
 
   async getAllRoles() {
     try {
@@ -47,4 +55,60 @@ export class GroupRolesService {
       );
     }
   }
+
+  async create(createRoleDto: CreateRoleDto) {
+    const role =
+      await this.prisma.tbl_user_role.create({
+        data: {
+          role_name: createRoleDto.role_name,
+          role_code: createRoleDto.role_code,
+          description: createRoleDto.description,
+        },
+      });
+
+    return ResponseHelper.success(
+      role,
+      'Role created successfully',
+    );
+  }
+
+  async findOne(role_id: string) {
+    const role =
+      await this.prisma.tbl_user_role.findUnique({
+        where: {
+          pk_role_id: role_id,
+        },
+      });
+  
+    if (!role) {
+      throw new NotFoundException(
+        'Role not found',
+      );
+    }
+    return ResponseHelper.success(
+      role,
+      'Role fetched successfully',
+    );
+  }
+
+  async findAll() {
+      try {
+        this.logger.log(RoleProperties.service.findAll.start);
+        const roles = await this.prisma.tbl_user_role.findMany();
+        this.logger.log(RoleProperties.service.findAll.success);
+        return ResponseHelper.success(
+          roles,
+          'Roles fetched successfully',
+        );
+      } catch (error) {
+        this.logger.error(
+          RoleProperties.service.findAll.error,
+          error.stack,
+        );
+        return ResponseHelper.error(
+          'Failed to fetch vendors',
+          error.message,
+        );
+      }
+    }
 }

@@ -187,6 +187,9 @@ services:
       KC_HTTP_ENABLED: true
       KC_PROXY: edge
 
+    # volumes:
+    #   - ./keycloak/themes:/opt/keycloak/themes
+    #   - ./keycloak/providers/target:/opt/keycloak/providers
     ports:
       - "8080:8080"
 

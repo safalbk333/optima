@@ -17,8 +17,8 @@ export class PurchaseRequestService {
       this.logger.log(PurchaseRequestProperties.service.findAll.start);
       const purchaseRequests = await this.prisma.tbl_purchase_request.findMany({
         include: {
-          current_status: true,
-          priority: true,
+          // current_status relation removed
+          // priority relation removed
           requested_by: {
             select: {
               pk_user_id: true,
@@ -54,8 +54,8 @@ export class PurchaseRequestService {
       const purchaseRequest = await this.prisma.tbl_purchase_request.findUnique({
         where: { pk_request_id: strId },
         include: {
-          current_status: true,
-          priority: true,
+          // current_status relation removed
+          // priority relation removed
           requested_by: {
             select: {
               pk_user_id: true,
@@ -88,8 +88,8 @@ export class PurchaseRequestService {
           },
           request_histories: {
             include: {
-              from_status: true,
-              to_status: true,
+              // from_status removed
+              // to_status removed
               from_phase: true,
               to_phase: true,
               changed_by: {
@@ -132,8 +132,7 @@ export class PurchaseRequestService {
           request_number: objData.strRequestNumber,
           title: objData.strTitle,
           description: objData.strDescription,
-          fk_current_status_id: objData.strCurrentStatusId,
-          fk_priority_id: objData.strPriorityId,
+          status: objData.strCurrentStatusId,
           estimated_value: objData.intEstimatedValue,
           currency: objData.strCurrency || 'USD',
           fk_requested_by_id: objData.strRequestedById,
@@ -149,8 +148,8 @@ export class PurchaseRequestService {
           },
         },
         include: {
-          current_status: true,
-          priority: true,
+          // current_status relation removed
+          // priority relation removed
           requested_by: {
             select: {
               pk_user_id: true,
@@ -200,7 +199,7 @@ export class PurchaseRequestService {
         data: {
           ...(updateData.strTitle !== undefined && { title: updateData.strTitle }),
           ...(updateData.strDescription !== undefined && { description: updateData.strDescription }),
-          ...(updateData.strCurrentStatusId !== undefined && { fk_current_status_id: updateData.strCurrentStatusId }),
+          ...(updateData.strCurrentStatusId !== undefined && { status: updateData.strCurrentStatusId }),
           ...(updateData.strPriorityId !== undefined && { fk_priority_id: updateData.strPriorityId }),
           ...(updateData.intEstimatedValue !== undefined && { estimated_value: updateData.intEstimatedValue }),
           ...(updateData.strCurrency !== undefined && { currency: updateData.strCurrency }),
@@ -220,8 +219,8 @@ export class PurchaseRequestService {
           }),
         },
         include: {
-          current_status: true,
-          priority: true,
+          // current_status relation removed
+          // priority relation removed
           requested_by: {
             select: {
               pk_user_id: true,

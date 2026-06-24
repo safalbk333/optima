@@ -18,6 +18,17 @@ export class KeycloakUtil {
   private static logger = new Logger(KeycloakUtil.name);
   private static axiosInstance: AxiosInstance | null = null;
 
+
+  
+  public static getAxiosInstance(): AxiosInstance {
+    const bypassSsl = process.env.BYPASS_SSL === 'true';
+    return axios.create({
+      httpsAgent: bypassSsl
+        ? new Agent({ rejectUnauthorized: false })
+        : undefined,
+      timeout: 60000,
+    });
+  }
   static getConfig(origin: string, client: string): KeycloakConfig {
     const allowedClients = (process.env.ALLOWED_CLIENTS || '')
       .split(',')
@@ -72,15 +83,6 @@ export class KeycloakUtil {
     return config;
   }
 
-  public static getAxiosInstance(): AxiosInstance {
-    const bypassSsl = process.env.BYPASS_SSL === 'true';
-    return axios.create({
-      httpsAgent: bypassSsl
-        ? new Agent({ rejectUnauthorized: false })
-        : undefined,
-      timeout: 60000,
-    });
-  }
 
   static async validateCode(
     issuer: string,

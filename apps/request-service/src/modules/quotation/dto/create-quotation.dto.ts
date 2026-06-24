@@ -53,6 +53,9 @@ export class CreateQuotationDto {
   @IsString()
   strRfqId: string;
 
+  @IsString()
+  strRequestId: string;
+
   @IsOptional()
   @IsString()
   strCategoryId?: string;
