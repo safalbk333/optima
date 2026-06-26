@@ -189,26 +189,41 @@ model tbl_department {
 
   @@map("tbl_department")
 }
-
 model tbl_category {
-  pk_category_id  String                 @id @default(uuid())
-  category_name   String
-  is_active       Boolean                @default(true)
-  is_delete       Boolean                 @default(false)
-  deleted_at      DateTime?
-  created         DateTime               @default(now())
-  modified        DateTime?
-  fk_created_id   String?
-  fk_modified_id  String?
-  created_by          tbl_user?              @relation("category_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
-  modified_by         tbl_user?              @relation("category_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
-  items               tbl_item[]
-  purchase_requests   tbl_purchase_request[]
-  quotations          tbl_quotation[]
+  pk_category_id     String    @id @default(uuid())
+  category_name      String
 
+  // Hierarchy
+  hierarchy_level    Int
+  parent_category_id String?
+
+  parent_category  tbl_category?  @relation("CategoryHierarchy", fields: [parent_category_id], references: [pk_category_id], onDelete: NoAction, onUpdate: NoAction)
+  child_categories tbl_category[] @relation("CategoryHierarchy")
+
+  // Audit
+  is_active  Boolean   @default(true)
+  is_delete  Boolean   @default(false)
+  deleted_at DateTime?
+  created    DateTime  @default(now())
+  modified   DateTime?
+
+  fk_created_id  String?
+  fk_modified_id String?
+
+  created_by  tbl_user? @relation("category_created_by",  fields: [fk_created_id],  references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by tbl_user? @relation("category_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  // Relations
+  items             tbl_item[]
+  purchase_requests tbl_purchase_request[]
+  quotations        tbl_quotation[]
+
+  @@index([parent_category_id])
+  @@index([hierarchy_level])
   @@index([is_active])
   @@map("tbl_category")
 }
+
 
 model tbl_request_phase {
   pk_request_phase_id String                          @id @default(uuid())
