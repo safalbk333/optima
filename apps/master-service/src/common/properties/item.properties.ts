@@ -4,6 +4,7 @@ export const ItemProperties = {
     findAll: 'Received request to find all items',
     findOne: 'Received request to find item with id',
     create: 'Received request to create item',
+    update: 'Received request to update item',
   },
   service: {
     findAll: {
@@ -21,6 +22,11 @@ export const ItemProperties = {
       start: 'Creating new item',
       success: 'Item created with id',
       error: 'Failed to create item',
+    },
+    update: {
+      start: 'Updating item',
+      success: 'Item updated successfully',
+      error: 'Failed to update item',
     },
   },
 };

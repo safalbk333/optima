@@ -1,9 +1,10 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'libs/database/prisma-service';
-import { CreateItemDto } from './dto/create-item.dto';
+import { CreateItemDto, UpdateItemDto } from './dto/create-item.dto';
 import { AppLogger } from '../../common/logger/app.logger';
 import { ItemProperties } from '../../common/properties/item.properties';
 import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
@@ -32,14 +33,15 @@ export class ItemService {
       const prisma =
         await this.getSchemaClient();
 
-      const item = await prisma.tbl_item.create({
+      const item = await this.prisma.tbl_item.create({
         data: {
-          item_name: createItemDto.strItemName,
-          item_code: createItemDto.strItemCode,
-          description: createItemDto.strDescription,
-          fk_category_id: createItemDto.strCategoryId,
-          unit: createItemDto.strUnit,
-          documents: createItemDto.strDocuments,
+          item_name: createItemDto.itemName,
+          item_code: createItemDto.itemCode,
+          description: createItemDto.description,
+          fk_category_id: createItemDto.categoryId,
+          unit: createItemDto.unit,
+          sac_code: createItemDto.sacCode,
+          documents: createItemDto.documents,
         },
       });
       this.logger.log(`${ItemProperties.service.create.success}: ${item.pk_item_id}`);
@@ -59,20 +61,77 @@ export class ItemService {
     }
   }
 
-  async findAll() {
+  async findAll(payload: {
+    limit?: number;
+    page?: number;
+    search?: string;
+  }) {
     try {
       this.logger.log(ItemProperties.service.findAll.start);
       const prisma =
         await this.getSchemaClient();
 
-      const items = await prisma.tbl_item.findMany({
+      const page =
+        !isNaN(Number(payload?.page)) &&
+          Number(payload?.page) > 0
+          ? Number(payload.page)
+          : 1;
+
+      const limit =
+        !isNaN(Number(payload?.limit)) &&
+          Number(payload?.limit) > 0
+          ? Number(payload.limit)
+          : 10;
+
+      const offset = (page - 1) * limit;
+
+      const whereClause: any = {};
+
+      if (payload.search) {
+        whereClause.OR = [
+          {
+            item_name: {
+              contains: payload.search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            item_code: {
+              contains: payload.search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            sac_code: {
+              contains: payload.search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
+
+      const items = await this.prisma.tbl_item.findMany({
+        where: {
+          ...whereClause,
+          is_active: true
+        },
         include: {
           category: true,
         },
       });
       this.logger.log(ItemProperties.service.findAll.success);
+
+      let total = items.length;
       return ResponseHelper.success(
-        items,
+        {
+          items,
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+          },
+        },
         'Items fetched successfully',
       );
     } catch (error) {
@@ -93,8 +152,11 @@ export class ItemService {
       const prisma =
         await this.getSchemaClient();
 
-      const item = await prisma.tbl_item.findUnique({
-        where: { pk_item_id: id },
+      const item = await this.prisma.tbl_item.findUnique({
+        where: {
+          pk_item_id: id,
+          is_active: true
+        },
         include: {
           category: true,
         },
@@ -117,5 +179,47 @@ export class ItemService {
       );
       throw error;
     }
+  }
+
+  async update(
+    itemId: string,
+    dto: UpdateItemDto,
+  ) {
+    this.logger.log(
+      `${ItemProperties.service.update}: ${itemId}`,
+    );
+    const prisma =
+      await this.getSchemaClient();
+
+    const item = await this.prisma.tbl_item.findUnique({
+      where: {
+        pk_item_id: itemId,
+        is_active: true
+      }
+    });
+
+    if (!item) {
+      throw new BadRequestException('Item not found');
+    }
+
+    const item_data = await this.prisma.tbl_item.update({
+      where: {
+        pk_item_id: itemId,
+      },
+      data: {
+        item_name: dto.itemName,
+        item_code: dto.itemCode,
+        description: dto.description,
+        fk_category_id: dto.categoryId,
+        unit: dto.unit,
+        sac_code: dto.sacCode,
+        is_active: dto.isActive,
+        modified: new Date(),
+      },
+    });
+    return ResponseHelper.success(
+      item_data,
+      "Item updated successfully",
+    );
   }
 }

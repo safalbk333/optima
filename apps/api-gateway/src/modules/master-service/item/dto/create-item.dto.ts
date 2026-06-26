@@ -4,54 +4,102 @@ import {
   IsString,
   IsNumber,
   IsDateString,
+  IsOptional,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateItemDto {
   @ApiProperty({
-    description: 'ID of the vendor',
-  })
-  @IsString()
-  strVendorId: string;
-
-  @ApiPropertyOptional({
-    description: 'ID of the quotation',
-  })
-  @IsString()
-  strQuotationId: string;
-
-  @ApiProperty({
     description: 'Item name',
   })
   @IsString()
-  strItemName: string;
+  itemName: string;
 
   @ApiProperty({
     description: 'Item code',
   })
   @IsString()
-  strItemCode: string;
+  itemCode: string;
+
+  @ApiProperty({
+    description: 'Item category Id',
+  })
+  @IsString()
+  categoryId: string;
 
   @ApiProperty({
     description: 'Item description',
   })
   @IsString()
-  strDescription: string;
-
-  @ApiProperty({
-    description: 'Quantity of item',
-  })
-  @IsNumber()
-  intQuantity: number;
+  description: string;
 
   @ApiProperty({
     description: 'Unit of the item',
   })
   @IsString()
-  strUnit: string;
+  unit: string;
+
+  @ApiProperty({
+    description: 'SAC code of the item',
+  })
+  @IsString()
+  sacCode: string;
 
   @ApiProperty({
     description: 'Detail document of item',
   })
   @IsString()
-  strDocuments: string;
+  documents: string;
+}
+
+export class UpdateItemDto {
+  @ApiPropertyOptional({ description: 'Item name', })
+  @IsOptional()
+  @IsString()
+  itemName: string;
+
+  @ApiPropertyOptional({ description: 'Item code', })
+  @IsOptional()
+  @IsString()
+  itemCode: string;
+
+  @ApiPropertyOptional({ description: 'Item category Id', })
+  @IsOptional()
+  @IsString()
+  categoryId: string;
+
+  @ApiPropertyOptional({
+    description: 'Item description',
+  })
+  @IsOptional()
+  @IsString()
+  description: string;
+
+  @ApiPropertyOptional({
+    description: 'Unit of the item',
+  })
+  @IsOptional()
+  @IsString()
+  unit: string;
+
+  @ApiPropertyOptional({
+    description: 'SAC code of the item',
+  })
+  @IsOptional()
+  @IsString()
+  sacCode: string;
+
+  @ApiPropertyOptional({
+    description: 'Detail document of item',
+  })
+  @IsOptional()
+  @IsString()
+  documents: string;
+
+  @ApiPropertyOptional({
+    description: 'Item active or not',
+  })
+  @IsOptional()
+  @IsBoolean()
+  isActive: boolean;
 }

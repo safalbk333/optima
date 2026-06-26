@@ -6,6 +6,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { ITEM_PATTERN } from './item.pattern';
+import { UpdateItemDto } from './dto/create-item.dto';
 
 @Injectable()
 export class ItemGatewayService {
@@ -18,44 +19,50 @@ export class ItemGatewayService {
   }
 
   async create(data: any) {
-    try{
+    try {
       return await firstValueFrom(
         this.client.send(
           ITEM_PATTERN.CREATE,
           data,
         ),
       );
-    }catch(error){
+    } catch (error) {
       this.logger.error(error.message, error);
       throw error;
     }
   }
 
-  async findAll() {
-    try{
+  async findAll(payload: any) {
+    try {
       return await firstValueFrom(
         this.client.send(
           ITEM_PATTERN.FIND_ALL,
-          {},
+          payload,
         ),
       );
-    }catch(error){
+    } catch (error) {
       this.logger.error(error.message, error);
       throw error;
     }
   }
 
   async findOne(id: string) {
-    try{
+    try {
       return await firstValueFrom(
         this.client.send(
           ITEM_PATTERN.FIND_ONE,
           { id },
         ),
       );
-    }catch(error){
+    } catch (error) {
       this.logger.error(error.message, error);
       throw error;
     }
+  }
+
+  async update(id: string, data: UpdateItemDto) {
+    return await firstValueFrom(
+      this.client.send(ITEM_PATTERN.UPDATE, { id, data }),
+    );
   }
 }
