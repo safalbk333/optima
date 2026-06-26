@@ -1,13 +1,10 @@
-import {
-  Inject,
-  Injectable,
-} from '@nestjs/common';
-
+import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-
 import { firstValueFrom } from 'rxjs';
+
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { MoveCategoryDto } from './dto/move-category.dto';
 import { CATEGORY_PATTERN } from './category.pattern';
 
 @Injectable()
@@ -17,51 +14,61 @@ export class CategoryGatewayService {
     private readonly client: ClientProxy,
   ) {}
 
+  // ─── Queries ──────────────────────────────────────────────────────────────
+
   async findAll() {
-    return await firstValueFrom(
-      this.client.send(
-        CATEGORY_PATTERN.FIND_ALL,
-        {},
-      ),
+    return firstValueFrom(
+      this.client.send(CATEGORY_PATTERN.FIND_ALL, {}),
     );
   }
 
-  async findOne(id: string) {
-    return await firstValueFrom(
-      this.client.send(
-        CATEGORY_PATTERN.FIND_ONE,
-        id,
-      ),
+  async findRoots() {
+    return firstValueFrom(
+      this.client.send(CATEGORY_PATTERN.FIND_ROOTS, {}),
     );
   }
 
-  async create(data: CreateCategoryDto) {
-    return await firstValueFrom(
-      this.client.send(
-        CATEGORY_PATTERN.CREATE,
-        data,
-      ),
+  async findOne(strId: string) {
+    return firstValueFrom(
+      this.client.send(CATEGORY_PATTERN.FIND_ONE, strId),
     );
   }
 
-  async update(
-    id: string,
-    data: UpdateCategoryDto,
-  ) {
-    return await firstValueFrom(
-      this.client.send(
-        CATEGORY_PATTERN.UPDATE,
-        { id, data },
-      ),
+  async findSubtree(strId: string) {
+    return firstValueFrom(
+      this.client.send(CATEGORY_PATTERN.FIND_SUBTREE, strId),
     );
   }
 
-  async delete(id: string) {
-    return await firstValueFrom(
-      this.client.send(
-        CATEGORY_PATTERN.DELETE,
-        id,
-      ),
+  async findAncestors(strId: string) {
+    return firstValueFrom(
+      this.client.send(CATEGORY_PATTERN.FIND_ANCESTORS, strId),
+    );
+  }
+
+  // ─── Mutations ────────────────────────────────────────────────────────────
+
+  async create(data: CreateCategoryDto, strCreatedById?: string) {
+    return firstValueFrom(
+      this.client.send(CATEGORY_PATTERN.CREATE, { data, strCreatedById }),
+    );
+  }
+
+  async update(strId: string, data: UpdateCategoryDto, strModifiedById?: string) {
+    return firstValueFrom(
+      this.client.send(CATEGORY_PATTERN.UPDATE, { strId, data, strModifiedById }),
+    );
+  }
+
+  async move(strId: string, data: MoveCategoryDto, strModifiedById?: string) {
+    return firstValueFrom(
+      this.client.send(CATEGORY_PATTERN.MOVE, { strId, data, strModifiedById }),
+    );
+  }
+
+  async delete(strId: string, blnCascade = false) {
+    return firstValueFrom(
+      this.client.send(CATEGORY_PATTERN.DELETE, { strId, blnCascade }),
     );
   }
 }
