@@ -4,13 +4,17 @@ import {
   Get,
   Param,
   Post,
+  Put,
+  Query,
 } from '@nestjs/common';
 import {
+  ApiBody,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateItemDto } from './dto/create-item.dto';
+import { CreateItemDto, UpdateItemDto } from './dto/create-item.dto';
 import { ItemGatewayService } from './item.service';
 
 @ApiTags('Item-Service')
@@ -42,8 +46,25 @@ export class ItemController {
     description:
       'Item list fetched successfully',
   })
-  findAll() {
-    return this.itemService.findAll();
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search for items by Item name, Item code, SAC code'
+  })
+  findAll(
+    @Query('limit') limit: number,
+    @Query('page') page: number,
+    @Query('search') search?: string,
+  ) {
+    const payload = {
+      limit: Number(limit),
+      page: Number(page),
+      search: search,
+    };
+    return this.itemService.findAll(payload);
   }
 
   @Get(':id')
@@ -57,5 +78,12 @@ export class ItemController {
   })
   findOne(@Param('id') id: string) {
     return this.itemService.findOne(id);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update an Item' })
+  @ApiResponse({ status: 200, description: 'Item updated successfully' })
+  update(@Param('id') id: string, @Body() data: UpdateItemDto) {
+    return this.itemService.update(id, data);
   }
 }

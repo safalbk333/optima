@@ -74,6 +74,7 @@ export class EoiController {
     ) {
         return this.eoiService.findByVendorId(vendorId);
     }
+    
     @Post()
     @ApiOperation({ summary: 'Create a new EOI' })
     @ApiBody({

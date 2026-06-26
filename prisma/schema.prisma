@@ -333,15 +333,16 @@ model tbl_item {
   pk_item_id          String                              @id @default(uuid())
   item_name           String
   item_code           String                              @unique
-  description         String?
   fk_category_id      String
   unit                String?
+  sac_code            String
+  description         String?
   documents           String?
   created             DateTime                            @default(now())
   modified            DateTime?
   fk_created_id       String?
   fk_modified_id      String?
-  is_active           Boolean                              @default(false)
+  is_active           Boolean                             @default(true)
   category            tbl_category                        @relation(fields: [fk_category_id], references: [pk_category_id])
   created_by          tbl_user?                           @relation("item_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?                           @relation("item_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
