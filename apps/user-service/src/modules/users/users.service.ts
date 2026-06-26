@@ -7,6 +7,8 @@ import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 import { KeycloakService } from '../../integrations/keycloak/keycloak.service';
 import { AppLogger } from '../../common/logger/app.logger';
 import { UserProperties } from '../../common/properties/user.properties';
+import { Payload } from '@nestjs/microservices';
+import { log } from 'console';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +21,7 @@ export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly keycloakService: KeycloakService,
-  ) {}
+  ) { }
 
   private async getSchemaClient() {
     if (!this.schemaClient) {
@@ -112,28 +114,31 @@ export class UsersService {
 
   async create(dto: CreateUserDto) {
     try {
-      this.logger.log(
-        UserProperties.service.create.start,
-      );
+      this.logger.log(UserProperties.service.create.start);
 
-      const prisma =
-        await this.getSchemaClient();
+      const prisma = await this.getSchemaClient();
 
-      const token =
-        await this.keycloakService.getToken();
+      const token = await this.keycloakService.getToken();
+      console.log(token);
 
       const keycloakPayload: any = {
         username: dto.userName,
         email: dto.userEmail,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
         enabled: true,
+        emailVerified: true,
         credentials: [
           {
             type: 'password',
             value: dto.password,
-            temporary: true,
+            temporary: false,
           },
         ],
       };
+
+      console.log(keycloakPayload);
+
 
       if (dto.schemaId) {
         keycloakPayload.attributes = {
@@ -141,51 +146,47 @@ export class UsersService {
         };
       }
 
-      const keycloakUserId =
-        await this.keycloakService.createUser(
-          token,
-          keycloakPayload,
-        );
+      const keycloakUserId = await this.keycloakService.createUser(
+        token,
+        keycloakPayload,
+      );
 
       const createData: any = {
         keycloak_id: keycloakUserId,
         user_name: dto.userName,
         user_email: dto.userEmail,
         user_phone: dto.userPhone,
-        role_id: dto.fkRoleId,
+        roles: {
+          connect: { pk_role_id: dto.fkRoleId },
+        },
       };
 
       if (dto.fkCompanyId) {
-        createData.fk_company_id =
-          dto.fkCompanyId;
+        createData.company = {
+          connect: { pk_company_id: dto.fkCompanyId },
+        };
       }
 
-      const objUser =
-        await prisma.tbl_user.create({
-          data: createData,
-        });
+      const objUser = await prisma.tbl_user.create({
+        data: createData,
+        include: {
+          roles: true,
+          company: true,
+        },
+      });
 
       this.logger.log(
         `${UserProperties.service.create.success}: ${objUser.pk_user_id}`,
       );
 
-      return ResponseHelper.success(
-        objUser,
-        'User created successfully',
-      );
+      return ResponseHelper.success(objUser, 'User created successfully');
     } catch (error) {
-      this.logger.error(
-        UserProperties.service.create.error,
-        error.stack,
-      );
-
-      return ResponseHelper.error(
-        'Failed to create user',
-        error.message,
-      );
+      this.logger.error(UserProperties.service.create.error, error.stack);
+      return ResponseHelper.error('Failed to create user', error.message);
     }
   }
 
+  
   async update(
     id: string,
     dto: UpdateUserDto,
@@ -412,10 +413,9 @@ export class UsersService {
 
       return ResponseHelper.success(
         objUser,
-        `User ${
-          dto.isActive
-            ? 'activated'
-            : 'deactivated'
+        `User ${dto.isActive
+          ? 'activated'
+          : 'deactivated'
         } successfully`,
       );
     } catch (error) {
