@@ -25,7 +25,7 @@ export class PrismaService extends PrismaClient
       const client = new PrismaClient({
         datasources: {
           db: {
-            url: `${process.env.DATABASE_URL}?schema=${schema}`,
+            url: `${process.env.DATABASE_URL}&schema=${schema}`,
           },
         },
       });
