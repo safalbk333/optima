@@ -36,36 +36,61 @@ export class ItemController {
   create(@Body() data: CreateItemDto) {
     return this.itemService.create(data);
   }
+@Get()
+@ApiOperation({
+  summary: 'Get all items',
+})
+@ApiResponse({
+  status: 200,
+  description: 'Item list fetched successfully',
+})
+@ApiQuery({
+  name: 'limit',
+  required: false,
+  type: Number,
+  description: 'Number of items per page',
+})
+@ApiQuery({
+  name: 'page',
+  required: false,
+  type: Number,
+  description: 'Page number',
+})
+@ApiQuery({
+  name: 'search',
+  required: false,
+  type: String,
+  description: 'Search by Item name, Item code, or SAC code',
+})
+@ApiQuery({
+  name: 'category_id',
+  required: false,
+  type: String,
+  description: 'Filter by category ID',
+})
+@ApiQuery({
+  name: 'category_name',
+  required: false,
+  type: String,
+  description: 'Search items by category name',
+})
+findAll(
+  @Query('limit') limit?: number,
+  @Query('page') page?: number,
+  @Query('search') search?: string,
+  @Query('category_id') category_id?: string,
+  @Query('category_name') category_name?: string,
+) {
+  const payload = {
+    limit: limit ? Number(limit) : undefined,
+    page: page ? Number(page) : undefined,
+    search,
+    category_id,
+    category_name,
+  };
 
-  @Get()
-  @ApiOperation({
-    summary: 'Get all items',
-  })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Item list fetched successfully',
-  })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    description: 'Search for items by Item name, Item code, HSN code'
-  })
-  findAll(
-    @Query('limit') limit: number,
-    @Query('page') page: number,
-    @Query('search') search?: string,
-  ) {
-    const payload = {
-      limit: Number(limit),
-      page: Number(page),
-      search: search,
-    };
-    return this.itemService.findAll(payload);
-  }
+  return this.itemService.findAll(payload);
+}
 
   @Get(':id')
   @ApiOperation({
