@@ -335,7 +335,7 @@ model tbl_item {
   item_code           String                              @unique
   fk_category_id      String
   unit                String?
-  sac_code            String
+  rc_flag             Boolean                             
   hsn_code            String?
   description         String?
   documents           String?

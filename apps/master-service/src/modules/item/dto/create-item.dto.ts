@@ -22,9 +22,6 @@ export class CreateItemDto {
     @IsString()
     unit?: string;
 
-    @IsString()
-    sacCode: string;
-
     @IsOptional()
     @IsString()
     hsnCode?: string;
@@ -32,6 +29,10 @@ export class CreateItemDto {
     @IsOptional()
     @IsString()
     documents?: string;
+
+    @IsOptional()
+    @IsBoolean()
+    rcFlag?: boolean;
 }
 
 export class UpdateItemDto {
@@ -56,8 +57,8 @@ export class UpdateItemDto {
     unit?: string;
 
     @IsOptional()
-    @IsString()
-    sacCode: string;
+    @IsBoolean()
+    rcFlag: boolean;
 
     @IsOptional()
     @IsString()

@@ -40,10 +40,16 @@ export class CreateItemDto {
   unit: string;
 
   @ApiProperty({
-    description: 'SAC code of the item',
+    description: 'Item HSN code',
   })
   @IsString()
-  sacCode: string;
+  hsnCode: string;
+
+  @ApiProperty({
+    description: 'Item is Rate contract item or not',
+  })
+  @IsBoolean()
+  rcFlag: boolean;
 
   @ApiProperty({
     description: 'Detail document of item',
@@ -83,11 +89,18 @@ export class UpdateItemDto {
   unit: string;
 
   @ApiPropertyOptional({
-    description: 'SAC code of the item',
+    description: 'Item HSN code',
   })
   @IsOptional()
   @IsString()
-  sacCode: string;
+  hsnCode: string;
+
+  @ApiPropertyOptional({
+    description: 'Item is Rate contract item or not',
+  })
+  @IsOptional()
+  @IsBoolean()
+  rcFlag: boolean;
 
   @ApiPropertyOptional({
     description: 'Detail document of item',

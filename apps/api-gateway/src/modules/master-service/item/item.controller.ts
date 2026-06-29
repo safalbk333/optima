@@ -52,7 +52,7 @@ export class ItemController {
     name: 'search',
     required: false,
     type: String,
-    description: 'Search for items by Item name, Item code, SAC code'
+    description: 'Search for items by Item name, Item code, HSN code'
   })
   findAll(
     @Query('limit') limit: number,

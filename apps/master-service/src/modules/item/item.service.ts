@@ -33,14 +33,14 @@ export class ItemService {
       const prisma =
         await this.getSchemaClient();
 
-      const item = await this.prisma.tbl_item.create({
+      const item = await prisma.tbl_item.create({
         data: {
           item_name: createItemDto.itemName,
           item_code: createItemDto.itemCode,
           description: createItemDto.description,
           fk_category_id: createItemDto.categoryId,
           unit: createItemDto.unit,
-          sac_code: createItemDto.sacCode,
+          rc_flag: createItemDto.rcFlag,
           hsn_code: createItemDto.hsnCode,
           documents: createItemDto.documents,
         },
@@ -103,7 +103,7 @@ export class ItemService {
             },
           },
           {
-            sac_code: {
+            hsn_code: {
               contains: payload.search,
               mode: 'insensitive',
             },
@@ -111,7 +111,7 @@ export class ItemService {
         ];
       }
 
-      const items = await this.prisma.tbl_item.findMany({
+      const items = await prisma.tbl_item.findMany({
         where: {
           ...whereClause,
           is_active: true
@@ -153,7 +153,7 @@ export class ItemService {
       const prisma =
         await this.getSchemaClient();
 
-      const item = await this.prisma.tbl_item.findUnique({
+      const item = await prisma.tbl_item.findUnique({
         where: {
           pk_item_id: id,
           is_active: true
@@ -192,7 +192,7 @@ export class ItemService {
     const prisma =
       await this.getSchemaClient();
 
-    const item = await this.prisma.tbl_item.findUnique({
+    const item = await prisma.tbl_item.findUnique({
       where: {
         pk_item_id: itemId,
         is_active: true
@@ -203,7 +203,7 @@ export class ItemService {
       throw new BadRequestException('Item not found');
     }
 
-    const item_data = await this.prisma.tbl_item.update({
+    const item_data = await prisma.tbl_item.update({
       where: {
         pk_item_id: itemId,
       },
@@ -213,7 +213,7 @@ export class ItemService {
         description: dto.description,
         fk_category_id: dto.categoryId,
         unit: dto.unit,
-        sac_code: dto.sacCode,
+        rc_flag: dto.rcFlag,
         hsn_code: dto.hsnCode,
         is_active: dto.isActive,
         modified: new Date(),
