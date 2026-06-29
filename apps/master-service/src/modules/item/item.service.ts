@@ -14,7 +14,7 @@ export class ItemService {
   private readonly logger = new AppLogger(ItemService.name);
   private schemaClient: any;
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private async getSchemaClient() {
     if (!this.schemaClient) {
@@ -58,7 +58,7 @@ export class ItemService {
   }) {
     try {
       this.logger.log(ItemProperties.service.findAll.start);
-      await this.getSchemaClient();
+      const prisma = await this.getSchemaClient();
 
       const page =
         !isNaN(Number(payload?.page)) && Number(payload?.page) > 0
@@ -77,7 +77,7 @@ export class ItemService {
         whereClause.OR = [
           { item_name: { contains: payload.search, mode: 'insensitive' } },
           { item_code: { contains: payload.search, mode: 'insensitive' } },
-          { sac_code: { contains: payload.search, mode: 'insensitive' } },
+          { hsn_code: { contains: payload.search, mode: 'insensitive' } },
         ];
       }
 
@@ -107,7 +107,7 @@ export class ItemService {
       }
 
       const [items, total] = await Promise.all([
-        this.prisma.tbl_item.findMany({
+        prisma.tbl_item.findMany({
           where: { ...whereClause, is_active: true },
           include: {
             category: {
@@ -117,7 +117,7 @@ export class ItemService {
           skip: offset,
           take: limit,
         }),
-        this.prisma.tbl_item.count({
+        prisma.tbl_item.count({
           where: { ...whereClause, is_active: true },
         }),
       ]);

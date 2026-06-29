@@ -60,7 +60,7 @@ export class ItemController {
   name: 'search',
   required: false,
   type: String,
-  description: 'Search by Item name, Item code, or SAC code',
+  description: 'Search by Item name, Item code, or HSN code',
 })
 @ApiQuery({
   name: 'category_id',
