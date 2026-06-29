@@ -336,6 +336,7 @@ model tbl_item {
   fk_category_id      String
   unit                String?
   sac_code            String
+  hsn_code            String?
   description         String?
   documents           String?
   created             DateTime                            @default(now())
