@@ -27,6 +27,10 @@ export class CreateItemDto {
 
     @IsOptional()
     @IsString()
+    hsnCode?: string;
+
+    @IsOptional()
+    @IsString()
     documents?: string;
 }
 
@@ -54,6 +58,10 @@ export class UpdateItemDto {
     @IsOptional()
     @IsString()
     sacCode: string;
+
+    @IsOptional()
+    @IsString()
+    hsnCode?: string;
 
     @IsOptional()
     @IsString()

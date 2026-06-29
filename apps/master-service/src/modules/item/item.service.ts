@@ -41,6 +41,7 @@ export class ItemService {
           fk_category_id: createItemDto.categoryId,
           unit: createItemDto.unit,
           sac_code: createItemDto.sacCode,
+          hsn_code: createItemDto.hsnCode,
           documents: createItemDto.documents,
         },
       });
@@ -213,6 +214,7 @@ export class ItemService {
         fk_category_id: dto.categoryId,
         unit: dto.unit,
         sac_code: dto.sacCode,
+        hsn_code: dto.hsnCode,
         is_active: dto.isActive,
         modified: new Date(),
       },
