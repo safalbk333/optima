@@ -189,6 +189,7 @@ model tbl_department {
 
   @@map("tbl_department")
 }
+
 model tbl_category {
   pk_category_id     String    @id @default(uuid())
   category_name      String
