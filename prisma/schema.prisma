@@ -962,3 +962,19 @@ model tbl_company {
   @@index([is_active])
   @@map("tbl_company")
 }
+
+model tbl_currency {
+  pk_currency_id  String    @id @default(uuid())
+  currency_name   String
+  currency_code   String    @unique
+  symbol          String
+  description     String?
+  is_active       Boolean   @default(true)
+  created         DateTime  @default(now())
+  modified        DateTime?
+  is_delete       Boolean   @default(false)
+
+  @@index([currency_code])
+  @@index([is_active])
+  @@map("tbl_currency")
+}
