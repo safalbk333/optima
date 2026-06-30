@@ -42,6 +42,8 @@ import { InvoiceGatewayService } from './modules/shipment-service/invoice/invoic
 import { RoleGatewayService } from './modules/auth-service/authentication/roles/roles.service';
 import { UsersController } from './modules/user-service/users/users.controller';
 import { UsersGatewayService } from './modules/user-service/users/users.service';
+import { CurrencyController } from './modules/master-service/currency/currency.controller';
+import { CurrencyGatewayService } from './modules/master-service/currency/currency.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
  
@@ -133,7 +135,8 @@ ConfigModule.forRoot({
     DepartmentController,
     TemplateController,
     InvoiceController,
-    UsersController
+    UsersController,
+    CurrencyController,
   ],
  
   providers: [
@@ -153,7 +156,8 @@ ConfigModule.forRoot({
     TemplateGatewayService,
     InvoiceGatewayService,
     RoleGatewayService,
-    UsersGatewayService
+    UsersGatewayService,
+    CurrencyGatewayService,
   ],
 })
 export class AppModule {
