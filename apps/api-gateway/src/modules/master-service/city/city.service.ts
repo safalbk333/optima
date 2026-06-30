@@ -1,25 +1,24 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { DEPARTMENT_PATTERN } from './department.pattern';
-import { CreateDepartmentDto } from './dto/create-department.dto';
-import { UpdateDepartmentDto } from './dto/update-department.dto';
+import { CITY_PATTERN } from './city.pattern';
+import { CreateCityDto, UpdateCityDto } from './dto/city.dto';
 
 @Injectable()
-export class DepartmentGatewayService {
+export class CityGatewayService {
   private readonly logger: Logger;
 
   constructor(
     @Inject('MASTER_SERVICE')
     private readonly client: ClientProxy,
   ) {
-    this.logger = new Logger(DepartmentGatewayService.name);
+    this.logger = new Logger(CityGatewayService.name);
   }
 
-  async create(data: CreateDepartmentDto) {
+  async create(data: CreateCityDto) {
     try {
       return await firstValueFrom(
-        this.client.send(DEPARTMENT_PATTERN.CREATE, data),
+        this.client.send(CITY_PATTERN.CREATE, data),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -27,10 +26,10 @@ export class DepartmentGatewayService {
     }
   }
 
-  async findAll(payload: { limit?: number; page?: number; search?: string }) {
+  async findAll(payload: { limit?: number; page?: number; search?: string; countryId?: string }) {
     try {
       return await firstValueFrom(
-        this.client.send(DEPARTMENT_PATTERN.FIND_ALL, payload),
+        this.client.send(CITY_PATTERN.FIND_ALL, payload),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -41,7 +40,7 @@ export class DepartmentGatewayService {
   async findOne(id: string) {
     try {
       return await firstValueFrom(
-        this.client.send(DEPARTMENT_PATTERN.FIND_ONE, { id }),
+        this.client.send(CITY_PATTERN.FIND_ONE, { id }),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -49,10 +48,10 @@ export class DepartmentGatewayService {
     }
   }
 
-  async update(id: string, data: UpdateDepartmentDto) {
+  async update(id: string, data: UpdateCityDto) {
     try {
       return await firstValueFrom(
-        this.client.send(DEPARTMENT_PATTERN.UPDATE, { id, data }),
+        this.client.send(CITY_PATTERN.UPDATE, { id, data }),
       );
     } catch (error) {
       this.logger.error(error.message, error);

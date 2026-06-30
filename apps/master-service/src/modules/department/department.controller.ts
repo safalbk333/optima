@@ -1,8 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import {
-  MessagePattern,
-  Payload,
-} from '@nestjs/microservices';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -12,33 +9,32 @@ import { AppLogger } from '../../common/logger/app.logger';
 @Controller()
 export class DepartmentController {
   private readonly logger = new AppLogger(DepartmentController.name);
-  constructor(
-    private readonly departmentService: DepartmentService,
-  ) {
+
+  constructor(private readonly departmentService: DepartmentService) {
     this.logger.log(DepartmentProperties.controller.start);
   }
 
   @MessagePattern('department.create')
-  create(@Body() createDepartmentDto: CreateDepartmentDto) {
-    return this.departmentService.create(createDepartmentDto);
+  create(@Payload() dto: CreateDepartmentDto) {
+    this.logger.log(DepartmentProperties.controller.create);
+    return this.departmentService.create(dto);
   }
 
   @MessagePattern('department.findAll')
-  findAll() {
-    return this.departmentService.findAll();
+  findAll(@Payload() payload: { limit?: number; page?: number; search?: string }) {
+    this.logger.log(DepartmentProperties.controller.findAll);
+    return this.departmentService.findAll(payload);
   }
 
   @MessagePattern('department.findOne')
-  findOne(
-    @Payload() data: { id: string },
-  ) {
-    return this.departmentService.findOne(
-      data.id,
-    );
+  findOne(@Payload() data: { id: string }) {
+    this.logger.log(`${DepartmentProperties.controller.findOne}: ${data.id}`);
+    return this.departmentService.findOne(data.id);
   }
 
   @MessagePattern('department.update')
-  update(@Param('id') id: string, @Body() updateDepartmentDto: UpdateDepartmentDto) {
-    return this.departmentService.update(id, updateDepartmentDto);
+  update(@Payload() payload: { id: string; data: UpdateDepartmentDto }) {
+    this.logger.log(`${DepartmentProperties.controller.update}: ${payload.id}`);
+    return this.departmentService.update(payload.id, payload.data);
   }
 }

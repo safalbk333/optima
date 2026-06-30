@@ -4,6 +4,7 @@ export const DepartmentProperties = {
     findAll: 'Received request to find all departments',
     findOne: 'Received request to find department with id',
     create: 'Received request to create department',
+    update: 'Received request to update department',
   },
   service: {
     findAll: {

@@ -8,6 +8,9 @@ import { ItemModule } from './modules/item/item.module';
 import { DepartmentModule } from './modules/department/department.module';
 import { TemplateModule } from './modules/template/template.module';
 import { CurrencyModule } from './modules/currency/currency.module';
+import { CountryModule } from './modules/country/country.module';
+import { CityModule } from './modules/city/city.module';
+import { CompanyModule } from './modules/company/company.module';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { CurrencyModule } from './modules/currency/currency.module';
     DepartmentModule,
     TemplateModule,
     CurrencyModule,
+    CountryModule,
+    CityModule,
+    CompanyModule,
   ],
 
   controllers: [AppController],
