@@ -294,20 +294,21 @@ model tbl_vendor {
   pk_vendor_id              String            @id @default(uuid())
   company_legal_name        String
   trading_name              String?
+  contact_person            String
+  email                     String              @unique
+  phone                     String
   company_type              String
   year_of_establishment     DateTime
   office_address            String
   GST_number                String
   PAN_number                String
   MSME_status               String
+  bank                      Int
   nature_of_business        String
   categories_of_supply      String
-  contact_person            String
-  email                     String              @unique
-  phone                     String
   fk_country_id             String
   fk_city_id                String
-  is_active                 Boolean
+  status                    String              
   created                   DateTime            @default(now())
   modified                  DateTime?
   fk_created_id             String?

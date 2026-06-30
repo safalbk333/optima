@@ -3,11 +3,15 @@ import {
     IsBoolean,
     IsDateString,
     IsOptional,
+    IsInt,
 } from 'class-validator';
 
 export class CreateVendorDto {
     @IsString()
-    name: string;
+    company_legal_name: string;
+
+    @IsString()
+    trading_name: string;
 
     @IsString()
     company_type: string;
@@ -26,6 +30,9 @@ export class CreateVendorDto {
 
     @IsString()
     MSME_status: string;
+
+    @IsInt()
+    bank: number;
 
     @IsString()
     nature_of_business: string;
@@ -48,10 +55,6 @@ export class CreateVendorDto {
     @IsString()
     fk_city_id: string;
 
-    @IsBoolean()
-    is_active: boolean;
-
-    @IsOptional()
     @IsString()
-    fk_created_id?: string;
+    status: string;
 }

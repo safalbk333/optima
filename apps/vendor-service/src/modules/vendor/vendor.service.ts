@@ -67,15 +67,47 @@ export class VendorService {
     const prisma =
       await this.getSchemaClient();
 
+    const vendors =
+      await prisma.tbl_vendor.findMany();
+      console.log("qqqqqqqqqq",vendors)
+
     const vendor =
       await prisma.tbl_vendor.create({
         data: {
           vendor_name:
-            createVendorDto.name,
-          vendor_email:
+            createVendorDto.company_legal_name,
+          trade_name:
+            createVendorDto.trading_name,
+          company_type:
+            createVendorDto.company_type,
+          year_of_establishment:
+            createVendorDto.year_of_establishment,
+          office_address:
+            createVendorDto.office_address,
+          GST_number:
+            createVendorDto.GST_number,
+          PAN_number:
+            createVendorDto.PAN_number,
+          MSME_status:
+            createVendorDto.MSME_status,
+          bank:
+            createVendorDto.bank,
+          nature_of_business:
+            createVendorDto.nature_of_business,
+          categories_of_supply:
+            createVendorDto.categories_of_supply,
+          contact_person:
+            createVendorDto.contact_person,
+          email:
             createVendorDto.email,
-          vendor_phone:
+          phone:
             createVendorDto.phone,
+          fk_country_id:
+            createVendorDto.fk_country_id,
+          fk_city_id:
+            createVendorDto.fk_city_id,
+          status:
+            createVendorDto.status,
         },
       });
 
