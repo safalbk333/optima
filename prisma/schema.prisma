@@ -303,7 +303,7 @@ model tbl_vendor {
   GST_number                String
   PAN_number                String
   MSME_status               String
-  bank                      Int
+  bank                      Int?
   nature_of_business        String
   categories_of_supply      String
   fk_country_id             String
