@@ -1,15 +1,19 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsBoolean } from 'class-validator';
 
 export class UpdateDepartmentDto {
-    @IsString()
-    @IsOptional()
-    departmentName: string;
+  @IsOptional()
+  @IsString()
+  departmentName?: string;
 
-    @IsString()
-    @IsOptional()
-    departmentCode: string;
+  @IsOptional()
+  @IsString()
+  departmentCode?: string;
 
-    @IsString()
-    @IsOptional()
-    description: string;
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 }

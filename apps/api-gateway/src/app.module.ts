@@ -48,6 +48,8 @@ import { CountryController } from './modules/master-service/country/country.cont
 import { CountryGatewayService } from './modules/master-service/country/country.service';
 import { CityController } from './modules/master-service/city/city.controller';
 import { CityGatewayService } from './modules/master-service/city/city.service';
+import { CompanyController } from './modules/master-service/company/company.controller';
+import { CompanyGatewayService } from './modules/master-service/company/company.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
  
@@ -143,6 +145,7 @@ ConfigModule.forRoot({
     CurrencyController,
     CountryController,
     CityController,
+    CompanyController,
   ],
  
   providers: [
@@ -166,6 +169,7 @@ ConfigModule.forRoot({
     CurrencyGatewayService,
     CountryGatewayService,
     CityGatewayService,
+    CompanyGatewayService,
   ],
 })
 export class AppModule {
