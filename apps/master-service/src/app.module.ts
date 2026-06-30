@@ -7,6 +7,7 @@ import { CategoryModule } from './modules/category/category.module';
 import { ItemModule } from './modules/item/item.module';
 import { DepartmentModule } from './modules/department/department.module';
 import { TemplateModule } from './modules/template/template.module';
+import { CurrencyModule } from './modules/currency/currency.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TemplateModule } from './modules/template/template.module';
     ItemModule,
     DepartmentModule,
     TemplateModule,
+    CurrencyModule,
   ],
 
   controllers: [AppController],
