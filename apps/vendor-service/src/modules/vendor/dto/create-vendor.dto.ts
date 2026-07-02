@@ -31,8 +31,8 @@ export class CreateVendorDto {
     @IsString()
     MSME_status: string;
 
-    @IsInt()
-    bank: number;
+    @IsString()
+    bank: string;
 
     @IsString()
     nature_of_business: string;
@@ -57,4 +57,78 @@ export class CreateVendorDto {
 
     @IsString()
     status: string;
+}
+
+export class UpdateVendorDto {
+    @IsOptional()
+    @IsString()
+    company_legal_name: string;
+
+    @IsOptional()
+    @IsString()
+    trading_name: string;
+
+    @IsOptional()
+    @IsString()
+    company_type: string;
+
+    @IsOptional()
+    @IsDateString()
+    year_of_establishment: string;
+
+    @IsOptional()
+    @IsString()
+    office_address: string;
+
+    @IsOptional()
+    @IsString()
+    GST_number: string;
+
+    @IsOptional()
+    @IsString()
+    PAN_number: string;
+
+    @IsOptional()
+    @IsString()
+    MSME_status: string;
+
+    @IsOptional()
+    @IsString()
+    bank: string;
+
+    @IsOptional()
+    @IsString()
+    nature_of_business: string;
+
+    @IsOptional()
+    @IsString()
+    categories_of_supply: string;
+
+    @IsOptional()
+    @IsString()
+    contact_person: string;
+
+    @IsOptional()
+    @IsString()
+    email: string;
+
+    @IsOptional()
+    @IsString()
+    phone: string;
+
+    @IsOptional()
+    @IsString()
+    fk_country_id: string;
+
+    @IsOptional()
+    @IsString()
+    fk_city_id: string;
+
+    @IsOptional()
+    @IsString()
+    status: string;
+
+    @IsOptional()
+    @IsString()
+    notes: string;
 }

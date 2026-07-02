@@ -307,12 +307,13 @@ model tbl_vendor {
   GST_number                String
   PAN_number                String
   MSME_status               String
-  bank                      Int?
+  bank                      String
   nature_of_business        String
   categories_of_supply      String
   fk_country_id             String
   fk_city_id                String
-  status                    String              
+  status                    String  
+  notes                     String?          
   created                   DateTime            @default(now())
   modified                  DateTime?
   fk_created_id             String?
