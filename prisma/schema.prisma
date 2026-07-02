@@ -91,7 +91,11 @@ model tbl_user {
   vendors_created              tbl_vendor[]                        @relation("vendor_created_by")
   vendors_modified             tbl_vendor[]                        @relation("vendor_modified_by")
   company                      tbl_company?                        @relation("user_company", fields: [fk_company_id], references: [pk_company_id]) 
-  
+  rate_cards_created       tbl_rate_card[] @relation("rate_card_created_by")
+  rate_cards_modified      tbl_rate_card[] @relation("rate_card_modified_by")
+
+  rate_card_items_created  tbl_rate_card_item[] @relation("rate_card_item_created_by")
+  rate_card_items_modified tbl_rate_card_item[] @relation("rate_card_item_modified_by")
   @@map("tbl_user")
 }
 
@@ -329,6 +333,9 @@ model tbl_vendor {
   shipments                 tbl_shipment[]
   company                   tbl_company?              @relation("vendor_company", fields: [fk_company_id], references: [pk_company_id])
 
+  rate_cards          tbl_rate_card[]
+  vendor_item_prices  tbl_vendor_item_price[]
+
   @@map("tbl_vendor")
 }
 
@@ -352,7 +359,8 @@ model tbl_item {
   modified_by         tbl_user?                           @relation("item_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   pr_item_mappings    tbl_purchase_request_item_mapping[]
   goods_receipt_items tbl_goods_receipt_item[]
-
+  rate_card_items     tbl_rate_card_item[]
+  vendor_item_prices  tbl_vendor_item_price[]
   @@index([fk_category_id])
   @@map("tbl_item")
 }
@@ -978,4 +986,163 @@ model tbl_currency {
   @@index([currency_code])
   @@index([is_active])
   @@map("tbl_currency")
+}
+
+model tbl_rate_card {
+  pk_rate_card_id     String   @id @default(uuid())
+
+  rate_card_code      String   @unique
+  rate_card_name      String
+
+  fk_vendor_id        String
+
+  valid_from          DateTime
+  valid_to            DateTime
+
+  status              String   @default("DRAFT")
+  remarks             String?
+
+  created             DateTime @default(now())
+  modified            DateTime?
+
+  fk_created_id       String?
+  fk_modified_id      String?
+
+  is_delete           Boolean  @default(false)
+
+  vendor              tbl_vendor @relation(fields: [fk_vendor_id], references: [pk_vendor_id])
+
+  created_by          tbl_user? @relation("rate_card_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user? @relation("rate_card_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  items               tbl_rate_card_item[]
+  mappings            tbl_vendor_item_price[]
+
+  @@index([fk_vendor_id])
+  @@index([status])
+  @@index([valid_from])
+  @@index([valid_to])
+
+  @@map("tbl_rate_card")
+}
+
+model tbl_rate_card_item {
+  pk_rate_card_item_id   String @id @default(uuid())
+
+  fk_rate_card_id        String
+  fk_item_id             String
+
+  pricing_type           String
+
+  currency               String @default("INR")
+
+  is_active              Boolean @default(true)
+
+  created                DateTime @default(now())
+  modified               DateTime?
+
+  fk_created_id          String?
+  fk_modified_id         String?
+
+  rate_card              tbl_rate_card @relation(fields: [fk_rate_card_id], references: [pk_rate_card_id], onDelete: Cascade)
+
+  item                   tbl_item @relation(fields: [fk_item_id], references: [pk_item_id])
+
+  created_by             tbl_user? @relation("rate_card_item_created_by", fields: [fk_created_id], references: [pk_user_id])
+  modified_by            tbl_user? @relation("rate_card_item_modified_by", fields: [fk_modified_id], references: [pk_user_id])
+
+  fixed_price            tbl_rate_card_fixed_price?
+  tiers                  tbl_rate_card_tier[]
+  milestones             tbl_rate_card_milestone[]
+
+  mappings               tbl_vendor_item_price[]
+
+  @@unique([fk_rate_card_id, fk_item_id])
+
+  @@index([fk_rate_card_id])
+  @@index([fk_item_id])
+
+  @@map("tbl_rate_card_item")
+}
+
+model tbl_rate_card_fixed_price {
+
+  pk_fixed_price_id      String @id @default(uuid())
+
+  fk_rate_card_item_id   String @unique
+
+  unit_price             Float
+
+  rate_card_item         tbl_rate_card_item @relation(fields: [fk_rate_card_item_id], references: [pk_rate_card_item_id], onDelete: Cascade)
+
+  @@map("tbl_rate_card_fixed_price")
+}
+
+model tbl_rate_card_tier {
+
+  pk_tier_id             String @id @default(uuid())
+
+  fk_rate_card_item_id   String
+
+  min_qty                Int
+
+  max_qty                Int
+
+  unit_price             Float
+
+  rate_card_item         tbl_rate_card_item @relation(fields: [fk_rate_card_item_id], references: [pk_rate_card_item_id], onDelete: Cascade)
+
+  @@index([fk_rate_card_item_id])
+
+  @@map("tbl_rate_card_tier")
+}
+
+model tbl_rate_card_milestone {
+
+  pk_milestone_id        String @id @default(uuid())
+
+  fk_rate_card_item_id   String
+
+  milestone_name         String
+
+  milestone_order        Int
+
+  unit_price             Float
+
+  rate_card_item         tbl_rate_card_item @relation(fields: [fk_rate_card_item_id], references: [pk_rate_card_item_id], onDelete: Cascade)
+
+  @@index([fk_rate_card_item_id])
+
+  @@map("tbl_rate_card_milestone")
+}
+
+model tbl_vendor_item_price {
+
+  pk_vendor_item_price_id String @id @default(uuid())
+
+  fk_vendor_id            String
+
+  fk_item_id              String
+
+  fk_rate_card_id         String
+
+  fk_rate_card_item_id    String
+
+  is_active               Boolean @default(true)
+
+  vendor                  tbl_vendor @relation(fields: [fk_vendor_id], references: [pk_vendor_id])
+
+  item                    tbl_item @relation(fields: [fk_item_id], references: [pk_item_id])
+
+  rate_card               tbl_rate_card @relation(fields: [fk_rate_card_id], references: [pk_rate_card_id])
+
+  rate_card_item          tbl_rate_card_item @relation(fields: [fk_rate_card_item_id], references: [pk_rate_card_item_id])
+
+  @@unique([fk_vendor_id, fk_item_id, is_active])
+
+  @@index([fk_vendor_id])
+
+  @@index([fk_item_id])
+
+  @@map("tbl_vendor_item_price")
 }
