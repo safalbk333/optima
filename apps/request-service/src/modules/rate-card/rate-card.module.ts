@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
-import { PrismaModule } from '../../prisma/prisma.module';
 
 // Controllers
 import { RateCardController } from './controllers/rate-card.controller';
@@ -24,7 +23,7 @@ import { RateCardValidationService } from './services/rate-card-validation.servi
 import { RateCardScheduler } from './schedulers/rate-card.scheduler';
 
 @Module({
-  imports: [PrismaModule, ScheduleModule.forRoot()],
+  imports: [ScheduleModule.forRoot()],
   controllers: [
     RateCardController,
     RateCardItemController,

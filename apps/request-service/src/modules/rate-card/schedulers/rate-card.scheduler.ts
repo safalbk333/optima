@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from "libs/database/prisma-service";
 import { VendorItemPriceService } from '../services/vendor-item-price.service';
 import { RateCardStatus } from '../enums/rate-card-status.enum';
 import { RATE_CARD_CONSTANTS } from '../constants/rate-card.constants';
@@ -8,12 +8,19 @@ import { RATE_CARD_CONSTANTS } from '../constants/rate-card.constants';
 @Injectable()
 export class RateCardScheduler {
   private readonly logger = new Logger(RateCardScheduler.name);
+      private schemaClient: any;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly vendorItemPriceService: VendorItemPriceService,
   ) {}
-
+ private async getSchemaClient() {
+        if (!this.schemaClient) {
+            this.schemaClient =
+                await this.prisma.getClient('public');
+        }
+        return this.schemaClient;
+    }
   /**
    * Runs every day at midnight (Asia/Kolkata).
    * 1. Activates DRAFT cards whose valid_from has arrived (if previously approved/scheduled).
@@ -47,8 +54,9 @@ export class RateCardScheduler {
    */
   private async expireOutdatedRateCards(): Promise<void> {
     const now = new Date();
-
-    const expiringCards = await this.prisma.tbl_rate_card.findMany({
+const prisma =
+            await this.getSchemaClient();
+    const expiringCards = await prisma.tbl_rate_card.findMany({
       where: {
         status: RateCardStatus.ACTIVE,
         is_delete: false,
@@ -62,7 +70,7 @@ export class RateCardScheduler {
     }
 
     for (const card of expiringCards) {
-      await this.prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx) => {
         await tx.tbl_rate_card.update({
           where: { pk_rate_card_id: card.pk_rate_card_id },
           data: { status: RateCardStatus.EXPIRED, modified: new Date() },
@@ -95,8 +103,9 @@ export class RateCardScheduler {
   private async sendExpiryReminders(): Promise<void> {
     for (const days of RATE_CARD_CONSTANTS.EXPIRY_REMINDER_DAYS) {
       const { startOfDay, endOfDay } = this.getDayWindow(days);
-
-      const cards = await this.prisma.tbl_rate_card.findMany({
+const prisma =
+            await this.getSchemaClient();
+      const cards = await prisma.tbl_rate_card.findMany({
         where: {
           status: RateCardStatus.ACTIVE,
           is_delete: false,
@@ -149,8 +158,9 @@ export class RateCardScheduler {
    */
   private async reminderAlreadySent(rateCardId: string, typeCode: string): Promise<boolean> {
     const notificationType = await this.getOrCreateNotificationType(typeCode);
-
-    const existing = await this.prisma.tbl_notification.findFirst({
+const prisma =
+            await this.getSchemaClient();
+    const existing = await prisma.tbl_notification.findFirst({
       where: {
         fk_notification_type_id: notificationType.pk_notification_type_id,
         is_delete: false,
@@ -180,8 +190,9 @@ export class RateCardScheduler {
     }
 
     const notificationType = await this.getOrCreateNotificationType(typeCode);
-
-    await this.prisma.tbl_notification.create({
+const prisma =
+            await this.getSchemaClient();
+    await prisma.tbl_notification.create({
       data: {
         fk_notification_type_id: notificationType.pk_notification_type_id,
         fk_user_id: card.fk_created_id,
@@ -199,7 +210,10 @@ export class RateCardScheduler {
    * reminder types are specific to this module and may not be pre-seeded.
    */
   private async getOrCreateNotificationType(typeCode: string) {
-    const existing = await this.prisma.tbl_notification_type.findFirst({
+
+    const prisma =
+            await this.getSchemaClient();
+    const existing = await prisma.tbl_notification_type.findFirst({
       where: { type_code: typeCode, is_delete: false },
     });
 
@@ -207,7 +221,7 @@ export class RateCardScheduler {
       return existing;
     }
 
-    return this.prisma.tbl_notification_type.create({
+    return prisma.tbl_notification_type.create({
       data: {
         type_code: typeCode,
         type_name: this.humanizeTypeCode(typeCode),

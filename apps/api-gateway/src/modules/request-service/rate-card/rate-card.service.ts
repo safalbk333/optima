@@ -20,7 +20,7 @@ export class RateCardGatewayService {
   private readonly logger: Logger;
 
   constructor(
-    @Inject('RATE_CARD_SERVICE')
+    @Inject('REQUEST_SERVICE')
     private readonly client: ClientProxy,
   ) {
     this.logger = new Logger(RateCardGatewayService.name);
