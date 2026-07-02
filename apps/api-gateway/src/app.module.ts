@@ -50,6 +50,13 @@ import { CityController } from './modules/master-service/city/city.controller';
 import { CityGatewayService } from './modules/master-service/city/city.service';
 import { CompanyController } from './modules/master-service/company/company.controller';
 import { CompanyGatewayService } from './modules/master-service/company/company.service';
+import { FixedPriceGatewayController } from './modules/request-service/rate-card/fixed-price.controller';
+import { MilestonePriceGatewayController } from './modules/request-service/rate-card/milestone-price.controller';
+import { PricingEngineGatewayController } from './modules/request-service/rate-card/pricing-engine.controller';
+import { RateCardItemGatewayController } from './modules/request-service/rate-card/rate-card-item.controller';
+import { RateCardGatewayController } from './modules/request-service/rate-card/rate-card.controller';
+import { RateCardGatewayService } from './modules/request-service/rate-card/rate-card.service';
+import { TierPriceGatewayController } from './modules/request-service/rate-card/tier-price.controller';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
  
@@ -146,6 +153,15 @@ ConfigModule.forRoot({
     CountryController,
     CityController,
     CompanyController,
+
+    FixedPriceGatewayController,
+    MilestonePriceGatewayController,
+    PricingEngineGatewayController,
+    RateCardItemGatewayController,
+    RateCardGatewayController,
+    TierPriceGatewayController,
+    
+
   ],
  
   providers: [
@@ -170,6 +186,8 @@ ConfigModule.forRoot({
     CountryGatewayService,
     CityGatewayService,
     CompanyGatewayService,
+    RateCardGatewayService
+    
   ],
 })
 export class AppModule {
