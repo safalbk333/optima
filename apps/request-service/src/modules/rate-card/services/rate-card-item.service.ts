@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from "libs/database/prisma-service";
 import { CreateRateCardItemDto } from '../dto/rate-card-item/create-rate-card-item.dto';
 import { UpdateRateCardItemDto } from '../dto/rate-card-item/update-rate-card-item.dto';
@@ -7,57 +7,65 @@ import { RateCardValidationService } from './rate-card-validation.service';
 import { RateCardService } from './rate-card.service';
 import { RATE_CARD_CONSTANTS, RATE_CARD_ERROR_MESSAGES } from '../constants/rate-card.constants';
 import { BadRequestException } from '@nestjs/common';
+import { AppLogger } from '../../../common/logger/app.logger';
+import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
 @Injectable()
 export class RateCardItemService {
-  private readonly logger = new Logger(RateCardItemService.name);
-    private schemaClient: any;
+  private readonly logger = new AppLogger(RateCardItemService.name);
+  private schemaClient: any;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly validationService: RateCardValidationService,
     private readonly rateCardService: RateCardService,
   ) {}
- private async getSchemaClient() {
-        if (!this.schemaClient) {
-            this.schemaClient =
-                await this.prisma.getClient('public');
-        }
-        return this.schemaClient;
+
+  private async getSchemaClient() {
+    if (!this.schemaClient) {
+      this.schemaClient =
+        await this.prisma.getClient('public');
     }
+    return this.schemaClient;
+  }
+
   async addItem(
     rateCardId: string,
     dto: CreateRateCardItemDto,
     userId: string,
-  ): Promise<RateCardItemResponseDto> {
-    await this.rateCardService.getEntityOrThrow(rateCardId);
-const prisma =
-            await this.getSchemaClient();
-    const item = await prisma.tbl_item.findFirst({
-      where: { pk_item_id: dto.fk_item_id, is_active: true },
-    });
-    if (!item) {
-      throw new BadRequestException('Item not found or inactive');
+  ) {
+    try {
+      await this.rateCardService.getEntityOrThrow(rateCardId);
+      const prisma = await this.getSchemaClient();
+      const item = await prisma.tbl_item.findFirst({
+        where: { pk_item_id: dto.fk_item_id, is_active: true },
+      });
+      if (!item) {
+        throw new BadRequestException('Item not found or inactive');
+      }
+
+      await this.validationService.validateUniqueItemInRateCard(rateCardId, dto.fk_item_id);
+
+      const created = await prisma.tbl_rate_card_item.create({
+        data: {
+          fk_rate_card_id: rateCardId,
+          fk_item_id: dto.fk_item_id,
+          pricing_type: dto.pricing_type,
+          currency: dto.currency || RATE_CARD_CONSTANTS.DEFAULT_CURRENCY,
+          fk_created_id: userId,
+        },
+        include: { item: { select: { item_name: true, item_code: true } } },
+      });
+
+      this.logger.log(
+        `Item ${dto.fk_item_id} added to rate card ${rateCardId} with pricing type ${dto.pricing_type}`,
+      );
+
+      return ResponseHelper.success(this.toResponseDto(created), 'Rate card item added successfully');
+    } catch (error: any) {
+      this.logger.error(error.stack || error.message);
+      return ResponseHelper.error(error.message);
     }
-
-    await this.validationService.validateUniqueItemInRateCard(rateCardId, dto.fk_item_id);
-
-    const created = await prisma.tbl_rate_card_item.create({
-      data: {
-        fk_rate_card_id: rateCardId,
-        fk_item_id: dto.fk_item_id,
-        pricing_type: dto.pricing_type,
-        currency: dto.currency || RATE_CARD_CONSTANTS.DEFAULT_CURRENCY,
-        fk_created_id: userId,
-      },
-      include: { item: { select: { item_name: true, item_code: true } } },
-    });
-
-    this.logger.log(
-      `Item ${dto.fk_item_id} added to rate card ${rateCardId} with pricing type ${dto.pricing_type}`,
-    );
-
-    return this.toResponseDto(created);
   }
 
   async updateItem(
@@ -65,57 +73,69 @@ const prisma =
     itemId: string,
     dto: UpdateRateCardItemDto,
     userId: string,
-  ): Promise<RateCardItemResponseDto> {
-    await this.getEntityOrThrow(rateCardId, itemId);
-const prisma =
-            await this.getSchemaClient();
-    const updated = await prisma.tbl_rate_card_item.update({
-      where: { pk_rate_card_item_id: itemId },
-      data: {
-        ...(dto.currency && { currency: dto.currency }),
-        ...(dto.is_active !== undefined && { is_active: dto.is_active }),
-        modified: new Date(),
-        fk_modified_id: userId,
-      },
-      include: { item: { select: { item_name: true, item_code: true } } },
-    });
+  ) {
+    try {
+      await this.getEntityOrThrow(rateCardId, itemId);
+      const prisma = await this.getSchemaClient();
+      const updated = await prisma.tbl_rate_card_item.update({
+        where: { pk_rate_card_item_id: itemId },
+        data: {
+          ...(dto.currency && { currency: dto.currency }),
+          ...(dto.is_active !== undefined && { is_active: dto.is_active }),
+          modified: new Date(),
+          fk_modified_id: userId,
+        },
+        include: { item: { select: { item_name: true, item_code: true } } },
+      });
 
-    this.logger.log(`Rate card item updated: ${itemId}`);
-    return this.toResponseDto(updated);
+      this.logger.log(`Rate card item updated: ${itemId}`);
+      return ResponseHelper.success(this.toResponseDto(updated), 'Rate card item updated successfully');
+    } catch (error: any) {
+      this.logger.error(error.stack || error.message);
+      return ResponseHelper.error(error.message);
+    }
   }
 
-  async deleteItem(rateCardId: string, itemId: string): Promise<void> {
-    await this.getEntityOrThrow(rateCardId, itemId);
-const prisma =
-            await this.getSchemaClient();
-    await prisma.tbl_rate_card_item.delete({
-      where: { pk_rate_card_item_id: itemId },
-    });
+  async deleteItem(rateCardId: string, itemId: string) {
+    try {
+      await this.getEntityOrThrow(rateCardId, itemId);
+      const prisma = await this.getSchemaClient();
+      await prisma.tbl_rate_card_item.delete({
+        where: { pk_rate_card_item_id: itemId },
+      });
 
-    this.logger.log(`Rate card item deleted: ${itemId}`);
+      this.logger.log(`Rate card item deleted: ${itemId}`);
+      return ResponseHelper.success(null, 'Rate card item deleted successfully');
+    } catch (error: any) {
+      this.logger.error(error.stack || error.message);
+      return ResponseHelper.error(error.message);
+    }
   }
 
-  async listItems(rateCardId: string): Promise<RateCardItemResponseDto[]> {
-    await this.rateCardService.getEntityOrThrow(rateCardId);
-const prisma =
-            await this.getSchemaClient();
-    const items = await prisma.tbl_rate_card_item.findMany({
-      where: { fk_rate_card_id: rateCardId },
-      include: {
-        item: { select: { item_name: true, item_code: true } },
-        fixed_price: true,
-        tiers: { orderBy: { min_qty: 'asc' } },
-        milestones: { orderBy: { milestone_order: 'asc' } },
-      },
-      orderBy: { created: 'asc' },
-    });
+  async listItems(rateCardId: string) {
+    try {
+      await this.rateCardService.getEntityOrThrow(rateCardId);
+      const prisma = await this.getSchemaClient();
+      const items = await prisma.tbl_rate_card_item.findMany({
+        where: { fk_rate_card_id: rateCardId },
+        include: {
+          item: { select: { item_name: true, item_code: true } },
+          fixed_price: true,
+          tiers: { orderBy: { min_qty: 'asc' } },
+          milestones: { orderBy: { milestone_order: 'asc' } },
+        },
+        orderBy: { created: 'asc' },
+      });
 
-    return items.map((item) => this.toResponseDto(item));
+      return ResponseHelper.success(items.map((item) => this.toResponseDto(item)), 'Rate card items fetched successfully');
+    } catch (error: any) {
+      this.logger.error(error.stack || error.message);
+      return ResponseHelper.error(error.message);
+    }
   }
 
   async getEntityOrThrow(rateCardId: string, itemId: string) {
-    const prisma =
-            await this.getSchemaClient();
+    const prisma = await this.getSchemaClient();
     const item = await prisma.tbl_rate_card_item.findFirst({
       where: { pk_rate_card_item_id: itemId, fk_rate_card_id: rateCardId },
     });
