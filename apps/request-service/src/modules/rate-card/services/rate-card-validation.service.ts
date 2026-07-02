@@ -5,10 +5,20 @@ import { RATE_CARD_ERROR_MESSAGES } from '../constants/rate-card.constants';
 
 @Injectable()
 export class RateCardValidationService {
-  constructor(private readonly prisma: PrismaService) {}
+      private schemaClient: any;
 
+  constructor(private readonly prisma: PrismaService) {}
+ private async getSchemaClient() {
+        if (!this.schemaClient) {
+            this.schemaClient =
+                await this.prisma.getClient('public');
+        }
+        return this.schemaClient;
+    }
   async validateUniqueCode(rate_card_code: string, excludeId?: string): Promise<void> {
-    const existing = await this.prisma.tbl_rate_card.findFirst({
+    const prisma =
+            await this.getSchemaClient();
+    const existing = await prisma.tbl_rate_card.findFirst({
       where: {
         rate_card_code,
         is_delete: false,
@@ -32,7 +42,9 @@ export class RateCardValidationService {
     valid_to: Date,
     excludeId?: string,
   ): Promise<void> {
-    const overlapping = await this.prisma.tbl_rate_card.findFirst({
+    const prisma =
+            await this.getSchemaClient();
+    const overlapping = await prisma.tbl_rate_card.findFirst({
       where: {
         fk_vendor_id,
         is_delete: false,
@@ -66,7 +78,9 @@ export class RateCardValidationService {
     fk_item_id: string,
     excludeId?: string,
   ): Promise<void> {
-    const existing = await this.prisma.tbl_rate_card_item.findFirst({
+    const prisma =
+            await this.getSchemaClient();
+    const existing = await prisma.tbl_rate_card_item.findFirst({
       where: {
         fk_rate_card_id,
         fk_item_id,
@@ -87,7 +101,9 @@ export class RateCardValidationService {
     if (min_qty > max_qty) {
       throw new BadRequestException('min_qty cannot be greater than max_qty');
     }
-    const overlapping = await this.prisma.tbl_rate_card_tier.findFirst({
+    const prisma =
+            await this.getSchemaClient();
+    const overlapping = await prisma.tbl_rate_card_tier.findFirst({
       where: {
         fk_rate_card_item_id,
         ...(excludeId ? { NOT: { pk_tier_id: excludeId } } : {}),
@@ -104,7 +120,9 @@ export class RateCardValidationService {
     milestone_order: number,
     excludeId?: string,
   ): Promise<void> {
-    const existing = await this.prisma.tbl_rate_card_milestone.findFirst({
+    const prisma =
+            await this.getSchemaClient();
+    const existing = await prisma.tbl_rate_card_milestone.findFirst({
       where: {
         fk_rate_card_item_id,
         milestone_order,

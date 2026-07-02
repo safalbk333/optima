@@ -17,12 +17,19 @@ import { RATE_CARD_ERROR_MESSAGES } from '../constants/rate-card.constants';
 @Injectable()
 export class RateCardService {
   private readonly logger = new Logger(RateCardService.name);
+      private schemaClient: any;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly validationService: RateCardValidationService,
   ) {}
-
+ private async getSchemaClient() {
+        if (!this.schemaClient) {
+            this.schemaClient =
+                await this.prisma.getClient('public');
+        }
+        return this.schemaClient;
+    }
   async create(dto: CreateRateCardDto, userId: string): Promise<RateCardResponseDto> {
     this.logger.log(`Creating rate card with code: ${dto.rate_card_code}`);
 
@@ -31,15 +38,16 @@ export class RateCardService {
 
     await this.validationService.validateUniqueCode(dto.rate_card_code);
     this.validationService.validateDateRange(valid_from, valid_to);
-
-    const vendor = await this.prisma.tbl_vendor.findFirst({
+    const prisma =
+            await this.getSchemaClient();
+    const vendor = await prisma.tbl_vendor.findFirst({
       where: { pk_vendor_id: dto.fk_vendor_id, is_delete: false },
     });
     if (!vendor) {
       throw new BadRequestException('Vendor not found');
     }
 
-    const rateCard = await this.prisma.tbl_rate_card.create({
+    const rateCard = await prisma.tbl_rate_card.create({
       data: {
         rate_card_code: dto.rate_card_code,
         rate_card_name: dto.rate_card_name,
@@ -70,9 +78,10 @@ export class RateCardService {
         { rate_card_name: { contains: query.search, mode: 'insensitive' } },
       ];
     }
-
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.tbl_rate_card.findMany({
+    const prisma =
+            await this.getSchemaClient();
+    const [items, total] = await prisma.$transaction([
+      prisma.tbl_rate_card.findMany({
         where,
         skip,
         take: limit,
@@ -82,7 +91,7 @@ export class RateCardService {
           items: { select: { pk_rate_card_item_id: true } },
         },
       }),
-      this.prisma.tbl_rate_card.count({ where }),
+      prisma.tbl_rate_card.count({ where }),
     ]);
 
     return {
@@ -96,7 +105,9 @@ export class RateCardService {
   }
 
   async findOne(id: string): Promise<RateCardResponseDto> {
-    const rateCard = await this.prisma.tbl_rate_card.findFirst({
+        const prisma =
+            await this.getSchemaClient();
+    const rateCard = await prisma.tbl_rate_card.findFirst({
       where: { pk_rate_card_id: id, is_delete: false },
       include: {
         vendor: { select: { company_legal_name: true } },
@@ -112,7 +123,9 @@ export class RateCardService {
   }
 
   async getEntityOrThrow(id: string) {
-    const rateCard = await this.prisma.tbl_rate_card.findFirst({
+        const prisma =
+            await this.getSchemaClient();
+    const rateCard = await prisma.tbl_rate_card.findFirst({
       where: { pk_rate_card_id: id, is_delete: false },
     });
     if (!rateCard) {
@@ -137,8 +150,9 @@ export class RateCardService {
         id,
       );
     }
-
-    const updated = await this.prisma.tbl_rate_card.update({
+    const prisma =
+            await this.getSchemaClient();
+    const updated = await prisma.tbl_rate_card.update({
       where: { pk_rate_card_id: id },
       data: {
         ...(dto.fk_vendor_id && { fk_vendor_id: dto.fk_vendor_id }),
@@ -158,8 +172,9 @@ export class RateCardService {
   async remove(id: string, userId: string): Promise<void> {
     const existing = await this.getEntityOrThrow(id);
     this.validationService.validateNotActiveForDelete(existing.status);
-
-    await this.prisma.tbl_rate_card.update({
+    const prisma =
+            await this.getSchemaClient();
+    await prisma.tbl_rate_card.update({
       where: { pk_rate_card_id: id },
       data: {
         is_delete: true,
@@ -186,8 +201,9 @@ export class RateCardService {
       new Date(existing.valid_from).getTime() > Date.now()
         ? RateCardStatus.ACTIVE
         : RateCardStatus.ACTIVE;
-
-    const updated = await this.prisma.tbl_rate_card.update({
+    const prisma =
+            await this.getSchemaClient();
+    const updated = await prisma.tbl_rate_card.update({
       where: { pk_rate_card_id: id },
       data: {
         status: newStatus,
@@ -204,8 +220,9 @@ export class RateCardService {
 
   async deactivate(id: string, userId: string): Promise<RateCardResponseDto> {
     await this.getEntityOrThrow(id);
-
-    const updated = await this.prisma.tbl_rate_card.update({
+    const prisma =
+            await this.getSchemaClient();
+    const updated = await prisma.tbl_rate_card.update({
       where: { pk_rate_card_id: id },
       data: {
         status: RateCardStatus.INACTIVE,
@@ -214,7 +231,7 @@ export class RateCardService {
       },
     });
 
-    await this.prisma.tbl_vendor_item_price.updateMany({
+    await prisma.tbl_vendor_item_price.updateMany({
       where: { fk_rate_card_id: id, is_active: true },
       data: { is_active: false },
     });
@@ -224,7 +241,9 @@ export class RateCardService {
   }
 
   async clone(id: string, dto: CloneRateCardDto, userId: string): Promise<RateCardResponseDto> {
-    const source = await this.prisma.tbl_rate_card.findFirst({
+        const prisma =
+            await this.getSchemaClient();
+    const source = await prisma.tbl_rate_card.findFirst({
       where: { pk_rate_card_id: id, is_delete: false },
       include: {
         items: {
@@ -243,7 +262,7 @@ export class RateCardService {
     await this.validationService.validateUniqueCode(dto.rate_card_code);
     this.validationService.validateDateRange(valid_from, valid_to);
 
-    const cloned = await this.prisma.$transaction(async (tx) => {
+    const cloned = await prisma.$transaction(async (tx) => {
       const newRateCard = await tx.tbl_rate_card.create({
         data: {
           rate_card_code: dto.rate_card_code,
@@ -308,7 +327,9 @@ export class RateCardService {
   }
 
   async getActive(): Promise<RateCardResponseDto[]> {
-    const items = await this.prisma.tbl_rate_card.findMany({
+        const prisma =
+            await this.getSchemaClient();
+    const items = await prisma.tbl_rate_card.findMany({
       where: { status: RateCardStatus.ACTIVE, is_delete: false },
       include: { vendor: { select: { company_legal_name: true } } },
       orderBy: { valid_to: 'asc' },
@@ -317,7 +338,9 @@ export class RateCardService {
   }
 
   async getExpired(): Promise<RateCardResponseDto[]> {
-    const items = await this.prisma.tbl_rate_card.findMany({
+        const prisma =
+            await this.getSchemaClient();
+    const items = await prisma.tbl_rate_card.findMany({
       where: { status: RateCardStatus.EXPIRED, is_delete: false },
       include: { vendor: { select: { company_legal_name: true } } },
       orderBy: { valid_to: 'desc' },
@@ -328,8 +351,9 @@ export class RateCardService {
   async getExpiring(days: number): Promise<RateCardResponseDto[]> {
     const now = new Date();
     const threshold = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-
-    const items = await this.prisma.tbl_rate_card.findMany({
+    const prisma =
+            await this.getSchemaClient();
+    const items = await prisma.tbl_rate_card.findMany({
       where: {
         status: RateCardStatus.ACTIVE,
         is_delete: false,
@@ -342,13 +366,15 @@ export class RateCardService {
   }
 
   private async refreshVendorItemPricesForRateCard(rateCardId: string): Promise<void> {
-    const rateCard = await this.prisma.tbl_rate_card.findUnique({
+        const prisma =
+            await this.getSchemaClient();
+    const rateCard = await prisma.tbl_rate_card.findUnique({
       where: { pk_rate_card_id: rateCardId },
       include: { items: true },
     });
     if (!rateCard) return;
 
-    await this.prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       await tx.tbl_vendor_item_price.updateMany({
         where: { fk_vendor_id: rateCard.fk_vendor_id, is_active: true },
         data: { is_active: false },

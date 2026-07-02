@@ -1,78 +1,43 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { RateCardItemService } from '../services/rate-card-item.service';
 import { CreateRateCardItemDto } from '../dto/rate-card-item/create-rate-card-item.dto';
 import { UpdateRateCardItemDto } from '../dto/rate-card-item/update-rate-card-item.dto';
-import { RateCardItemResponseDto } from '../dto/rate-card-item/rate-card-item-response.dto';
+import { AppLogger } from '../../../common/logger/app.logger';
 
-@ApiTags('Rate Card Items')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
-@Controller('rate-cards/:rateCardId/items')
+@Controller()
 export class RateCardItemController {
-  constructor(private readonly rateCardItemService: RateCardItemService) {}
+  private readonly logger = new AppLogger(RateCardItemController.name);
 
-  @Post()
-  @ApiOperation({ summary: 'Add an item to a rate card with a pricing type' })
-  @ApiParam({ name: 'rateCardId', description: 'Rate card UUID' })
-  @ApiResponse({ status: HttpStatus.CREATED, type: RateCardItemResponseDto })
-  @HttpCode(HttpStatus.CREATED)
-  async addItem(
-    @Param('rateCardId', ParseUUIDPipe) rateCardId: string,
-    @Body() dto: CreateRateCardItemDto,
-    @CurrentUser('pk_user_id') userId: string,
-  ): Promise<RateCardItemResponseDto> {
-    return this.rateCardItemService.addItem(rateCardId, dto, userId);
+  constructor(private readonly rateCardItemService: RateCardItemService) {
+    this.logger.log('RateCardItemController initialized');
   }
 
-  @Get()
-  @ApiOperation({ summary: 'List all items in a rate card with their pricing' })
-  @ApiParam({ name: 'rateCardId', description: 'Rate card UUID' })
-  @ApiResponse({ status: HttpStatus.OK, type: [RateCardItemResponseDto] })
-  async listItems(
-    @Param('rateCardId', ParseUUIDPipe) rateCardId: string,
-  ): Promise<RateCardItemResponseDto[]> {
-    return this.rateCardItemService.listItems(rateCardId);
+  @MessagePattern('rate-card-item.add')
+  addItem(
+    @Payload() data: { rateCardId: string; dto: CreateRateCardItemDto; userId: string },
+  ) {
+    this.logger.log(`rate-card-item.add: rateCard=${data.rateCardId} item=${data.dto.fk_item_id}`);
+    return this.rateCardItemService.addItem(data.rateCardId, data.dto, data.userId);
   }
 
-  @Patch(':itemId')
-  @ApiOperation({ summary: 'Update a rate card item (currency / active flag)' })
-  @ApiParam({ name: 'rateCardId', description: 'Rate card UUID' })
-  @ApiParam({ name: 'itemId', description: 'Rate card item UUID' })
-  @ApiResponse({ status: HttpStatus.OK, type: RateCardItemResponseDto })
-  async updateItem(
-    @Param('rateCardId', ParseUUIDPipe) rateCardId: string,
-    @Param('itemId', ParseUUIDPipe) itemId: string,
-    @Body() dto: UpdateRateCardItemDto,
-    @CurrentUser('pk_user_id') userId: string,
-  ): Promise<RateCardItemResponseDto> {
-    return this.rateCardItemService.updateItem(rateCardId, itemId, dto, userId);
+  @MessagePattern('rate-card-item.list')
+  listItems(@Payload() data: { rateCardId: string }) {
+    this.logger.log(`rate-card-item.list: rateCard=${data.rateCardId}`);
+    return this.rateCardItemService.listItems(data.rateCardId);
   }
 
-  @Delete(':itemId')
-  @ApiOperation({ summary: 'Remove an item from a rate card' })
-  @ApiParam({ name: 'rateCardId', description: 'Rate card UUID' })
-  @ApiParam({ name: 'itemId', description: 'Rate card item UUID' })
-  @ApiResponse({ status: HttpStatus.NO_CONTENT })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteItem(
-    @Param('rateCardId', ParseUUIDPipe) rateCardId: string,
-    @Param('itemId', ParseUUIDPipe) itemId: string,
-  ): Promise<void> {
-    return this.rateCardItemService.deleteItem(rateCardId, itemId);
+  @MessagePattern('rate-card-item.update')
+  updateItem(
+    @Payload() data: { rateCardId: string; itemId: string; dto: UpdateRateCardItemDto; userId: string },
+  ) {
+    this.logger.log(`rate-card-item.update: ${data.itemId}`);
+    return this.rateCardItemService.updateItem(data.rateCardId, data.itemId, data.dto, data.userId);
+  }
+
+  @MessagePattern('rate-card-item.delete')
+  deleteItem(@Payload() data: { rateCardId: string; itemId: string }) {
+    this.logger.log(`rate-card-item.delete: ${data.itemId}`);
+    return this.rateCardItemService.deleteItem(data.rateCardId, data.itemId);
   }
 }

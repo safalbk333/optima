@@ -11,21 +11,29 @@ import { BadRequestException } from '@nestjs/common';
 @Injectable()
 export class RateCardItemService {
   private readonly logger = new Logger(RateCardItemService.name);
+    private schemaClient: any;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly validationService: RateCardValidationService,
     private readonly rateCardService: RateCardService,
   ) {}
-
+ private async getSchemaClient() {
+        if (!this.schemaClient) {
+            this.schemaClient =
+                await this.prisma.getClient('public');
+        }
+        return this.schemaClient;
+    }
   async addItem(
     rateCardId: string,
     dto: CreateRateCardItemDto,
     userId: string,
   ): Promise<RateCardItemResponseDto> {
     await this.rateCardService.getEntityOrThrow(rateCardId);
-
-    const item = await this.prisma.tbl_item.findFirst({
+const prisma =
+            await this.getSchemaClient();
+    const item = await prisma.tbl_item.findFirst({
       where: { pk_item_id: dto.fk_item_id, is_active: true },
     });
     if (!item) {
@@ -34,7 +42,7 @@ export class RateCardItemService {
 
     await this.validationService.validateUniqueItemInRateCard(rateCardId, dto.fk_item_id);
 
-    const created = await this.prisma.tbl_rate_card_item.create({
+    const created = await prisma.tbl_rate_card_item.create({
       data: {
         fk_rate_card_id: rateCardId,
         fk_item_id: dto.fk_item_id,
@@ -59,8 +67,9 @@ export class RateCardItemService {
     userId: string,
   ): Promise<RateCardItemResponseDto> {
     await this.getEntityOrThrow(rateCardId, itemId);
-
-    const updated = await this.prisma.tbl_rate_card_item.update({
+const prisma =
+            await this.getSchemaClient();
+    const updated = await prisma.tbl_rate_card_item.update({
       where: { pk_rate_card_item_id: itemId },
       data: {
         ...(dto.currency && { currency: dto.currency }),
@@ -77,8 +86,9 @@ export class RateCardItemService {
 
   async deleteItem(rateCardId: string, itemId: string): Promise<void> {
     await this.getEntityOrThrow(rateCardId, itemId);
-
-    await this.prisma.tbl_rate_card_item.delete({
+const prisma =
+            await this.getSchemaClient();
+    await prisma.tbl_rate_card_item.delete({
       where: { pk_rate_card_item_id: itemId },
     });
 
@@ -87,8 +97,9 @@ export class RateCardItemService {
 
   async listItems(rateCardId: string): Promise<RateCardItemResponseDto[]> {
     await this.rateCardService.getEntityOrThrow(rateCardId);
-
-    const items = await this.prisma.tbl_rate_card_item.findMany({
+const prisma =
+            await this.getSchemaClient();
+    const items = await prisma.tbl_rate_card_item.findMany({
       where: { fk_rate_card_id: rateCardId },
       include: {
         item: { select: { item_name: true, item_code: true } },
@@ -103,7 +114,9 @@ export class RateCardItemService {
   }
 
   async getEntityOrThrow(rateCardId: string, itemId: string) {
-    const item = await this.prisma.tbl_rate_card_item.findFirst({
+    const prisma =
+            await this.getSchemaClient();
+    const item = await prisma.tbl_rate_card_item.findFirst({
       where: { pk_rate_card_item_id: itemId, fk_rate_card_id: rateCardId },
     });
     if (!item) {

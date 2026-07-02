@@ -10,13 +10,20 @@ import { RATE_CARD_ERROR_MESSAGES } from '../constants/rate-card.constants';
 @Injectable()
 export class TierPriceService {
   private readonly logger = new Logger(TierPriceService.name);
+      private schemaClient: any;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly rateCardItemService: RateCardItemService,
     private readonly validationService: RateCardValidationService,
   ) {}
-
+ private async getSchemaClient() {
+        if (!this.schemaClient) {
+            this.schemaClient =
+                await this.prisma.getClient('public');
+        }
+        return this.schemaClient;
+    }
   async create(rateCardId: string, rateCardItemId: string, dto: CreateTierPriceDto) {
     const item = await this.rateCardItemService.getEntityOrThrow(rateCardId, rateCardItemId);
 
@@ -29,8 +36,9 @@ export class TierPriceService {
       dto.min_qty,
       dto.max_qty,
     );
-
-    const created = await this.prisma.tbl_rate_card_tier.create({
+    const prisma =
+            await this.getSchemaClient();
+    const created = await prisma.tbl_rate_card_tier.create({
       data: {
         fk_rate_card_item_id: rateCardItemId,
         min_qty: dto.min_qty,
@@ -50,8 +58,9 @@ export class TierPriceService {
     dto: UpdateTierPriceDto,
   ) {
     await this.rateCardItemService.getEntityOrThrow(rateCardId, rateCardItemId);
-
-    const existing = await this.prisma.tbl_rate_card_tier.findFirst({
+    const prisma =
+            await this.getSchemaClient();
+    const existing = await prisma.tbl_rate_card_tier.findFirst({
       where: { pk_tier_id: tierId, fk_rate_card_item_id: rateCardItemId },
     });
     if (!existing) {
@@ -70,7 +79,7 @@ export class TierPriceService {
       );
     }
 
-    const updated = await this.prisma.tbl_rate_card_tier.update({
+    const updated = await prisma.tbl_rate_card_tier.update({
       where: { pk_tier_id: tierId },
       data: {
         ...(dto.min_qty !== undefined && { min_qty: dto.min_qty }),
@@ -85,15 +94,16 @@ export class TierPriceService {
 
   async delete(rateCardId: string, rateCardItemId: string, tierId: string): Promise<void> {
     await this.rateCardItemService.getEntityOrThrow(rateCardId, rateCardItemId);
-
-    const existing = await this.prisma.tbl_rate_card_tier.findFirst({
+    const prisma =
+            await this.getSchemaClient();
+    const existing = await prisma.tbl_rate_card_tier.findFirst({
       where: { pk_tier_id: tierId, fk_rate_card_item_id: rateCardItemId },
     });
     if (!existing) {
       throw new NotFoundException(RATE_CARD_ERROR_MESSAGES.TIER_NOT_FOUND);
     }
 
-    await this.prisma.tbl_rate_card_tier.delete({ where: { pk_tier_id: tierId } });
+    await prisma.tbl_rate_card_tier.delete({ where: { pk_tier_id: tierId } });
     this.logger.log(`Tier deleted: ${tierId}`);
   }
 }

@@ -5,16 +5,25 @@ import { RATE_CARD_ERROR_MESSAGES } from '../constants/rate-card.constants';
 @Injectable()
 export class VendorItemPriceService {
   private readonly logger = new Logger(VendorItemPriceService.name);
+      private schemaClient: any;
 
   constructor(private readonly prisma: PrismaService) {}
-
+ private async getSchemaClient() {
+        if (!this.schemaClient) {
+            this.schemaClient =
+                await this.prisma.getClient('public');
+        }
+        return this.schemaClient;
+    }
   /**
    * Returns the currently active vendor-item-price mapping, including the
    * full rate card item (with fixed/tier/milestone pricing) so the pricing
    * engine can evaluate it without a second round trip.
    */
   async getActiveMapping(fk_vendor_id: string, fk_item_id: string) {
-    const mapping = await this.prisma.tbl_vendor_item_price.findFirst({
+        const prisma =
+            await this.getSchemaClient();
+    const mapping = await prisma.tbl_vendor_item_price.findFirst({
       where: {
         fk_vendor_id,
         fk_item_id,
@@ -46,7 +55,9 @@ export class VendorItemPriceService {
    * card transitions status (e.g. expiry), to keep mappings consistent.
    */
   async rebuildForVendor(fk_vendor_id: string): Promise<void> {
-    await this.prisma.$transaction(async (tx) => {
+        const prisma =
+            await this.getSchemaClient();
+    await prisma.$transaction(async (tx) => {
       await tx.tbl_vendor_item_price.updateMany({
         where: { fk_vendor_id, is_active: true },
         data: { is_active: false },
@@ -98,7 +109,9 @@ export class VendorItemPriceService {
    * Called when a rate card expires or is deactivated.
    */
   async deactivateForRateCard(fk_rate_card_id: string): Promise<void> {
-    await this.prisma.tbl_vendor_item_price.updateMany({
+        const prisma =
+            await this.getSchemaClient();
+    await prisma.tbl_vendor_item_price.updateMany({
       where: { fk_rate_card_id, is_active: true },
       data: { is_active: false },
     });

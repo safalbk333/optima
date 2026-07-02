@@ -1,26 +1,22 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { PricingEngineService } from '../services/pricing-engine.service';
 import { CalculatePriceDto } from '../dto/pricing-engine/calculate-price.dto';
-import { PriceResultDto } from '../dto/pricing-engine/price-result.dto';
+import { AppLogger } from '../../../common/logger/app.logger';
 
-@ApiTags('Pricing Engine')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
-@Controller('pricing')
+@Controller()
 export class PricingEngineController {
-  constructor(private readonly pricingEngineService: PricingEngineService) {}
+  private readonly logger = new AppLogger(PricingEngineController.name);
 
-  @Post('calculate')
-  @ApiOperation({
-    summary: 'Calculate price for a vendor/item using the active rate card',
-    description:
-      'Resolves the active vendor-item-price mapping and applies the correct pricing strategy (FIXED, TIER, or MILESTONE) to compute unit and total price.',
-  })
-  @ApiResponse({ status: HttpStatus.OK, type: PriceResultDto })
-  @HttpCode(HttpStatus.OK)
-  async calculate(@Body() dto: CalculatePriceDto): Promise<PriceResultDto> {
+  constructor(private readonly pricingEngineService: PricingEngineService) {
+    this.logger.log('PricingEngineController initialized');
+  }
+
+  @MessagePattern('pricing.calculate')
+  calculate(@Payload() dto: CalculatePriceDto) {
+    this.logger.log(
+      `pricing.calculate: vendor=${dto.fk_vendor_id} item=${dto.fk_item_id}`,
+    );
     return this.pricingEngineService.calculatePrice(dto);
   }
 }

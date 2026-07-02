@@ -1,65 +1,37 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { FixedPriceService } from '../services/fixed-price.service';
 import { CreateFixedPriceDto } from '../dto/fixed-price/create-fixed-price.dto';
 import { UpdateFixedPriceDto } from '../dto/fixed-price/update-fixed-price.dto';
+import { AppLogger } from '../../../common/logger/app.logger';
 
-@ApiTags('Rate Card - Fixed Pricing')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
-@Controller('rate-cards/:rateCardId/items/:itemId/fixed-price')
+@Controller()
 export class FixedPriceController {
-  constructor(private readonly fixedPriceService: FixedPriceService) {}
+  private readonly logger = new AppLogger(FixedPriceController.name);
 
-  @Post()
-  @ApiOperation({ summary: 'Create fixed price for a rate card item' })
-  @ApiParam({ name: 'rateCardId', description: 'Rate card UUID' })
-  @ApiParam({ name: 'itemId', description: 'Rate card item UUID' })
-  @ApiResponse({ status: HttpStatus.CREATED })
-  @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Param('rateCardId', ParseUUIDPipe) rateCardId: string,
-    @Param('itemId', ParseUUIDPipe) itemId: string,
-    @Body() dto: CreateFixedPriceDto,
-  ) {
-    return this.fixedPriceService.create(rateCardId, itemId, dto);
+  constructor(private readonly fixedPriceService: FixedPriceService) {
+    this.logger.log('FixedPriceController initialized');
   }
 
-  @Patch()
-  @ApiOperation({ summary: 'Update fixed price for a rate card item' })
-  @ApiParam({ name: 'rateCardId', description: 'Rate card UUID' })
-  @ApiParam({ name: 'itemId', description: 'Rate card item UUID' })
-  @ApiResponse({ status: HttpStatus.OK })
-  async update(
-    @Param('rateCardId', ParseUUIDPipe) rateCardId: string,
-    @Param('itemId', ParseUUIDPipe) itemId: string,
-    @Body() dto: UpdateFixedPriceDto,
+  @MessagePattern('fixed-price.create')
+  create(
+    @Payload() data: { rateCardId: string; itemId: string; dto: CreateFixedPriceDto },
   ) {
-    return this.fixedPriceService.update(rateCardId, itemId, dto);
+    this.logger.log(`fixed-price.create: item=${data.itemId}`);
+    return this.fixedPriceService.create(data.rateCardId, data.itemId, data.dto);
   }
 
-  @Delete()
-  @ApiOperation({ summary: 'Delete fixed price for a rate card item' })
-  @ApiParam({ name: 'rateCardId', description: 'Rate card UUID' })
-  @ApiParam({ name: 'itemId', description: 'Rate card item UUID' })
-  @ApiResponse({ status: HttpStatus.NO_CONTENT })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(
-    @Param('rateCardId', ParseUUIDPipe) rateCardId: string,
-    @Param('itemId', ParseUUIDPipe) itemId: string,
-  ): Promise<void> {
-    return this.fixedPriceService.delete(rateCardId, itemId);
+  @MessagePattern('fixed-price.update')
+  update(
+    @Payload() data: { rateCardId: string; itemId: string; dto: UpdateFixedPriceDto },
+  ) {
+    this.logger.log(`fixed-price.update: item=${data.itemId}`);
+    return this.fixedPriceService.update(data.rateCardId, data.itemId, data.dto);
+  }
+
+  @MessagePattern('fixed-price.delete')
+  delete(@Payload() data: { rateCardId: string; itemId: string }) {
+    this.logger.log(`fixed-price.delete: item=${data.itemId}`);
+    return this.fixedPriceService.delete(data.rateCardId, data.itemId);
   }
 }
