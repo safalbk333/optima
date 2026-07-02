@@ -4,6 +4,7 @@ export const VendorProperties = {
     findAll: 'Received request to find all vendors',
     findOne: 'Received request to find vendor with id',
     create: 'Received request to create vendor',
+    update: 'Received request to update vendor'
   },
   service: {
     findAll: {
@@ -21,6 +22,11 @@ export const VendorProperties = {
       start: 'Creating new vendor',
       success: 'Vendor created with id',
       error: 'Failed to create vendor',
+    },
+    update: {
+      start: 'Updating vendor',
+      success: 'Vendor updated with id',
+      error: 'Failed to update vendor',
     },
   },
 };

@@ -6,3 +6,10 @@ const Quotation_status = {
   REJECTED: 5,
 }
 export default Quotation_status;
+
+export const Vendor_status = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  BACKLISTED: 'BACKLISTED',
+  INACTIVE: 'INACTIVE',
+}
