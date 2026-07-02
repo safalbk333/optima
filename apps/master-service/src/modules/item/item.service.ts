@@ -167,32 +167,40 @@ export class ItemService {
   }
 
   async update(itemId: string, dto: UpdateItemDto) {
-    this.logger.log(`${ItemProperties.service.update}: ${itemId}`);
-    const prisma = await this.getSchemaClient();
+    try {
+      this.logger.log(`${ItemProperties.service.update}: ${itemId}`);
+      const prisma = await this.getSchemaClient();
 
-    const item = await prisma.tbl_item.findUnique({
-      where: { pk_item_id: itemId, is_active: true },
-    });
+      const item = await prisma.tbl_item.findUnique({
+        where: { pk_item_id: itemId, is_active: true },
+      });
 
-    if (!item) {
-      throw new BadRequestException('Item not found');
+      if (!item) {
+        throw new BadRequestException('Item not found');
+      }
+
+      const item_data = await prisma.tbl_item.update({
+        where: { pk_item_id: itemId },
+        data: {
+          item_name: dto.itemName,
+          item_code: dto.itemCode,
+          description: dto.description,
+          fk_category_id: dto.categoryId,
+          unit: dto.unit,
+          rc_flag: dto.rcFlag,
+          hsn_code: dto.hsnCode,
+          is_active: dto.isActive,
+          modified: new Date(),
+        },
+      });
+
+      return ResponseHelper.success(item_data, 'Item updated successfully');
+    } catch (error) {
+      this.logger.error(
+        `${ItemProperties.service.findOne.error}: ${itemId}`,
+        error.stack,
+      );
+      throw error;
     }
-
-    const item_data = await prisma.tbl_item.update({
-      where: { pk_item_id: itemId },
-      data: {
-        item_name: dto.itemName,
-        item_code: dto.itemCode,
-        description: dto.description,
-        fk_category_id: dto.categoryId,
-        unit: dto.unit,
-        rc_flag: dto.rcFlag,
-        hsn_code: dto.hsnCode,
-        is_active: dto.isActive,
-        modified: new Date(),
-      },
-    });
-
-    return ResponseHelper.success(item_data, 'Item updated successfully');
   }
 }

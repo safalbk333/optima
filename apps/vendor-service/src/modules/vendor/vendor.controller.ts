@@ -4,7 +4,7 @@ import {
   Payload,
 } from '@nestjs/microservices';
 import { VendorService } from './vendor.service';
-import { CreateVendorDto } from './dto/create-vendor.dto';
+import { CreateVendorDto, UpdateVendorDto } from './dto/create-vendor.dto';
 import { AppLogger } from '../../common/logger/app.logger';
 import { VendorProperties } from '../../common/properties/vendor.properties';
 
@@ -19,9 +19,15 @@ export class VendorController {
   }
 
   @MessagePattern('vendor.findAll')
-  findAll() {
+  findAll(
+    @Payload() payload: {
+      limit?: number;
+      page?: number;
+      search?: string;
+    }
+  ) {
     this.logger.log(VendorProperties.controller.findAll);
-    return this.vendorService.findAll();
+    return this.vendorService.findAll(payload);
   }
 
   @MessagePattern('vendor.findOne')
@@ -35,4 +41,18 @@ export class VendorController {
     this.logger.log(VendorProperties.controller.create);
     return this.vendorService.create(createVendorDto);
   }
+
+  @MessagePattern('vendor.update')
+    update(@Payload()
+    payload: {
+      id: string;
+      data: UpdateVendorDto;
+    },
+    ) {
+      this.logger.log(`${VendorProperties.controller.update}: ${payload.id}`,);
+      return this.vendorService.update(
+        payload.id,
+        payload.data,
+      );
+    }
 }

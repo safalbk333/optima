@@ -61,8 +61,13 @@ export class ItemGatewayService {
   }
 
   async update(id: string, data: UpdateItemDto) {
-    return await firstValueFrom(
-      this.client.send(ITEM_PATTERN.UPDATE, { id, data }),
-    );
+    try {
+      return await firstValueFrom(
+        this.client.send(ITEM_PATTERN.UPDATE, { id, data }),
+      );
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
+    }
   }
 }
