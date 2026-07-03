@@ -5,6 +5,8 @@ import {
   IsNumber,
   IsDateString,
   IsInt,
+  Min,
+  Max,
 } from 'class-validator';
 
 export class CreateVendorDto {
@@ -24,8 +26,8 @@ export class CreateVendorDto {
   company_type: string;
 
   @ApiProperty({ description: 'Year of establishment', })
-  @IsDateString()
-  year_of_establishment: Date;
+  @IsInt()
+  year_of_establishment: number;
 
   @ApiProperty({ description: 'office address', })
   @IsString()
@@ -78,7 +80,7 @@ export class CreateVendorDto {
   @IsString()
   fk_city_id: string;
 
-  @ApiProperty({ description: 'vendor status', default: 'PENDING'})
+  @ApiProperty({ description: 'vendor status', default: 'PENDING' })
   @IsString()
   status: string;
 }
@@ -100,8 +102,8 @@ export class UpdateVendorDto {
   company_type: string;
 
   @ApiProperty({ description: 'Year of establishment', })
-  @IsDateString()
-  year_of_establishment: Date;
+  @IsInt()
+  year_of_establishment: number;
 
   @ApiProperty({ description: 'office address', })
   @IsString()

@@ -302,7 +302,7 @@ model tbl_vendor {
   email                     String              @unique
   phone                     String
   company_type              String
-  year_of_establishment     DateTime
+  year_of_establishment     Int
   office_address            String
   GST_number                String
   PAN_number                String
