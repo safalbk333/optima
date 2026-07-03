@@ -16,8 +16,8 @@ export class CreateVendorDto {
     @IsString()
     company_type: string;
 
-    @IsDateString()
-    year_of_establishment: string;
+    @IsInt()
+    year_of_establishment: number;
 
     @IsString()
     office_address: string;
@@ -73,8 +73,8 @@ export class UpdateVendorDto {
     company_type: string;
 
     @IsOptional()
-    @IsDateString()
-    year_of_establishment: string;
+    @IsInt()
+    year_of_establishment: number;
 
     @IsOptional()
     @IsString()

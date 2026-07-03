@@ -160,6 +160,17 @@ export class VendorService {
         }
       }
 
+      const currentYear = new Date().getFullYear();
+
+      if (
+        createVendorDto.year_of_establishment < 1800 ||
+        createVendorDto.year_of_establishment > currentYear
+      ) {
+        throw new BadRequestException(
+          `Year of establishment must be a year`,
+        );
+      }
+
       const vendor =
         await prisma.tbl_vendor.create({
           data: {
