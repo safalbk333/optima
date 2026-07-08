@@ -10,12 +10,25 @@ export class TemplateGatewayService {
   constructor(
     @Inject('MASTER_SERVICE')
     private readonly client: ClientProxy,
-  ) {}
+  ) { }
 
   async getByCode(templateCode: string) {
     try {
       return await firstValueFrom(
         this.client.send(TEMPLATE_PATTERN.GET_BY_CODE, templateCode),
+      );
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
+    }
+  }
+
+  async downloadTemplate(type: string) {
+    try {
+      return firstValueFrom(
+        this.client.send(TEMPLATE_PATTERN.DOWNLOAD_TEMPLATE, {
+          type,
+        }),
       );
     } catch (error) {
       this.logger.error(error.message, error);

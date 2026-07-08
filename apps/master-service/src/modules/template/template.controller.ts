@@ -17,4 +17,13 @@ export class TemplateController {
     this.logger.log(`${TemplateProperties.controller.getByCode}: ${templateCode}`);
     return this.templateService.getByCode(templateCode);
   }
+
+  @MessagePattern('template.downloadTemplate')
+  async downloadTemplate(
+    @Payload() payload: any,
+  ) {
+    return this.templateService.downloadTemplate(
+      payload.type,
+    );
+  }
 }
