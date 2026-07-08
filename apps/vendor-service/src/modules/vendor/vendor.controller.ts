@@ -43,16 +43,23 @@ export class VendorController {
   }
 
   @MessagePattern('vendor.update')
-    update(@Payload()
-    payload: {
-      id: string;
-      data: UpdateVendorDto;
-    },
-    ) {
-      this.logger.log(`${VendorProperties.controller.update}: ${payload.id}`,);
-      return this.vendorService.update(
-        payload.id,
-        payload.data,
-      );
-    }
+  update(@Payload()
+  payload: {
+    id: string;
+    data: UpdateVendorDto;
+  },
+  ) {
+    this.logger.log(`${VendorProperties.controller.update}: ${payload.id}`,);
+    return this.vendorService.update(
+      payload.id,
+      payload.data,
+    );
+  }
+
+  @MessagePattern('vendor.upload')
+  async bulkUpload(
+    @Payload() payload: any,
+  ) {
+    return this.vendorService.bulkUpload(payload);
+  }
 }

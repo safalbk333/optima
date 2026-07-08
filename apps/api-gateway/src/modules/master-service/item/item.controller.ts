@@ -6,9 +6,13 @@ import {
   Post,
   Put,
   Query,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiQuery,
   ApiResponse,
@@ -16,6 +20,8 @@ import {
 } from '@nestjs/swagger';
 import { CreateItemDto, UpdateItemDto } from './dto/create-item.dto';
 import { ItemGatewayService } from './item.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Multer } from 'multer';
 
 @ApiTags('Item-Service')
 @Controller('item')
@@ -111,5 +117,41 @@ export class ItemController {
   @ApiResponse({ status: 200, description: 'Item updated successfully' })
   update(@Param('id') id: string, @Body() data: UpdateItemDto) {
     return this.itemService.update(id, data);
+  }
+
+  @Post('bulk-upload')
+  @ApiOperation({ summary: 'Bulk Upload Items' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  // async bulkUpload(
+  //   @UploadedFile() file: Multer.File,
+  // ) {
+  //   return this.itemService.bulkUpload(file);
+  // }
+  async bulkUpload(
+    @UploadedFile() file: any,
+  ): Promise<any> {
+    const result = await this.itemService.bulkUpload(file);
+
+    if (!result.errorReport) {
+      return result;
+    }
+
+    return new StreamableFile(result.errorReport, {
+      disposition:
+        'attachment; filename="Item_Bulk_Upload_Errors.xlsx"',
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
   }
 }

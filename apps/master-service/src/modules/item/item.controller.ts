@@ -55,4 +55,11 @@ export class ItemController {
       payload.data,
     );
   }
+
+  @MessagePattern('item.upload')
+  async bulkUpload(
+    @Payload() payload: any,
+  ) {
+    return this.itemService.bulkUpload(payload);
+  }
 }

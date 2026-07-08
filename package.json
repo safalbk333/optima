@@ -70,10 +70,12 @@
     "class-validator": "^0.14.4",
     "cron": "^4.4.0",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.2.0",
     "prisma": "^6.19.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.2",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
