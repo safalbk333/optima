@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 
 import {
   MicroserviceOptions,
@@ -21,7 +22,7 @@ async function bootstrap() {
         },
       },
     );
-
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   await app.listen();
 
   console.log(
