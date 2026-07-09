@@ -15,10 +15,10 @@ export class CurrencyGatewayService {
     this.logger = new Logger(CurrencyGatewayService.name);
   }
 
-  async create(data: CreateCurrencyDto) {
+  async create(strSchemaId: string, data: CreateCurrencyDto) {
     try {
       return await firstValueFrom(
-        this.client.send(CURRENCY_PATTERN.CREATE, data),
+        this.client.send(CURRENCY_PATTERN.CREATE, { schemaId: strSchemaId, data }),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -26,10 +26,10 @@ export class CurrencyGatewayService {
     }
   }
 
-  async findAll() {
+  async findAll(strSchemaId: string) {
     try {
       return await firstValueFrom(
-        this.client.send(CURRENCY_PATTERN.FIND_ALL, {}),
+        this.client.send(CURRENCY_PATTERN.FIND_ALL, { schemaId: strSchemaId }),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -37,10 +37,10 @@ export class CurrencyGatewayService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(strSchemaId: string, id: string) {
     try {
       return await firstValueFrom(
-        this.client.send(CURRENCY_PATTERN.FIND_ONE, { id }),
+        this.client.send(CURRENCY_PATTERN.FIND_ONE, { schemaId: strSchemaId, id }),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -48,10 +48,10 @@ export class CurrencyGatewayService {
     }
   }
 
-  async update(id: string, data: UpdateCurrencyDto) {
+  async update(strSchemaId: string, id: string, data: UpdateCurrencyDto) {
     try {
       return await firstValueFrom(
-        this.client.send(CURRENCY_PATTERN.UPDATE, { id, data }),
+        this.client.send(CURRENCY_PATTERN.UPDATE, { schemaId: strSchemaId, id, data }),
       );
     } catch (error) {
       this.logger.error(error.message, error);

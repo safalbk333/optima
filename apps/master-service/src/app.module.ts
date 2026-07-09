@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from 'libs/database/prisma.module';
+import { CacheModule } from 'libs/database/cache.module';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ItemModule } from './modules/item/item.module';
@@ -19,6 +20,7 @@ import { CompanyModule } from './modules/company/company.module';
       envFilePath: `apps/master-service/.env.${process.env.NODE_ENV || 'development'}`,
     }),
     PrismaModule,
+    CacheModule,
     CategoryModule,
     ItemModule,
     DepartmentModule,

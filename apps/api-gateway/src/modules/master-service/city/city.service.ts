@@ -15,10 +15,10 @@ export class CityGatewayService {
     this.logger = new Logger(CityGatewayService.name);
   }
 
-  async create(data: CreateCityDto) {
+  async create(strSchemaId: string, data: CreateCityDto) {
     try {
       return await firstValueFrom(
-        this.client.send(CITY_PATTERN.CREATE, data),
+        this.client.send(CITY_PATTERN.CREATE, { schemaId: strSchemaId, data }),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -26,10 +26,10 @@ export class CityGatewayService {
     }
   }
 
-  async findAll(payload: { limit?: number; page?: number; search?: string; countryId?: string }) {
+  async findAll(strSchemaId: string, payload: { limit?: number; page?: number; search?: string; countryId?: string }) {
     try {
       return await firstValueFrom(
-        this.client.send(CITY_PATTERN.FIND_ALL, payload),
+        this.client.send(CITY_PATTERN.FIND_ALL, { schemaId: strSchemaId, ...payload }),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -37,10 +37,10 @@ export class CityGatewayService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(strSchemaId: string, id: string) {
     try {
       return await firstValueFrom(
-        this.client.send(CITY_PATTERN.FIND_ONE, { id }),
+        this.client.send(CITY_PATTERN.FIND_ONE, { schemaId: strSchemaId, id }),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -48,10 +48,10 @@ export class CityGatewayService {
     }
   }
 
-  async update(id: string, data: UpdateCityDto) {
+  async update(strSchemaId: string, id: string, data: UpdateCityDto) {
     try {
       return await firstValueFrom(
-        this.client.send(CITY_PATTERN.UPDATE, { id, data }),
+        this.client.send(CITY_PATTERN.UPDATE, { schemaId: strSchemaId, id, data }),
       );
     } catch (error) {
       this.logger.error(error.message, error);

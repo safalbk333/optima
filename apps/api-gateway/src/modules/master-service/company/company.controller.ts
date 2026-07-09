@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CompanyGatewayService } from './company.service';
 import { CreateCompanyDto, UpdateCompanyDto } from './dto/company.dto';
+import { SchemaId } from '../../guards/decorators/schema-id.decorator';
 
 @ApiTags('Company')
 @Controller('company')
@@ -12,8 +13,11 @@ export class CompanyController {
   @ApiOperation({ summary: 'Create a new company' })
   @ApiResponse({ status: 200, description: 'Company created successfully' })
   @ApiBody({ type: CreateCompanyDto })
-  create(@Body() data: CreateCompanyDto) {
-    return this.companyService.create(data);
+  create(
+    @SchemaId() schemaId: string,
+    @Body() data: CreateCompanyDto,
+  ) {
+    return this.companyService.create(schemaId, data);
   }
 
   @Get()
@@ -23,11 +27,12 @@ export class CompanyController {
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page' })
   @ApiQuery({ name: 'search', required: false, type: String, description: 'Search by name, code or email' })
   findAll(
+    @SchemaId() schemaId: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('search') search?: string,
   ) {
-    return this.companyService.findAll({
+    return this.companyService.findAll(schemaId, {
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
       search,
@@ -37,15 +42,22 @@ export class CompanyController {
   @Get(':id')
   @ApiOperation({ summary: 'Get company by id' })
   @ApiResponse({ status: 200, description: 'Company fetched successfully' })
-  findOne(@Param('id') id: string) {
-    return this.companyService.findOne(id);
+  findOne(
+    @SchemaId() schemaId: string,
+    @Param('id') id: string,
+  ) {
+    return this.companyService.findOne(schemaId, id);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a company' })
   @ApiResponse({ status: 200, description: 'Company updated successfully' })
   @ApiBody({ type: UpdateCompanyDto })
-  update(@Param('id') id: string, @Body() data: UpdateCompanyDto) {
-    return this.companyService.update(id, data);
+  update(
+    @SchemaId() schemaId: string,
+    @Param('id') id: string,
+    @Body() data: UpdateCompanyDto,
+  ) {
+    return this.companyService.update(schemaId, id, data);
   }
 }
