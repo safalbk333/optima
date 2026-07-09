@@ -7,6 +7,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { CreateVendorDto, UpdateVendorDto } from './dto/create-vendor.dto';
 import { VENDOR_PATTERN } from './vendor.pattern';
+import { Multer } from 'multer';
 
 @Injectable()
 export class VendorGatewayService {
@@ -70,4 +71,55 @@ export class VendorGatewayService {
       throw error;
     }
   }
+
+  async bulkUpload(file: Multer.File) {
+    try {
+      const result = await firstValueFrom(
+        this.client.send(VENDOR_PATTERN.UPLOAD, {
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          buffer: file.buffer,
+        }),
+      );
+
+      if (result.errorReport) {
+        result.errorReport = Buffer.from(
+          result.errorReport,
+          'base64',
+        );
+      }
+
+      return result;
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
+    }
+  }
+
+  // async bulkUpload(file: Multer.File) {
+  //   try {
+  //     const result = firstValueFrom(
+  //       this.client.send(
+  //         VENDOR_PATTERN.UPLOAD,
+  //         // { cmd: 'vendor.bulkUpload' },
+  //         {
+  //           originalname: file.originalname,
+  //           mimetype: file.mimetype,
+  //           buffer: file.buffer,
+  //         },
+  //       ),
+  //     );
+  //     if (result.errorReport) {
+  //       result.errorReport = Buffer.from(
+  //         result.errorReport,
+  //         'base64',
+  //       );
+  //     }
+
+  //     return result;
+  //   } catch (error) {
+  //     this.logger.error(error.message, error);
+  //     throw error;
+  //   }
+  // }
 }

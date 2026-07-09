@@ -2,20 +2,28 @@ import {
   Body,
   Controller,
   Get,
+  Header,
   Param,
   Post,
   Put,
   Query,
-  UseGuards,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
+  ApiProduces,
   ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { VendorGatewayService } from './vendor.service';
 import { CreateVendorDto, UpdateVendorDto } from './dto/create-vendor.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Multer } from 'multer';
 
 @ApiTags('Vendor-Service')
 @Controller('vendor')
@@ -104,5 +112,57 @@ export class VendorController {
   @ApiResponse({ status: 200, description: 'Vendor updated successfully' })
   update(@Param('id') id: string, @Body() data: UpdateVendorDto) {
     return this.vendorService.update(id, data);
+  }
+
+  // @Post('bulk-upload')
+  // @ApiOperation({ summary: 'Bulk Upload Vendors' })
+  // @ApiConsumes('multipart/form-data')
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       file: {
+  //         type: 'string',
+  //         format: 'binary',
+  //       },
+  //     },
+  //   },
+  // })
+  // @UseInterceptors(FileInterceptor('file'))
+  // async bulkUpload(
+  //   @UploadedFile() file: Multer.File,
+  // ) {
+  //   return this.vendorService.bulkUpload(file);
+  // }
+
+  @Post('bulk-upload')
+  @ApiOperation({ summary: 'Bulk Upload Vendors' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async bulkUpload(
+    @UploadedFile() file: any,
+  ): Promise<any> {
+    const result = await this.vendorService.bulkUpload(file);
+
+    if (!result.errorReport) {
+      return result;
+    }
+
+    return new StreamableFile(result.errorReport, {
+      disposition:
+        'attachment; filename="Vendor_Bulk_Upload_Errors.xlsx"',
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
   }
 }

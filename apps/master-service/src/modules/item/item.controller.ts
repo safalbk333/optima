@@ -36,4 +36,11 @@ export class ItemController {
     this.logger.log(`${ItemProperties.controller.update}: ${payload.id}`);
     return this.itemService.update(payload.schemaId, payload.id, payload.data);
   }
+
+  @MessagePattern('item.upload')
+  async bulkUpload(
+    @Payload() payload: any,
+  ) {
+    return this.itemService.bulkUpload(payload);
+  }
 }

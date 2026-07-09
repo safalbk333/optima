@@ -4,4 +4,5 @@ export const ITEM_PATTERN = {
   CREATE: 'item.create',
   UPDATE: 'item.update',
   DELETE: 'item.delete',
+  UPLOAD: 'item.upload',
 };

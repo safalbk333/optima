@@ -4,4 +4,5 @@ export const VENDOR_PATTERN = {
   CREATE: 'vendor.create',
   UPDATE: 'vendor.update',
   DELETE: 'vendor.delete',
+  UPLOAD: 'vendor.upload',
 };
