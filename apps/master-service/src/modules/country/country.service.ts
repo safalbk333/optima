@@ -1,54 +1,62 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'libs/database/prisma-service';
+import { CacheService } from 'libs/database/cache.service';
 import { CreateCountryDto, UpdateCountryDto } from './dto/country.dto';
 import { AppLogger } from '../../common/logger/app.logger';
 import { CountryProperties } from '../../common/properties/country.properties';
 import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
+const CACHE_KEYS = {
+  all: (strSchemaId: string) => `${strSchemaId}:country:all`,
+  one: (strSchemaId: string, strId: string) => `${strSchemaId}:country:${strId}`,
+};
+
 @Injectable()
 export class CountryService {
   private readonly logger = new AppLogger(CountryService.name);
-  private schemaClient: any;
+  private objSchemaClient: any;
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cache: CacheService,
+  ) {}
 
   private async getSchemaClient() {
-    if (!this.schemaClient) {
-      this.schemaClient = await this.prisma.getClient('public');
+    if (!this.objSchemaClient) {
+      this.objSchemaClient = await this.prisma.getClient('public');
     }
-    return this.schemaClient;
+    return this.objSchemaClient;
   }
 
-  async create(dto: CreateCountryDto) {
+  async create(strSchemaId: string, dto: CreateCountryDto) {
     try {
       this.logger.log(CountryProperties.service.create.start);
-      const prisma = await this.getSchemaClient();
+      const objPrisma = await this.getSchemaClient();
 
-      const country = await prisma.tbl_country.create({
+      const objCountry = await objPrisma.tbl_country.create({
         data: {
           country_name: dto.countryName,
           country_code: dto.countryCode,
         },
       });
 
-      this.logger.log(`${CountryProperties.service.create.success}: ${country.pk_country_id}`);
-      return ResponseHelper.success(country, 'Country created successfully');
+      this.logger.log(`${CountryProperties.service.create.success}: ${objCountry.pk_country_id}`);
+      await this.cache.del(CACHE_KEYS.all(strSchemaId));
+      return ResponseHelper.success(objCountry, 'Country created successfully');
     } catch (error) {
       this.logger.error(CountryProperties.service.create.error, error.stack);
       return ResponseHelper.error('Failed to create country', error.message);
     }
   }
 
-  async findAll(payload: { limit?: number; page?: number; search?: string }) {
+  async findAll(strSchemaId: string, payload: { limit?: number; page?: number; search?: string }) {
     try {
       this.logger.log(CountryProperties.service.findAll.start);
-      const prisma = await this.getSchemaClient();
 
       const page = !isNaN(Number(payload?.page)) && Number(payload?.page) > 0 ? Number(payload.page) : 1;
       const limit = !isNaN(Number(payload?.limit)) && Number(payload?.limit) > 0 ? Number(payload.limit) : 10;
 
       const whereClause: any = { is_active: true, is_delete: false };
-
       if (payload?.search) {
         whereClause.OR = [
           { country_name: { contains: payload.search, mode: 'insensitive' } },
@@ -56,21 +64,26 @@ export class CountryService {
         ];
       }
 
-      const countries = await prisma.tbl_country.findMany({
-        where: whereClause,
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: { country_name: 'asc' },
-      });
+      const arrCountries = await this.cache.getOrSet(
+        CACHE_KEYS.all(strSchemaId),
+        async () => {
+          this.logger.log('[DB Fallback] Fetching all countries from database');
+          const objPrisma = await this.getSchemaClient();
+          return objPrisma.tbl_country.findMany({
+            where: whereClause,
+            skip: (page - 1) * limit,
+            take: limit,
+            orderBy: { country_name: 'asc' },
+          });
+        },
+      );
 
-      const total = await prisma.tbl_country.count({ where: whereClause });
+      const objPrisma = await this.getSchemaClient();
+      const total = await objPrisma.tbl_country.count({ where: whereClause });
 
       this.logger.log(CountryProperties.service.findAll.success);
       return ResponseHelper.success(
-        {
-          countries,
-          pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-        },
+        { countries: arrCountries, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } },
         'Countries fetched successfully',
       );
     } catch (error) {
@@ -79,43 +92,45 @@ export class CountryService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(strSchemaId: string, strId: string) {
     try {
-      this.logger.log(`${CountryProperties.service.findOne.start}: ${id}`);
-      const prisma = await this.getSchemaClient();
+      this.logger.log(`${CountryProperties.service.findOne.start}: ${strId}`);
 
-      const country = await prisma.tbl_country.findUnique({
-        where: { pk_country_id: id, is_active: true, is_delete: false },
-        include: { cities: { where: { is_active: true, is_delete: false } } },
-      });
+      const objCountry = await this.cache.getOrSet(
+        CACHE_KEYS.one(strSchemaId, strId),
+        async () => {
+          this.logger.log(`[DB Fallback] Fetching country ${strId} from database`);
+          const objPrisma = await this.getSchemaClient();
+          return objPrisma.tbl_country.findUnique({
+            where: { pk_country_id: strId, is_active: true, is_delete: false },
+            include: { cities: { where: { is_active: true, is_delete: false } } },
+          });
+        },
+      );
 
-      if (!country) {
-        throw new NotFoundException('Country not found');
-      }
+      if (!objCountry) throw new NotFoundException('Country not found');
 
-      this.logger.log(`${CountryProperties.service.findOne.success}: ${id}`);
-      return ResponseHelper.success(country, 'Country fetched successfully');
+      this.logger.log(`${CountryProperties.service.findOne.success}: ${strId}`);
+      return ResponseHelper.success(objCountry, 'Country fetched successfully');
     } catch (error) {
-      this.logger.error(`${CountryProperties.service.findOne.error}: ${id}`, error.stack);
+      this.logger.error(`${CountryProperties.service.findOne.error}: ${strId}`, error.stack);
       throw error;
     }
   }
 
-  async update(id: string, dto: UpdateCountryDto) {
+  async update(strSchemaId: string, strId: string, dto: UpdateCountryDto) {
     try {
-      this.logger.log(`${CountryProperties.service.update.start}: ${id}`);
-      const prisma = await this.getSchemaClient();
+      this.logger.log(`${CountryProperties.service.update.start}: ${strId}`);
+      const objPrisma = await this.getSchemaClient();
 
-      const existing = await prisma.tbl_country.findUnique({
-        where: { pk_country_id: id, is_active: true, is_delete: false },
+      const objExisting = await objPrisma.tbl_country.findUnique({
+        where: { pk_country_id: strId, is_active: true, is_delete: false },
       });
 
-      if (!existing) {
-        throw new BadRequestException('Country not found');
-      }
+      if (!objExisting) throw new BadRequestException('Country not found');
 
-      const country = await prisma.tbl_country.update({
-        where: { pk_country_id: id },
+      const objUpdatedCountry = await objPrisma.tbl_country.update({
+        where: { pk_country_id: strId },
         data: {
           country_name: dto.countryName,
           country_code: dto.countryCode,
@@ -124,10 +139,15 @@ export class CountryService {
         },
       });
 
-      this.logger.log(`${CountryProperties.service.update.success}: ${id}`);
-      return ResponseHelper.success(country, 'Country updated successfully');
+      this.logger.log(`${CountryProperties.service.update.success}: ${strId}`);
+      await this.cache.update(
+        CACHE_KEYS.one(strSchemaId, strId),
+        objUpdatedCountry,
+        CACHE_KEYS.all(strSchemaId),
+      );
+      return ResponseHelper.success(objUpdatedCountry, 'Country updated successfully');
     } catch (error) {
-      this.logger.error(`${CountryProperties.service.update.error}: ${id}`, error.stack);
+      this.logger.error(`${CountryProperties.service.update.error}: ${strId}`, error.stack);
       throw error;
     }
   }

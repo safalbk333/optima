@@ -13,8 +13,8 @@ export class TemplateController {
   }
 
   @MessagePattern('template.getByCode')
-  getByCode(@Payload() templateCode: string) {
-    this.logger.log(`${TemplateProperties.controller.getByCode}: ${templateCode}`);
-    return this.templateService.getByCode(templateCode);
+  getByCode(@Payload() payload: { schemaId: string; templateCode: string }) {
+    this.logger.log(`${TemplateProperties.controller.getByCode}: ${payload.templateCode}`);
+    return this.templateService.getByCode(payload.schemaId, payload.templateCode);
   }
 }

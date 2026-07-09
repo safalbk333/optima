@@ -7,12 +7,17 @@ import { CurrencyProperties } from '../../common/properties/currency.properties'
 import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
 /**
- * Redis key constants for currency caching.
- * Keys persist indefinitely — reset only on create / update / delete.
+ * Redis key builders for currency caching.
+ *
+ * Pattern: {schemaId}:currency:all          → tenant-scoped list cache
+ *          {schemaId}:currency:{currencyId}  → tenant-scoped single-record cache
+ *
+ * Keys have NO expiry — they persist until explicitly invalidated on
+ * create / update / delete.
  */
 const CACHE_KEYS = {
-  all: 'currency:all',
-  one: (strId: string) => `currency:${strId}`,
+  all: (strSchemaId: string) => `${strSchemaId}:currency:all`,
+  one: (strSchemaId: string, strId: string) => `${strSchemaId}:currency:${strId}`,
 };
 
 @Injectable()
@@ -36,7 +41,7 @@ export class CurrencyService {
 
   // ─── Create ───────────────────────────────────────────────────────────────
 
-  async create(dto: CreateCurrencyDto) {
+  async create(strSchemaId: string, dto: CreateCurrencyDto) {
     try {
       this.logger.log(CurrencyProperties.service.create.start);
 
@@ -54,8 +59,8 @@ export class CurrencyService {
       const strCreatedId: string = objCurrency.pk_currency_id;
       this.logger.log(`${CurrencyProperties.service.create.success}: ${strCreatedId}`);
 
-      // Invalidate the "all" list so next findAll re-fetches fresh data from DB
-      await this.cache.del(CACHE_KEYS.all);
+      // Invalidate the tenant-scoped "all" list so next findAll re-fetches from DB
+      await this.cache.del(CACHE_KEYS.all(strSchemaId));
 
       return ResponseHelper.success(objCurrency, 'Currency created successfully');
     } catch (error) {
@@ -66,15 +71,18 @@ export class CurrencyService {
 
   // ─── Find All ─────────────────────────────────────────────────────────────
 
-  async findAll() {
+  async findAll(strSchemaId: string) {
     try {
       this.logger.log(CurrencyProperties.service.findAll.start);
 
       /**
        * Cache-Aside:
+       *  1. Check Redis for '{strSchemaId}:currency:all'
+       *  2. On miss → run DB callback, store result (no expiry), return it
+       *  3. If Redis is down → callback runs directly, no error thrown
        */
       const arrCurrencies = await this.cache.getOrSet(
-        CACHE_KEYS.all,
+        CACHE_KEYS.all(strSchemaId),
         async () => {
           this.logger.log('[DB Fallback] Fetching all currencies from database');
           const objPrisma = await this.getSchemaClient();
@@ -92,15 +100,18 @@ export class CurrencyService {
 
   // ─── Find One ─────────────────────────────────────────────────────────────
 
-  async findOne(strId: string) {
+  async findOne(strSchemaId: string, strId: string) {
     try {
       this.logger.log(`${CurrencyProperties.service.findOne.start}: ${strId}`);
 
       /**
        * Cache-Aside:
+       *  1. Check Redis for '{strSchemaId}:currency:{strId}'
+       *  2. On miss → fetch from DB, store in cache (no expiry)
+       *  3. If DB returns null → throw NotFoundException
        */
       const objCurrency = await this.cache.getOrSet(
-        CACHE_KEYS.one(strId),
+        CACHE_KEYS.one(strSchemaId, strId),
         async () => {
           this.logger.log(`[DB Fallback] Fetching currency ${strId} from database`);
           const objPrisma = await this.getSchemaClient();
@@ -124,7 +135,7 @@ export class CurrencyService {
 
   // ─── Update ───────────────────────────────────────────────────────────────
 
-  async update(strId: string, dto: UpdateCurrencyDto) {
+  async update(strSchemaId: string, strId: string, dto: UpdateCurrencyDto) {
     try {
       this.logger.log(`${CurrencyProperties.service.update.start}: ${strId}`);
 
@@ -155,12 +166,14 @@ export class CurrencyService {
       this.logger.log(`${CurrencyProperties.service.update.success}: ${strId}`);
 
       /**
-       * Cache update strategy (no TTL — persists until next mutation):
+       * Cache update strategy — both keys are tenant-scoped (no TTL):
+       *  - Overwrite '{strSchemaId}:currency:{strId}' with the fresh record
+       *  - Invalidate '{strSchemaId}:currency:all' so next findAll re-fetches
        */
       await this.cache.update(
-        CACHE_KEYS.one(strId),
+        CACHE_KEYS.one(strSchemaId, strId),
         objUpdatedCurrency,
-        CACHE_KEYS.all, // invalidate list cache
+        CACHE_KEYS.all(strSchemaId), // invalidate tenant list cache
       );
 
       return ResponseHelper.success(objUpdatedCurrency, 'Currency updated successfully');

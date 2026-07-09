@@ -14,26 +14,26 @@ export class CompanyController {
   }
 
   @MessagePattern('company.create')
-  create(@Payload() dto: CreateCompanyDto) {
+  create(@Payload() payload: { schemaId: string; data: CreateCompanyDto }) {
     this.logger.log(CompanyProperties.controller.create);
-    return this.companyService.create(dto);
+    return this.companyService.create(payload.schemaId, payload.data);
   }
 
   @MessagePattern('company.findAll')
-  findAll(@Payload() payload: { limit?: number; page?: number; search?: string }) {
+  findAll(@Payload() payload: { schemaId: string; limit?: number; page?: number; search?: string }) {
     this.logger.log(CompanyProperties.controller.findAll);
-    return this.companyService.findAll(payload);
+    return this.companyService.findAll(payload.schemaId, payload);
   }
 
   @MessagePattern('company.findOne')
-  findOne(@Payload() data: { id: string }) {
-    this.logger.log(`${CompanyProperties.controller.findOne}: ${data.id}`);
-    return this.companyService.findOne(data.id);
+  findOne(@Payload() payload: { schemaId: string; id: string }) {
+    this.logger.log(`${CompanyProperties.controller.findOne}: ${payload.id}`);
+    return this.companyService.findOne(payload.schemaId, payload.id);
   }
 
   @MessagePattern('company.update')
-  update(@Payload() payload: { id: string; data: UpdateCompanyDto }) {
+  update(@Payload() payload: { schemaId: string; id: string; data: UpdateCompanyDto }) {
     this.logger.log(`${CompanyProperties.controller.update}: ${payload.id}`);
-    return this.companyService.update(payload.id, payload.data);
+    return this.companyService.update(payload.schemaId, payload.id, payload.data);
   }
 }

@@ -1,115 +1,68 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiBody,
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateItemDto, UpdateItemDto } from './dto/create-item.dto';
 import { ItemGatewayService } from './item.service';
+import { SchemaId } from '../../guards/decorators/schema-id.decorator';
 
 @ApiTags('Item-Service')
 @Controller('item')
 export class ItemController {
-  constructor(
-    private readonly itemService: ItemGatewayService,
-  ) { }
+  constructor(private readonly itemService: ItemGatewayService) {}
 
   @Post()
-  @ApiOperation({
-    summary: 'Create a new item',
-  })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Item created successfully',
-  })
-  create(@Body() data: CreateItemDto) {
-    return this.itemService.create(data);
+  @ApiOperation({ summary: 'Create a new item' })
+  @ApiResponse({ status: 200, description: 'Item created successfully' })
+  @ApiBody({ type: CreateItemDto })
+  create(
+    @SchemaId() schemaId: string,
+    @Body() data: CreateItemDto,
+  ) {
+    return this.itemService.create(schemaId, data);
   }
 
   @Get()
-  @ApiOperation({
-    summary: 'Get all items',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Item list fetched successfully',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description: 'Number of items per page',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Page number',
-  })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    description: 'Search by Item name, Item code, or HSN code',
-  })
-  @ApiQuery({
-    name: 'category_id',
-    required: false,
-    type: String,
-    description: 'Filter by category ID',
-  })
-  @ApiQuery({
-    name: 'category_name',
-    required: false,
-    type: String,
-    description: 'Search items by category name',
-  })
+  @ApiOperation({ summary: 'Get all items' })
+  @ApiResponse({ status: 200, description: 'Item list fetched successfully' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search by item name, code or HSN code' })
+  @ApiQuery({ name: 'category_id', required: false, type: String })
+  @ApiQuery({ name: 'category_name', required: false, type: String })
   findAll(
+    @SchemaId() schemaId: string,
     @Query('limit') limit?: number,
     @Query('page') page?: number,
     @Query('search') search?: string,
     @Query('category_id') category_id?: string,
     @Query('category_name') category_name?: string,
   ) {
-    const payload = {
+    return this.itemService.findAll(schemaId, {
       limit: limit ? Number(limit) : undefined,
       page: page ? Number(page) : undefined,
       search,
       category_id,
       category_name,
-    };
-
-    return this.itemService.findAll(payload);
+    });
   }
 
   @Get(':id')
-  @ApiOperation({
-    summary: 'Get item by id',
-  })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Item fetched successfully',
-  })
-  findOne(@Param('id') id: string) {
-    return this.itemService.findOne(id);
+  @ApiOperation({ summary: 'Get item by id' })
+  @ApiResponse({ status: 200, description: 'Item fetched successfully' })
+  findOne(
+    @SchemaId() schemaId: string,
+    @Param('id') id: string,
+  ) {
+    return this.itemService.findOne(schemaId, id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update an Item' })
+  @ApiOperation({ summary: 'Update an item' })
   @ApiResponse({ status: 200, description: 'Item updated successfully' })
-  update(@Param('id') id: string, @Body() data: UpdateItemDto) {
-    return this.itemService.update(id, data);
+  update(
+    @SchemaId() schemaId: string,
+    @Param('id') id: string,
+    @Body() data: UpdateItemDto,
+  ) {
+    return this.itemService.update(schemaId, id, data);
   }
 }
