@@ -8,6 +8,7 @@ import { firstValueFrom } from 'rxjs';
 import { CreateVendorDto, UpdateVendorDto } from './dto/create-vendor.dto';
 import { VENDOR_PATTERN } from './vendor.pattern';
 import { Multer } from 'multer';
+import { UploadVendorDocumentDto } from './dto/upload-document.dto';
 
 @Injectable()
 export class VendorGatewayService {
@@ -96,30 +97,25 @@ export class VendorGatewayService {
     }
   }
 
-  // async bulkUpload(file: Multer.File) {
-  //   try {
-  //     const result = firstValueFrom(
-  //       this.client.send(
-  //         VENDOR_PATTERN.UPLOAD,
-  //         // { cmd: 'vendor.bulkUpload' },
-  //         {
-  //           originalname: file.originalname,
-  //           mimetype: file.mimetype,
-  //           buffer: file.buffer,
-  //         },
-  //       ),
-  //     );
-  //     if (result.errorReport) {
-  //       result.errorReport = Buffer.from(
-  //         result.errorReport,
-  //         'base64',
-  //       );
-  //     }
-
-  //     return result;
-  //   } catch (error) {
-  //     this.logger.error(error.message, error);
-  //     throw error;
-  //   }
-  // }
+  async uploadVendorDocument(
+    vendorId: string,
+    dto: UploadVendorDocumentDto,
+    file: Multer.File,
+  ) {
+    return await firstValueFrom(
+      this.client.send(
+        VENDOR_PATTERN.UPLOAD_DOCUMENT,
+        {
+          vendorId,
+          documentType: dto.documentType,
+          file: {
+            originalname: file.originalname,
+            mimetype: file.mimetype,
+            size: file.size,
+            buffer: file.buffer.toString('base64'),
+          },
+        },
+      ),
+    );
+  }
 }

@@ -11,15 +11,25 @@ import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 import { Vendor_status } from '../constant/enum';
 import * as XLSX from 'xlsx';
 import { Multer } from 'multer';
+import { UploadVendorDocumentDto } from './dto/upload-document.dto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class VendorService {
   private readonly logger = new AppLogger(VendorService.name);
   private schemaClient: any;
+  // private readonly s3: S3;
 
   constructor(
     private readonly prisma: PrismaService,
-  ) { }
+  ) {
+    //  this.s3 = new S3({
+    //   region: process.env.AWS_REGION,
+    //   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    //   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    // });
+  }
 
   private async getSchemaClient() {
     if (!this.schemaClient) {
@@ -688,65 +698,93 @@ export class VendorService {
     }
   }
 
-  // async bulkUpload(payload: any) {
-  //   try {
-  //     if (!payload) {
-  //       throw new BadRequestException('No file uploaded');
-  //     }
+  async uploadVendorDocument(payload: any) {
+    const prisma = await this.getSchemaClient();
 
-  //     const prisma = await this.getSchemaClient();
+    const { vendorId, documentType, file } = payload;
 
-  //     const buffer = Buffer.from(payload.buffer.data);
-  //     const workbook = XLSX.read(buffer, {
-  //       type: 'buffer',
-  //     });
+    // Validate vendor
+    const vendor = await prisma.tbl_vendor.findUnique({
+      where: {
+        pk_vendor_id: vendorId,
+      },
+    });
 
-  //     const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    if (!vendor) {
+      throw new BadRequestException('Vendor not found');
+    }
 
-  //     const rows = XLSX.utils.sheet_to_json(sheet, {
-  //       defval: '',
-  //     });
+    // Validate file
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
 
-  //     if (!rows.length) {
-  //       throw new BadRequestException('Excel file is empty');
-  //     }
+    const allowedMimeTypes = [
+      'application/pdf',
+      'image/jpeg',
+      'image/png',
+    ];
 
-  //     const vendorData = rows.map((row) => ({
-  //       company_legal_name: row['Company Legal Name'],
-  //       trading_name: row['Trading Name'],
-  //       contact_person: row['Contact Person'],
-  //       email: row['Email'],
-  //       phone: String(row['Phone']),
-  //       company_type: row['Company Type'],
-  //       year_of_establishment: Number(row['Year Of Establishment']),
-  //       office_address: row['Office Address'],
-  //       GST_number: row['GST Number'],
-  //       PAN_number: row['PAN Number'],
-  //       MSME_status: row['MSME Status'],
-  //       bank: row['Bank'],
-  //       nature_of_business: row['Nature of Business'],
-  //       categories_of_supply: row['Categories of Supply'],
-  //       fk_country_id: row['Country Id'],
-  //       fk_city_id: row['City Id'],
-  //       status: row['Status'],
-  //       notes: row['Notes'],
-  //     }));
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException(
+        'Only PDF, JPG and PNG files are allowed',
+      );
+    }
 
-  //     const result = await prisma.tbl_vendor.createMany({
-  //       data: vendorData,
-  //       skipDuplicates: true,
-  //     });
+    if (file.size > 5 * 1024 * 1024) {
+      throw new BadRequestException(
+        'Maximum file size is 5 MB',
+      );
+    }
 
-  //     return {
-  //       success: true,
-  //       totalRows: rows.length,
-  //       inserted: result.count,
-  //     };
-  //   } catch (error) {
-  //     this.logger.error(
-  //       error.stack,
-  //     );
-  //     throw error;
-  //   }
-  // }
+    // Create upload directory if it doesn't exist
+    const uploadDir = path.join(
+      process.cwd(),
+      'uploads',
+      'vendor-documents',
+      vendorId,
+    );
+
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    // Generate unique file name
+    const fileName = `${Date.now()}-${file.originalname}`;
+
+    const filePath = path.join(uploadDir, fileName);
+
+    // Save file locally
+    const buffer = Buffer.from(file.buffer, 'base64');
+
+    fs.writeFileSync(filePath, buffer);
+
+    // Save metadata in database
+    const document = await prisma.tbl_vendor_document.create({
+      data: {
+        fk_vendor_id: vendorId,
+        document_type: documentType,
+        file_name: fileName,
+        original_file_name: file.originalname,
+        file_size: file.size,
+        mime_type: file.mimetype,
+        file_url: filePath, // or store relative path
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Document uploaded successfully',
+      data: {
+        documentId: document.pk_document_id,
+        vendorId,
+        documentType,
+        originalFileName: file.originalname,
+        mimeType: file.mimetype,
+        fileSize: file.size,
+        referenceUrl: filePath,
+        uploadedAt: document.uploaded_at,
+      },
+    };
+  }
 }

@@ -331,12 +331,26 @@ model tbl_vendor {
   created_by                tbl_user?                 @relation("vendor_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by               tbl_user?                 @relation("vendor_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   shipments                 tbl_shipment[]
-  company                   tbl_company?              @relation("vendor_company", fields: [fk_company_id], references: [pk_company_id])
-
-  rate_cards          tbl_rate_card[]
-  vendor_item_prices  tbl_vendor_item_price[]
+  company                   tbl_company?              @relation("vendor_company", fields: [fk_company_id], references: [pk_company_id])           
+  rate_cards                tbl_rate_card[]
+  vendor_item_prices        tbl_vendor_item_price[]
+  vendor_document           tbl_vendor_document[] 
 
   @@map("tbl_vendor")
+}
+
+model tbl_vendor_document {
+  pk_document_id      String   @id @default(uuid())
+  fk_vendor_id        String
+  document_type       String
+  file_name           String
+  original_file_name  String
+  file_size           Int
+  mime_type           String
+  file_url            String
+  uploaded_at         DateTime @default(now())
+
+  vendor tbl_vendor @relation(fields: [fk_vendor_id], references: [pk_vendor_id])
 }
 
 model tbl_item {
