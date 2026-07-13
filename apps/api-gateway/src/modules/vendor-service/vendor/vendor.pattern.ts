@@ -5,4 +5,5 @@ export const VENDOR_PATTERN = {
   UPDATE: 'vendor.update',
   DELETE: 'vendor.delete',
   UPLOAD: 'vendor.upload',
+  UPLOAD_DOCUMENT: 'vendor.documentUpload',
 };

@@ -1,12 +1,20 @@
 const { Pool } = require("pg");
 const crypto = require("crypto");
 
+// const pool = new Pool({
+//   host: "localhost",
+//   port: 5432,
+//   database: "optima_app",
+//   user: "postgres",
+//   password: "postgres",
+// });
+
 const pool = new Pool({
-  host: "localhost",
+  host: "aws-1-ap-southeast-1.pooler.supabase.com",
   port: 5432,
-  database: "optima_app",
-  user: "postgres",
-  password: "postgres",
+  database: "postgres",
+  user: "postgres.zigydrirusbryrcfjbtf",
+  password: "8whT9db9NY69ZMaG",
 });
 
 async function executeQuery(query, params = []) {

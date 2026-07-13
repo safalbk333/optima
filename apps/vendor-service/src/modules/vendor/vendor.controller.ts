@@ -62,4 +62,9 @@ export class VendorController {
   ) {
     return this.vendorService.bulkUpload(payload);
   }
+
+  @MessagePattern('vendor.documentUpload')
+  async uploadVendorDocument(payload: any) {
+    return this.vendorService.uploadVendorDocument(payload);
+  }
 }
