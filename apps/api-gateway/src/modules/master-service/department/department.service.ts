@@ -16,10 +16,10 @@ export class DepartmentGatewayService {
     this.logger = new Logger(DepartmentGatewayService.name);
   }
 
-  async create(data: CreateDepartmentDto) {
+  async create(strSchemaId: string, data: CreateDepartmentDto) {
     try {
       return await firstValueFrom(
-        this.client.send(DEPARTMENT_PATTERN.CREATE, data),
+        this.client.send(DEPARTMENT_PATTERN.CREATE, { schemaId: strSchemaId, data }),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -27,10 +27,10 @@ export class DepartmentGatewayService {
     }
   }
 
-  async findAll(payload: { limit?: number; page?: number; search?: string }) {
+  async findAll(strSchemaId: string, payload: { limit?: number; page?: number; search?: string }) {
     try {
       return await firstValueFrom(
-        this.client.send(DEPARTMENT_PATTERN.FIND_ALL, payload),
+        this.client.send(DEPARTMENT_PATTERN.FIND_ALL, { schemaId: strSchemaId, ...payload }),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -38,10 +38,10 @@ export class DepartmentGatewayService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(strSchemaId: string, id: string) {
     try {
       return await firstValueFrom(
-        this.client.send(DEPARTMENT_PATTERN.FIND_ONE, { id }),
+        this.client.send(DEPARTMENT_PATTERN.FIND_ONE, { schemaId: strSchemaId, id }),
       );
     } catch (error) {
       this.logger.error(error.message, error);
@@ -49,10 +49,10 @@ export class DepartmentGatewayService {
     }
   }
 
-  async update(id: string, data: UpdateDepartmentDto) {
+  async update(strSchemaId: string, id: string, data: UpdateDepartmentDto) {
     try {
       return await firstValueFrom(
-        this.client.send(DEPARTMENT_PATTERN.UPDATE, { id, data }),
+        this.client.send(DEPARTMENT_PATTERN.UPDATE, { schemaId: strSchemaId, id, data }),
       );
     } catch (error) {
       this.logger.error(error.message, error);

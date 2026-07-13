@@ -15,26 +15,26 @@ export class DepartmentController {
   }
 
   @MessagePattern('department.create')
-  create(@Payload() dto: CreateDepartmentDto) {
+  create(@Payload() payload: { schemaId: string; data: CreateDepartmentDto }) {
     this.logger.log(DepartmentProperties.controller.create);
-    return this.departmentService.create(dto);
+    return this.departmentService.create(payload.schemaId, payload.data);
   }
 
   @MessagePattern('department.findAll')
-  findAll(@Payload() payload: { limit?: number; page?: number; search?: string }) {
+  findAll(@Payload() payload: { schemaId: string; limit?: number; page?: number; search?: string }) {
     this.logger.log(DepartmentProperties.controller.findAll);
-    return this.departmentService.findAll(payload);
+    return this.departmentService.findAll(payload.schemaId, payload);
   }
 
   @MessagePattern('department.findOne')
-  findOne(@Payload() data: { id: string }) {
-    this.logger.log(`${DepartmentProperties.controller.findOne}: ${data.id}`);
-    return this.departmentService.findOne(data.id);
+  findOne(@Payload() payload: { schemaId: string; id: string }) {
+    this.logger.log(`${DepartmentProperties.controller.findOne}: ${payload.id}`);
+    return this.departmentService.findOne(payload.schemaId, payload.id);
   }
 
   @MessagePattern('department.update')
-  update(@Payload() payload: { id: string; data: UpdateDepartmentDto }) {
+  update(@Payload() payload: { schemaId: string; id: string; data: UpdateDepartmentDto }) {
     this.logger.log(`${DepartmentProperties.controller.update}: ${payload.id}`);
-    return this.departmentService.update(payload.id, payload.data);
+    return this.departmentService.update(payload.schemaId, payload.id, payload.data);
   }
 }

@@ -14,26 +14,26 @@ export class CityController {
   }
 
   @MessagePattern('city.create')
-  create(@Payload() dto: CreateCityDto) {
+  create(@Payload() payload: { schemaId: string; data: CreateCityDto }) {
     this.logger.log(CityProperties.controller.create);
-    return this.cityService.create(dto);
+    return this.cityService.create(payload.schemaId, payload.data);
   }
 
   @MessagePattern('city.findAll')
-  findAll(@Payload() payload: { limit?: number; page?: number; search?: string; countryId?: string }) {
+  findAll(@Payload() payload: { schemaId: string; limit?: number; page?: number; search?: string; countryId?: string }) {
     this.logger.log(CityProperties.controller.findAll);
-    return this.cityService.findAll(payload);
+    return this.cityService.findAll(payload.schemaId, payload);
   }
 
   @MessagePattern('city.findOne')
-  findOne(@Payload() data: { id: string }) {
-    this.logger.log(`${CityProperties.controller.findOne}: ${data.id}`);
-    return this.cityService.findOne(data.id);
+  findOne(@Payload() payload: { schemaId: string; id: string }) {
+    this.logger.log(`${CityProperties.controller.findOne}: ${payload.id}`);
+    return this.cityService.findOne(payload.schemaId, payload.id);
   }
 
   @MessagePattern('city.update')
-  update(@Payload() payload: { id: string; data: UpdateCityDto }) {
+  update(@Payload() payload: { schemaId: string; id: string; data: UpdateCityDto }) {
     this.logger.log(`${CityProperties.controller.update}: ${payload.id}`);
-    return this.cityService.update(payload.id, payload.data);
+    return this.cityService.update(payload.schemaId, payload.id, payload.data);
   }
 }
