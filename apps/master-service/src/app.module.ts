@@ -12,6 +12,7 @@ import { CurrencyModule } from './modules/currency/currency.module';
 import { CountryModule } from './modules/country/country.module';
 import { CityModule } from './modules/city/city.module';
 import { CompanyModule } from './modules/company/company.module';
+import { BudgetModule } from './modules/budget/budget.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CompanyModule } from './modules/company/company.module';
     CountryModule,
     CityModule,
     CompanyModule,
+    BudgetModule
   ],
 
   controllers: [AppController],

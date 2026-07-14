@@ -42,3 +42,4 @@ temp/
 scripts/python/create-role.py
 .continue/mcpServers/new-mcp-server.yaml
 env-export.json
+env.bat
