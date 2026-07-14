@@ -57,6 +57,8 @@ import { RateCardItemGatewayController } from './modules/request-service/rate-ca
 import { RateCardGatewayController } from './modules/request-service/rate-card/rate-card.controller';
 import { RateCardGatewayService } from './modules/request-service/rate-card/rate-card.service';
 import { TierPriceGatewayController } from './modules/request-service/rate-card/tier-price.controller';
+import {  BudgetGatewayController } from './modules/master-service/budget/budget.controller';
+import { BudgetGatewayService } from './modules/master-service/budget/budget.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
  
@@ -160,6 +162,9 @@ ConfigModule.forRoot({
     RateCardItemGatewayController,
     RateCardGatewayController,
     TierPriceGatewayController,
+BudgetGatewayController
+
+    
     
 
   ],
@@ -186,7 +191,8 @@ ConfigModule.forRoot({
     CountryGatewayService,
     CityGatewayService,
     CompanyGatewayService,
-    RateCardGatewayService
+    RateCardGatewayService,
+    BudgetGatewayService
     
   ],
 })

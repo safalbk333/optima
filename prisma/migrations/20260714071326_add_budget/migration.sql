@@ -2,13 +2,35 @@
   Warnings:
 
   - You are about to drop the column `is_active` on the `tbl_vendor` table. All the data in the column will be lost.
+  - A unique constraint covering the columns `[GST_number]` on the table `tbl_vendor` will be added. If there are existing duplicate values, this will fail.
+  - A unique constraint covering the columns `[PAN_number]` on the table `tbl_vendor` will be added. If there are existing duplicate values, this will fail.
+  - Added the required column `bank` to the `tbl_vendor` table without a default value. This is not possible if the table is not empty.
   - Added the required column `status` to the `tbl_vendor` table without a default value. This is not possible if the table is not empty.
+  - Changed the type of `year_of_establishment` on the `tbl_vendor` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
 
 */
 -- AlterTable
 ALTER TABLE "tbl_vendor" DROP COLUMN "is_active",
-ADD COLUMN     "bank" INTEGER,
-ADD COLUMN     "status" TEXT NOT NULL;
+ADD COLUMN     "bank" TEXT NOT NULL,
+ADD COLUMN     "notes" TEXT,
+ADD COLUMN     "status" TEXT NOT NULL,
+DROP COLUMN "year_of_establishment",
+ADD COLUMN     "year_of_establishment" INTEGER NOT NULL;
+
+-- CreateTable
+CREATE TABLE "tbl_vendor_document" (
+    "pk_document_id" TEXT NOT NULL,
+    "fk_vendor_id" TEXT NOT NULL,
+    "document_type" TEXT NOT NULL,
+    "file_name" TEXT NOT NULL,
+    "original_file_name" TEXT NOT NULL,
+    "file_size" INTEGER NOT NULL,
+    "mime_type" TEXT NOT NULL,
+    "file_url" TEXT NOT NULL,
+    "uploaded_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "tbl_vendor_document_pkey" PRIMARY KEY ("pk_document_id")
+);
 
 -- CreateTable
 CREATE TABLE "tbl_currency" (
@@ -103,6 +125,40 @@ CREATE TABLE "tbl_vendor_item_price" (
     CONSTRAINT "tbl_vendor_item_price_pkey" PRIMARY KEY ("pk_vendor_item_price_id")
 );
 
+-- CreateTable
+CREATE TABLE "tbl_budget" (
+    "pk_budget_id" TEXT NOT NULL,
+    "budget_code" TEXT NOT NULL,
+    "budget_name" TEXT NOT NULL,
+    "fiscal_year" INTEGER NOT NULL,
+    "allocated_amount" DECIMAL(18,2) NOT NULL,
+    "consumed_amount" DECIMAL(18,2) NOT NULL DEFAULT 0,
+    "available_amount" DECIMAL(18,2) NOT NULL,
+    "fk_department_id" TEXT,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "created" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "modified" TIMESTAMP(3),
+    "fk_created_id" TEXT,
+    "fk_modified_id" TEXT,
+
+    CONSTRAINT "tbl_budget_pkey" PRIMARY KEY ("pk_budget_id")
+);
+
+-- CreateTable
+CREATE TABLE "tbl_budget_validation" (
+    "pk_budget_validation_id" TEXT NOT NULL,
+    "fk_budget_id" TEXT NOT NULL,
+    "fk_request_id" TEXT NOT NULL,
+    "fk_validated_by" TEXT,
+    "requested_amount" DECIMAL(18,2) NOT NULL,
+    "available_amount" DECIMAL(18,2) NOT NULL,
+    "is_override" BOOLEAN NOT NULL DEFAULT false,
+    "override_reason" TEXT,
+    "validated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "tbl_budget_validation_pkey" PRIMARY KEY ("pk_budget_validation_id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "tbl_currency_currency_code_key" ON "tbl_currency"("currency_code");
 
@@ -154,6 +210,30 @@ CREATE INDEX "tbl_vendor_item_price_fk_item_id_idx" ON "tbl_vendor_item_price"("
 -- CreateIndex
 CREATE UNIQUE INDEX "tbl_vendor_item_price_fk_vendor_id_fk_item_id_is_active_key" ON "tbl_vendor_item_price"("fk_vendor_id", "fk_item_id", "is_active");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "tbl_budget_budget_code_key" ON "tbl_budget"("budget_code");
+
+-- CreateIndex
+CREATE INDEX "tbl_budget_budget_code_idx" ON "tbl_budget"("budget_code");
+
+-- CreateIndex
+CREATE INDEX "tbl_budget_fiscal_year_idx" ON "tbl_budget"("fiscal_year");
+
+-- CreateIndex
+CREATE INDEX "tbl_budget_validation_fk_budget_id_idx" ON "tbl_budget_validation"("fk_budget_id");
+
+-- CreateIndex
+CREATE INDEX "tbl_budget_validation_fk_request_id_idx" ON "tbl_budget_validation"("fk_request_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tbl_vendor_GST_number_key" ON "tbl_vendor"("GST_number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tbl_vendor_PAN_number_key" ON "tbl_vendor"("PAN_number");
+
+-- AddForeignKey
+ALTER TABLE "tbl_vendor_document" ADD CONSTRAINT "tbl_vendor_document_fk_vendor_id_fkey" FOREIGN KEY ("fk_vendor_id") REFERENCES "tbl_vendor"("pk_vendor_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 -- AddForeignKey
 ALTER TABLE "tbl_rate_card" ADD CONSTRAINT "tbl_rate_card_fk_vendor_id_fkey" FOREIGN KEY ("fk_vendor_id") REFERENCES "tbl_vendor"("pk_vendor_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -195,3 +275,21 @@ ALTER TABLE "tbl_vendor_item_price" ADD CONSTRAINT "tbl_vendor_item_price_fk_rat
 
 -- AddForeignKey
 ALTER TABLE "tbl_vendor_item_price" ADD CONSTRAINT "tbl_vendor_item_price_fk_rate_card_item_id_fkey" FOREIGN KEY ("fk_rate_card_item_id") REFERENCES "tbl_rate_card_item"("pk_rate_card_item_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tbl_budget" ADD CONSTRAINT "tbl_budget_fk_created_id_fkey" FOREIGN KEY ("fk_created_id") REFERENCES "tbl_user"("pk_user_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tbl_budget" ADD CONSTRAINT "tbl_budget_fk_modified_id_fkey" FOREIGN KEY ("fk_modified_id") REFERENCES "tbl_user"("pk_user_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tbl_budget" ADD CONSTRAINT "tbl_budget_fk_department_id_fkey" FOREIGN KEY ("fk_department_id") REFERENCES "tbl_department"("pk_department_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tbl_budget_validation" ADD CONSTRAINT "tbl_budget_validation_fk_budget_id_fkey" FOREIGN KEY ("fk_budget_id") REFERENCES "tbl_budget"("pk_budget_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tbl_budget_validation" ADD CONSTRAINT "tbl_budget_validation_fk_request_id_fkey" FOREIGN KEY ("fk_request_id") REFERENCES "tbl_purchase_request"("pk_request_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tbl_budget_validation" ADD CONSTRAINT "tbl_budget_validation_fk_validated_by_fkey" FOREIGN KEY ("fk_validated_by") REFERENCES "tbl_user"("pk_user_id") ON DELETE SET NULL ON UPDATE CASCADE;
