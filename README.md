@@ -140,3 +140,6 @@ npm run start:vendor:dev
 npm run start:request:dev              
 npm run start:master:dev   
 npm run start:shipment:dev
+
+build commands
+.\env.bat pro ;docker compose down ;docker compose build ;docker compose up -d

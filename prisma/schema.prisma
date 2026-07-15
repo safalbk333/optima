@@ -91,6 +91,13 @@ model tbl_user {
   vendors_created              tbl_vendor[]                        @relation("vendor_created_by")
   vendors_modified             tbl_vendor[]                        @relation("vendor_modified_by")
   company                      tbl_company?                        @relation("user_company", fields: [fk_company_id], references: [pk_company_id]) 
+ 
+  budgets_created        tbl_budget[] @relation("budget_created_by")
+
+  budgets_modified       tbl_budget[] @relation("budget_modified_by")
+
+  budget_validations     tbl_budget_validation[] @relation("budget_validator")
+ 
   rate_cards_created       tbl_rate_card[] @relation("rate_card_created_by")
   rate_cards_modified      tbl_rate_card[] @relation("rate_card_modified_by")
 
@@ -190,7 +197,7 @@ model tbl_department {
   created_by           tbl_user?              @relation("department_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by          tbl_user?              @relation("department_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   purchase_requests    tbl_purchase_request[]
-
+  budgets tbl_budget[]
   @@map("tbl_department")
 }
 
@@ -412,7 +419,7 @@ model tbl_purchase_request {
   attachments              tbl_request_attachments[]
   rfqs                     tbl_request_for_quotation[]
   request_histories        tbl_request_history[]
-
+  budget_validations tbl_budget_validation[]
   @@index([fk_requested_by_id])
   @@index([request_number])
   @@map("tbl_purchase_request")
@@ -1159,4 +1166,66 @@ model tbl_vendor_item_price {
   @@index([fk_item_id])
 
   @@map("tbl_vendor_item_price")
+}
+
+
+model tbl_budget {
+  pk_budget_id        String   @id @default(uuid())
+
+  budget_code         String   @unique
+  budget_name         String
+
+  fiscal_year         Int
+
+  allocated_amount    Decimal  @db.Decimal(18,2)
+  consumed_amount     Decimal  @default(0) @db.Decimal(18,2)
+  available_amount    Decimal  @db.Decimal(18,2)
+
+  fk_department_id    String?
+
+  is_active           Boolean  @default(true)
+
+  created             DateTime @default(now())
+  modified            DateTime?
+
+  fk_created_id       String?
+  fk_modified_id      String?
+
+  created_by          tbl_user? @relation("budget_created_by", fields: [fk_created_id], references: [pk_user_id])
+  modified_by         tbl_user? @relation("budget_modified_by", fields: [fk_modified_id], references: [pk_user_id])
+
+  department          tbl_department? @relation(fields: [fk_department_id], references: [pk_department_id])
+
+  validations         tbl_budget_validation[]
+
+  @@index([budget_code])
+  @@index([fiscal_year])
+  @@map("tbl_budget")
+}
+model tbl_budget_validation {
+
+  pk_budget_validation_id String @id @default(uuid())
+
+  fk_budget_id         String
+  fk_request_id        String
+  fk_validated_by      String?
+
+  requested_amount     Decimal @db.Decimal(18,2)
+  available_amount     Decimal @db.Decimal(18,2)
+
+  is_override          Boolean @default(false)
+  override_reason      String?
+
+  validated_at         DateTime @default(now())
+
+  budget      tbl_budget @relation(fields: [fk_budget_id], references: [pk_budget_id])
+
+  request     tbl_purchase_request @relation(fields: [fk_request_id], references: [pk_request_id])
+
+  validator   tbl_user? @relation("budget_validator",fields: [fk_validated_by],references: [pk_user_id])
+
+  @@index([fk_budget_id])
+  @@index([fk_request_id])
+
+  @@map("tbl_budget_validation")
 }
