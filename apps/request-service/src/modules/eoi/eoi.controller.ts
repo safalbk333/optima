@@ -115,7 +115,7 @@ findByVendorId(
   // CHANGE STATUS
   // =========================================================
 
-  @MessagePattern('eoi.changeStatus')
+  @MessagePattern('eoi.updateStatus')
   changeStatus(
     @Payload()
     payload: {
