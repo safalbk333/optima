@@ -479,10 +479,10 @@ model tbl_approval_level {
   pk_approval_level_id     String         @id @default(uuid())
   approval_level           String         @unique
   description              String?
-  order                    Int
-  is_active                Boolean        @default(true)
   min_amount               Decimal
   max_amount               Decimal?
+  approver_roles           Json
+  is_active                Boolean        @default(true)
   created                  DateTime       @default(now())
   modified                 DateTime?
   fk_created_id            String?

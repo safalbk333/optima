@@ -34,7 +34,7 @@ import { GoodsReceiptController } from './modules/request-service/goods-receipt/
 import { GoodsReceiptGatewayService } from './modules/request-service/goods-receipt/goods-receipt.service';
 import { DepartmentController } from './modules/master-service/department/department.controller';
 import { DepartmentGatewayService } from './modules/master-service/department/department.service';
- 
+
 import { TemplateController } from './modules/template/template.controller';
 import { TemplateGatewayService } from './modules/template/template.service';
 import { InvoiceController } from './modules/shipment-service/invoice/invoice.controller';
@@ -57,19 +57,21 @@ import { RateCardItemGatewayController } from './modules/request-service/rate-ca
 import { RateCardGatewayController } from './modules/request-service/rate-card/rate-card.controller';
 import { RateCardGatewayService } from './modules/request-service/rate-card/rate-card.service';
 import { TierPriceGatewayController } from './modules/request-service/rate-card/tier-price.controller';
-import {  BudgetGatewayController } from './modules/master-service/budget/budget.controller';
+import { BudgetGatewayController } from './modules/master-service/budget/budget.controller';
 import { BudgetGatewayService } from './modules/master-service/budget/budget.service';
+import { ApprovalLevelController } from './modules/request-service/approval/approval.controller';
+import { ApprovalLevelGatewayService } from './modules/request-service/approval/approval.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
- 
+
 @Module({
   imports: [
     // ✅ ENV Configuration
-ConfigModule.forRoot({
-  isGlobal: true,
-  envFilePath: `apps/api-gateway/.env.${process.env.NODE_ENV || 'development'}`,
-}),
- 
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `apps/api-gateway/.env.${process.env.NODE_ENV || 'development'}`,
+    }),
+
     // ✅ TCP Microservice Clients
     ClientsModule.register([
       {
@@ -130,7 +132,7 @@ ConfigModule.forRoot({
       },
     ]),
   ],
- 
+
   controllers: [
     AppController,
     VendorController,
@@ -162,13 +164,10 @@ ConfigModule.forRoot({
     RateCardItemGatewayController,
     RateCardGatewayController,
     TierPriceGatewayController,
-BudgetGatewayController
-
-    
-    
-
+    BudgetGatewayController,
+    ApprovalLevelController,
   ],
- 
+
   providers: [
     AppService,
     VendorGatewayService,
@@ -192,28 +191,28 @@ BudgetGatewayController
     CityGatewayService,
     CompanyGatewayService,
     RateCardGatewayService,
-    BudgetGatewayService
-    
+    BudgetGatewayService,
+    ApprovalLevelGatewayService,
   ],
 })
 export class AppModule {
   constructor() {
- 
-        // ✅ Log loaded env values
+
+    // ✅ Log loaded env values
     console.log('================ ENV VALUES ================');
- 
+
     console.log('VENDOR_SERVICE_HOST =>', process.env.VENDOR_SERVICE_HOST);
     console.log('VENDOR_SERVICE_PORT =>', process.env.VENDOR_SERVICE_PORT);
- 
+
     console.log('MASTER_SERVICE_HOST =>', process.env.MASTER_SERVICE_HOST);
     console.log('MASTER_SERVICE_PORT =>', process.env.MASTER_SERVICE_PORT);
- 
+
     console.log('REQUEST_SERVICE_HOST =>', process.env.REQUEST_SERVICE_HOST);
     console.log('REQUEST_SERVICE_PORT =>', process.env.REQUEST_SERVICE_PORT);
- 
+
     console.log('AUTH_SERVICE_HOST =>', process.env.AUTH_SERVICE_HOST);
     console.log('AUTH_SERVICE_PORT =>', process.env.AUTH_SERVICE_PORT);
- 
+
     console.log(
       'CONTRACTS_SERVICE_HOST =>',
       process.env.CONTRACTS_SERVICE_HOST,
@@ -227,4 +226,4 @@ export class AppModule {
     console.log('USER_SERVICE_PORT =>', process.env.USER_SERVICE_PORT);
 
   }
- }
+}

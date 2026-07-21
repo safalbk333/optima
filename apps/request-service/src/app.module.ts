@@ -10,6 +10,7 @@ import { QuotationModule } from './modules/quotation/quotation.module';
 import { PurchaseOrderModule } from './modules/purchase-order/purchase-order.module';
 import { GoodsReceiptModule } from './modules/goods-receipt/goods-receipt.module';
 import { RateCardModule } from './modules/rate-card/rate-card.module';
+import { ApprovalModule } from './modules/approval/approval.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { RateCardModule } from './modules/rate-card/rate-card.module';
     PurchaseOrderModule,
     GoodsReceiptModule,
     RateCardModule,
+    ApprovalModule,
   ],
 
   controllers: [AppController],
