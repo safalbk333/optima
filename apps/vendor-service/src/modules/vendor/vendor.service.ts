@@ -19,17 +19,10 @@ import * as path from 'path';
 export class VendorService {
   private readonly logger = new AppLogger(VendorService.name);
   private schemaClient: any;
-  // private readonly s3: S3;
 
   constructor(
     private readonly prisma: PrismaService,
-  ) {
-    //  this.s3 = new S3({
-    //   region: process.env.AWS_REGION,
-    //   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    //   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    // });
-  }
+  ) {}
 
   private async getSchemaClient() {
     if (!this.schemaClient) {

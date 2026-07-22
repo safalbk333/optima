@@ -476,18 +476,18 @@ model tbl_approval {
 }
 
 model tbl_approval_level {
-  pk_approval_level_id String         @id @default(uuid())
-  approval_level       String         @unique
-  description          String?
-  order                Int
-  is_active            Boolean        @default(true)
-  from_amount          Float
-  to_amount            Float
-  created              DateTime       @default(now())
-  modified             DateTime?
-  fk_created_id        String?
-  fk_modified_id       String?
-  is_delete            Boolean         @default(false)
+  pk_approval_level_id     String         @id @default(uuid())
+  approval_level           String         @unique
+  description              String?
+  min_amount               Decimal
+  max_amount               Decimal?
+  approver_roles           Json
+  is_active                Boolean        @default(true)
+  created                  DateTime       @default(now())
+  modified                 DateTime?
+  fk_created_id            String?
+  fk_modified_id           String?
+  is_delete                Boolean         @default(false)
   approvals                tbl_approval[]
   created_by               tbl_user?      @relation("approval_level_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by              tbl_user?      @relation("approval_level_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
