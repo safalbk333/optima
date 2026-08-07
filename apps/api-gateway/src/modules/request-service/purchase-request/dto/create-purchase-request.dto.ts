@@ -32,13 +32,13 @@ export class CreatePurchaseRequestDto {
   @IsString()
   strDescription?: string;
 
-  @ApiProperty({ example: 'status-id-123', description: 'Current status ID' })
+  @ApiProperty({ description: 'Current status', default: 'Pending' })
   @IsString()
-  strCurrentStatusId: string;
+  status: string;
 
-  @ApiProperty({ example: 'priority-id-123', description: 'Priority ID' })
-  @IsString()
-  strPriorityId: string;
+  // @ApiProperty({ example: 'priority-id-123', description: 'Priority ID' })
+  // @IsString()
+  // strPriorityId: string;
 
   @ApiProperty({ example: 5000.00, description: 'Estimated value', required: false })
   @IsOptional()

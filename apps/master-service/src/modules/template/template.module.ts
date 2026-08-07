@@ -4,7 +4,7 @@ import { TemplateService } from './template.service';
 import { CacheModule } from 'libs/database/cache.module';
 
 @Module({
-  imports: [CacheModule],
+  // imports: [CacheModule],
   controllers: [TemplateController],
   providers: [TemplateService],
   exports: [TemplateService],

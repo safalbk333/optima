@@ -18,8 +18,8 @@ export class CityService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cache: CacheService,
-  ) {}
+    // private readonly cache: CacheService,
+  ) { }
 
   private async getSchemaClient() {
     if (!this.objSchemaClient) {
@@ -42,7 +42,7 @@ export class CityService {
       });
 
       this.logger.log(`${CityProperties.service.create.success}: ${objCity.pk_city_id}`);
-      await this.cache.del(CACHE_KEYS.all(strSchemaId));
+      // await this.cache.del(CACHE_KEYS.all(strSchemaId));
       return ResponseHelper.success(objCity, 'City created successfully');
     } catch (error) {
       this.logger.error(CityProperties.service.create.error, error.stack);
@@ -61,22 +61,21 @@ export class CityService {
       if (payload?.countryId) whereClause.fk_country_id = payload.countryId;
       if (payload?.search) whereClause.city_name = { contains: payload.search, mode: 'insensitive' };
 
-      const arrCities = await this.cache.getOrSet(
-        CACHE_KEYS.all(strSchemaId),
-        async () => {
-          this.logger.log('[DB Fallback] Fetching all cities from database');
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_city.findMany({
-            where: whereClause,
-            skip: (page - 1) * limit,
-            take: limit,
-            orderBy: { city_name: 'asc' },
-            include: { country: true },
-          });
-        },
-      );
-
       const objPrisma = await this.getSchemaClient();
+
+      const arrCities = await objPrisma.tbl_city.findMany({
+        where: whereClause,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: {
+          city_name: 'asc',
+        },
+        include: {
+          country: true,
+        },
+      });
+
+      // const objPrisma = await this.getSchemaClient();
       const total = await objPrisma.tbl_city.count({ where: whereClause });
 
       this.logger.log(CityProperties.service.findAll.success);
@@ -94,17 +93,18 @@ export class CityService {
     try {
       this.logger.log(`${CityProperties.service.findOne.start}: ${strId}`);
 
-      const objCity = await this.cache.getOrSet(
-        CACHE_KEYS.one(strSchemaId, strId),
-        async () => {
-          this.logger.log(`[DB Fallback] Fetching city ${strId} from database`);
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_city.findUnique({
-            where: { pk_city_id: strId, is_active: true, is_delete: false },
-            include: { country: true },
-          });
+      const objPrisma = await this.getSchemaClient();
+
+      const objCity = await objPrisma.tbl_city.findUnique({
+        where: {
+          pk_city_id: strId,
+          is_active: true,
+          is_delete: false,
         },
-      );
+        include: {
+          country: true,
+        },
+      });
 
       if (!objCity) throw new NotFoundException('City not found');
 
@@ -117,37 +117,82 @@ export class CityService {
   }
 
   async update(strSchemaId: string, strId: string, dto: UpdateCityDto) {
-    try {
-      this.logger.log(`${CityProperties.service.update.start}: ${strId}`);
-      const objPrisma = await this.getSchemaClient();
+  try {
+    this.logger.log(`${CityProperties.service.update.start}: ${strId}`);
+    const objPrisma = await this.getSchemaClient();
 
-      const objExisting = await objPrisma.tbl_city.findUnique({
-        where: { pk_city_id: strId, is_active: true, is_delete: false },
-      });
+    const objExisting = await objPrisma.tbl_city.findFirst({
+      where: {
+        pk_city_id: strId,
+        is_active: true,
+        is_delete: false,
+      },
+    });
 
-      if (!objExisting) throw new BadRequestException('City not found');
-
-      const objUpdatedCity = await objPrisma.tbl_city.update({
-        where: { pk_city_id: strId },
-        data: {
-          city_name: dto.cityName,
-          fk_country_id: dto.countryId,
-          is_active: dto.isActive,
-          modified: new Date(),
-        },
-        include: { country: true },
-      });
-
-      this.logger.log(`${CityProperties.service.update.success}: ${strId}`);
-      await this.cache.update(
-        CACHE_KEYS.one(strSchemaId, strId),
-        objUpdatedCity,
-        CACHE_KEYS.all(strSchemaId),
-      );
-      return ResponseHelper.success(objUpdatedCity, 'City updated successfully');
-    } catch (error) {
-      this.logger.error(`${CityProperties.service.update.error}: ${strId}`, error.stack);
-      throw error;
+    if (!objExisting) {
+      throw new BadRequestException('City not found');
     }
+
+    const objUpdatedCity = await objPrisma.tbl_city.update({
+      where: { pk_city_id: strId },
+      data: {
+        city_name: dto.cityName,
+        fk_country_id: dto.countryId,
+        is_active: dto.isActive,
+        modified: new Date(),
+      },
+      include: {
+        country: true,
+      },
+    });
+
+    this.logger.log(`${CityProperties.service.update.success}: ${strId}`);
+
+    return ResponseHelper.success(
+      objUpdatedCity,
+      'City updated successfully',
+    );
+  } catch (error) {
+    this.logger.error(
+      `${CityProperties.service.update.error}: ${strId}`,
+      error.stack,
+    );
+    throw error;
   }
+}
+
+  // async update(strSchemaId: string, strId: string, dto: UpdateCityDto) {
+  //   try {
+  //     this.logger.log(`${CityProperties.service.update.start}: ${strId}`);
+  //     const objPrisma = await this.getSchemaClient();
+
+  //     const objExisting = await objPrisma.tbl_city.findUnique({
+  //       where: { pk_city_id: strId, is_active: true, is_delete: false },
+  //     });
+
+  //     if (!objExisting) throw new BadRequestException('City not found');
+
+  //     const objUpdatedCity = await objPrisma.tbl_city.update({
+  //       where: { pk_city_id: strId },
+  //       data: {
+  //         city_name: dto.cityName,
+  //         fk_country_id: dto.countryId,
+  //         is_active: dto.isActive,
+  //         modified: new Date(),
+  //       },
+  //       include: { country: true },
+  //     });
+
+  //     this.logger.log(`${CityProperties.service.update.success}: ${strId}`);
+  //     await this.cache.update(
+  //       CACHE_KEYS.one(strSchemaId, strId),
+  //       objUpdatedCity,
+  //       CACHE_KEYS.all(strSchemaId),
+  //     );
+  //     return ResponseHelper.success(objUpdatedCity, 'City updated successfully');
+  //   } catch (error) {
+  //     this.logger.error(`${CityProperties.service.update.error}: ${strId}`, error.stack);
+  //     throw error;
+  //   }
+  // }
 }

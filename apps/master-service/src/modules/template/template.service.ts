@@ -17,8 +17,8 @@ export class TemplateService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cache: CacheService,
-  ) {}
+    // private readonly cache: CacheService,
+  ) { }
 
   private async getSchemaClient() {
     if (!this.objSchemaClient) {
@@ -31,23 +31,24 @@ export class TemplateService {
     try {
       this.logger.log(`${TemplateProperties.service.getByCode.start}: ${strTemplateCode}`);
 
-      const objTemplate = await this.cache.getOrSet(
-        CACHE_KEYS.byCode(strSchemaId, strTemplateCode),
-        async () => {
-          this.logger.log(`[DB Fallback] Fetching template ${strTemplateCode} from database`);
-          const objPrisma = await this.getSchemaClient();
-          return (objPrisma as any).tbl_templates.findFirst({
-            where: { template_code: strTemplateCode, is_active: true, document_status: { not: 'D' } },
-            select: {
-              pk_template_id: true,
-              template_code: true,
-              template_name: true,
-              document_type: true,
-              html_content: true,
-            },
-          });
+      const objPrisma = await this.getSchemaClient();
+
+      const objTemplate = await (objPrisma as any).tbl_templates.findFirst({
+        where: {
+          template_code: strTemplateCode,
+          is_active: true,
+          document_status: {
+            not: 'D',
+          },
         },
-      );
+        select: {
+          pk_template_id: true,
+          template_code: true,
+          template_name: true,
+          document_type: true,
+          html_content: true,
+        },
+      });
 
       if (!objTemplate) {
         throw new NotFoundException(TemplateProperties.service.getByCode.notFound);

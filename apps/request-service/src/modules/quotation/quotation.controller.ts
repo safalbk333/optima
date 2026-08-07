@@ -32,9 +32,7 @@ export class QuotationController {
   }
 
   @MessagePattern('quotation.create')
-  create(
-    @Payload() data: CreateQuotationDto,
-  ) {
+  create(@Payload() data: CreateQuotationDto) {
     this.logger.log(QuotationProperties.controller.create);
     return this.quotationService.create(data);
   }

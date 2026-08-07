@@ -19,6 +19,7 @@ export class QuotationGatewayService {
 
   async create(data: any) {
     try{
+      console.log("qqqqqq",QUOTATION_PATTERN.CREATE);
       return await firstValueFrom(
         this.client.send(
           QUOTATION_PATTERN.CREATE,

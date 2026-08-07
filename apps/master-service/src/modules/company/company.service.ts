@@ -18,7 +18,7 @@ export class CompanyService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cache: CacheService,
+    // private readonly cache: CacheService,
   ) {}
 
   private async getSchemaClient() {
@@ -52,7 +52,7 @@ export class CompanyService {
       });
 
       this.logger.log(`${CompanyProperties.service.create.success}: ${objCompany.pk_company_id}`);
-      await this.cache.del(CACHE_KEYS.all(strSchemaId));
+      // await this.cache.del(CACHE_KEYS.all(strSchemaId));
       return ResponseHelper.success(objCompany, 'Company created successfully');
     } catch (error) {
       this.logger.error(CompanyProperties.service.create.error, error.stack);
@@ -76,20 +76,15 @@ export class CompanyService {
         ];
       }
 
-      const arrCompanies = await this.cache.getOrSet(
-        CACHE_KEYS.all(strSchemaId),
-        async () => {
-          this.logger.log('[DB Fallback] Fetching all companies from database');
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_company.findMany({
-            where: whereClause,
-            skip: (page - 1) * limit,
-            take: limit,
-          });
-        },
-      );
+     const objPrisma = await this.getSchemaClient();
 
-      const objPrisma = await this.getSchemaClient();
+const arrCompanies = await objPrisma.tbl_company.findMany({
+  where: whereClause,
+  skip: (page - 1) * limit,
+  take: limit,
+});
+
+      // const objPrisma = await this.getSchemaClient();
       const total = await objPrisma.tbl_company.count({ where: whereClause });
 
       this.logger.log(CompanyProperties.service.findAll.success);
@@ -107,16 +102,15 @@ export class CompanyService {
     try {
       this.logger.log(`${CompanyProperties.service.findOne.start}: ${strId}`);
 
-      const objCompany = await this.cache.getOrSet(
-        CACHE_KEYS.one(strSchemaId, strId),
-        async () => {
-          this.logger.log(`[DB Fallback] Fetching company ${strId} from database`);
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_company.findUnique({
-            where: { pk_company_id: strId, is_active: true, is_delete: false },
-          });
-        },
-      );
+      const objPrisma = await this.getSchemaClient();
+
+const objCompany = await objPrisma.tbl_company.findFirst({
+  where: {
+    pk_company_id: strId,
+    is_active: true,
+    is_delete: false,
+  },
+});
 
       if (!objCompany) throw new NotFoundException('Company not found');
 
@@ -161,11 +155,11 @@ export class CompanyService {
       });
 
       this.logger.log(`${CompanyProperties.service.update.success}: ${strId}`);
-      await this.cache.update(
-        CACHE_KEYS.one(strSchemaId, strId),
-        objUpdatedCompany,
-        CACHE_KEYS.all(strSchemaId),
-      );
+      // await this.cache.update(
+      //   CACHE_KEYS.one(strSchemaId, strId),
+      //   objUpdatedCompany,
+      //   CACHE_KEYS.all(strSchemaId),
+      // );
       return ResponseHelper.success(objUpdatedCompany, 'Company updated successfully');
     } catch (error) {
       this.logger.error(`${CompanyProperties.service.update.error}: ${strId}`, error.stack);

@@ -22,6 +22,7 @@ export class RequestForQuotationService {
               pk_request_id: true,
               request_number: true,
               title: true,
+              fk_category_id: true,
             },
           },
           eoi: {
@@ -144,13 +145,13 @@ export class RequestForQuotationService {
           fk_created_id: rfqData.strCreatedId,
           ...(rfqData.strHtmlContent && { rendered_html: rfqData.strHtmlContent }),
           ...(arrItems && arrItems.length > 0 && {
-            rfq_item_mappings_disabled: {
-              create: arrItems.map(item => ({
-                fk_item_id: item.strItemId,
-                item_description: '',
-                quantity: item.intQuantity,
-              })),
-            },
+            // rfq_item_mappings_disabled: {
+            //   create: arrItems.map(item => ({
+            //     fk_item_id: item.strItemId,
+            //     item_description: '',
+            //     quantity: item.intQuantity,
+            //   })),
+            // },
           }),
         },
         include: {

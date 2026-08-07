@@ -4,7 +4,7 @@ import { CityService } from './city.service';
 import { CacheModule } from 'libs/database/cache.module';
 
 @Module({
-  imports: [CacheModule],
+  //imports: [CacheModule],
   controllers: [CityController],
   providers: [CityService],
 })

@@ -21,7 +21,7 @@ import { BudgetModule } from './modules/budget/budget.module';
       envFilePath: `apps/master-service/.env.${process.env.NODE_ENV || 'development'}`,
     }),
     PrismaModule,
-    CacheModule,
+   // CacheModule,
     CategoryModule,
     ItemModule,
     DepartmentModule,

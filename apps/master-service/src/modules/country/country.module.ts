@@ -4,7 +4,7 @@ import { CountryService } from './country.service';
 import { CacheModule } from 'libs/database/cache.module';
 
 @Module({
-  imports: [CacheModule],
+  // imports: [CacheModule],
   controllers: [CountryController],
   providers: [CountryService],
 })

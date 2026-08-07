@@ -8,8 +8,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VendorController } from './modules/vendor-service/vendor/vendor.controller';
 import { VendorGatewayService } from './modules/vendor-service/vendor/vendor.service';
-import { QuotationController } from './modules/vendor-service/vendor/quotation/quotation.controller';
-import { QuotationGatewayService } from './modules/vendor-service/vendor/quotation/quotation.service';
 import { ItemGatewayService } from './modules/master-service/item/item.service';
 import { ItemController } from './modules/master-service/item/item.controller';
 
@@ -61,6 +59,8 @@ import { BudgetGatewayController } from './modules/master-service/budget/budget.
 import { BudgetGatewayService } from './modules/master-service/budget/budget.service';
 import { ApprovalLevelController } from './modules/request-service/approval/approval.controller';
 import { ApprovalLevelGatewayService } from './modules/request-service/approval/approval.service';
+import { QuotationController } from './modules/vendor-service/quotation/quotation.controller';
+import { QuotationGatewayService } from './modules/vendor-service/quotation/quotation.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
 

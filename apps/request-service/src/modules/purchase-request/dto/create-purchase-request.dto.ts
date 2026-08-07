@@ -27,10 +27,10 @@ export class CreatePurchaseRequestDto {
   strDescription?: string;
 
   @IsString()
-  strCurrentStatusId: string;
+  status: string;
 
-  @IsString()
-  strPriorityId: string;
+  // @IsString()
+  // strPriorityId: string;
 
   @IsOptional()
   @IsNumber()

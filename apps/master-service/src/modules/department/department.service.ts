@@ -19,8 +19,8 @@ export class DepartmentService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cache: CacheService,
-  ) {}
+    // private readonly cache: CacheService,
+  ) { }
 
   private async getSchemaClient() {
     if (!this.objSchemaClient) {
@@ -43,7 +43,7 @@ export class DepartmentService {
       });
 
       this.logger.log(`${DepartmentProperties.service.create.success}: ${objDepartment.pk_department_id}`);
-      await this.cache.del(CACHE_KEYS.all(strSchemaId));
+      // await this.cache.del(CACHE_KEYS.all(strSchemaId));
       return ResponseHelper.success(objDepartment, 'Department created successfully');
     } catch (error) {
       this.logger.error(DepartmentProperties.service.create.error, error.stack);
@@ -66,20 +66,14 @@ export class DepartmentService {
         ];
       }
 
-      const arrDepartments = await this.cache.getOrSet(
-        CACHE_KEYS.all(strSchemaId),
-        async () => {
-          this.logger.log('[DB Fallback] Fetching all departments from database');
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_department.findMany({
-            where: whereClause,
-            skip: (page - 1) * limit,
-            take: limit,
-          });
-        },
-      );
-
       const objPrisma = await this.getSchemaClient();
+
+      const arrDepartments = await objPrisma.tbl_department.findMany({
+        where: whereClause,
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+
       const total = await objPrisma.tbl_department.count({ where: whereClause });
 
       this.logger.log(DepartmentProperties.service.findAll.success);
@@ -97,16 +91,15 @@ export class DepartmentService {
     try {
       this.logger.log(`${DepartmentProperties.service.findOne.start}: ${strId}`);
 
-      const objDepartment = await this.cache.getOrSet(
-        CACHE_KEYS.one(strSchemaId, strId),
-        async () => {
-          this.logger.log(`[DB Fallback] Fetching department ${strId} from database`);
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_department.findUnique({
-            where: { pk_department_id: strId, is_active: true, is_delete: false },
-          });
+      const objPrisma = await this.getSchemaClient();
+
+      const objDepartment = await objPrisma.tbl_department.findFirst({
+        where: {
+          pk_department_id: strId,
+          is_active: true,
+          is_delete: false,
         },
-      );
+      });
 
       if (!objDepartment) throw new NotFoundException('Department not found');
 
@@ -141,11 +134,11 @@ export class DepartmentService {
       });
 
       this.logger.log(`${DepartmentProperties.service.update.success}: ${strId}`);
-      await this.cache.update(
-        CACHE_KEYS.one(strSchemaId, strId),
-        objUpdatedDepartment,
-        CACHE_KEYS.all(strSchemaId),
-      );
+      // await this.cache.update(
+      //   CACHE_KEYS.one(strSchemaId, strId),
+      //   objUpdatedDepartment,
+      //   CACHE_KEYS.all(strSchemaId),
+      // );
       return ResponseHelper.success(objUpdatedDepartment, 'Department updated successfully');
     } catch (error) {
       this.logger.error(`${DepartmentProperties.service.update.error}: ${strId}`, error.stack);
