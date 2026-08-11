@@ -1,326 +1,255 @@
-
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { PrismaService } from 'libs/database/prisma-service';
-import { CreateQuotationDto } from './dto/create-quotation.dto';
-import Quotation_status from '../constant/enum';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "libs/database/prisma-service";
+import { CreateQuotationDto } from "./dto/create-quotation.dto";
+import { UpdateQuotationDto } from "./dto/update-quotation.dto";
+import { ResponseHelper } from "libs/common/utils/helper/response.helper";
 import { AppLogger } from '../../common/logger/app.logger';
 import { QuotationProperties } from '../../common/properties/quotation.properties';
-import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
 
 @Injectable()
 export class QuotationService {
-  private readonly logger = new AppLogger(
-    QuotationService.name,
-  );
+  private readonly logger = new AppLogger(QuotationService.name);
 
-  private schemaClient: any;
+  constructor(private readonly prisma: PrismaService) {}
 
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
-
-  private async getSchemaClient() {
-    if (!this.schemaClient) {
-      this.schemaClient =
-        await this.prisma.getClient('public');
-    }
-
-    return this.schemaClient;
-  }
-
-  async create(
-    createQuotationDto: CreateQuotationDto,
-  ) {
+  async create(objData: CreateQuotationDto) {
     try {
-      this.logger.log(
-        QuotationProperties.service.create.start,
-      );
+      this.logger.log(QuotationProperties.service.create.start);
+      const { arrItems, ...quotationData } = objData;
 
-      const prisma =
-        await this.getSchemaClient();
+      const quotation = await this.prisma.tbl_quotation.create({
+        data: {
+          title: quotationData.strRfqId, // Add title field
+          vendor: { connect: { pk_vendor_id: quotationData.strVendorId } },
+          rfq: { connect: { pk_rfq_id: quotationData.strRfqId } },
+          request: { connect: { pk_request_id: quotationData.strRequestId } }, // Add request relation
+          ...(quotationData.strCategoryId && {
+            category: { connect: { pk_category_id: quotationData.strCategoryId } },
+          }),
+          ...(quotationData.strBuyerId && {
+            buyer: { connect: { pk_user_id: quotationData.strBuyerId } },
+          }),
+          buyer_details: quotationData.strBuyerDetails,
+          seller_details: quotationData.strSellerDetails,
+          status: quotationData.strStatus || 'DRAFT',
+          total_amount: quotationData.intTotalAmount,
+          currency: quotationData.strCurrency || 'USD',
+          issue_date: new Date(quotationData.strIssueDate),
+          due_date: new Date(quotationData.strDueDate),
+          notes: quotationData.strNotes,
+          // ...(quotationData.strCreatedId && {
+          //   created_by: { connect: { pk_user_id: quotationData.strCreatedId } },
+          // }),
+          ...(quotationData.strHtmlContent && { rendered_html: quotationData.strHtmlContent }),
+          ...(arrItems && arrItems.length > 0 && {
+            // quotation_items_disabled: {
+            //   create: arrItems.map(item => ({
+            //     fk_item_id: item.strItemId,
+            //     item_description: item.strItemDescription,
+            //     quantity: item.intQuantity,
+            //     unit_of_measure: item.strUnitOfMeasure,
+            //     unit_price: item.intUnitPrice,
+            //     tax_percentage: item.intTaxPercentage || 0,
+            //     tax_amount: item.intTaxAmount || 0,
+            //     total_price: item.intTotalPrice,
+            //     currency: item.strCurrency || 'USD',
+            //     notes: item.strNotes,
+            //   })) as any,
+            // },
+          }),
+        },
+        include: {
+          vendor: true,
+          rfq: true,
+          category: true,
+          buyer: true,
+          // quotation_items removed
+        },
+      });
 
-      const quotation =
-        await prisma.tbl_quotation.create({
-          data: {
-            title: createQuotationDto.title,
-
-            vendor: {
-              connect: {
-                pk_vendor_id:
-                  createQuotationDto.vendorId,
-              },
-            },
-
-            rfq: {
-              connect: {
-                pk_rfq_id:
-                  createQuotationDto.rfqId,
-              },
-            },
-
-            request: {
-              connect: {
-                pk_request_id:
-                  createQuotationDto.requestId,
-              },
-            },
-
-            ...(createQuotationDto.category && {
-              category: {
-                connect: {
-                  pk_category_id:
-                    createQuotationDto.category,
-                },
-              },
-            }),
-
-            ...(createQuotationDto.buyer && {
-              buyer: {
-                connect: {
-                  pk_user_id:
-                    createQuotationDto.buyer,
-                },
-              },
-            }),
-
-            ...(createQuotationDto.strHtmlContent && {
-              rendered_html:
-                createQuotationDto.strHtmlContent,
-            }),
-
-            status:
-              createQuotationDto.status.toUpperCase(),
-
-            issue_date: new Date(
-              createQuotationDto.issueDate,
-            ),
-
-            due_date: new Date(
-              createQuotationDto.dueDate,
-            ),
-          },
-        });
-
-      this.logger.log(
-        `${QuotationProperties.service.create.success}: ${quotation.pk_quotation_id}`,
-      );
-
-      return ResponseHelper.success(
-        quotation,
-        'Quotation created successfully',
-      );
+      this.logger.log(`${QuotationProperties.service.create.success}: ${quotation.pk_quotation_id}`);
+      return ResponseHelper.success(quotation, "Quotation created successfully");
     } catch (error) {
-      this.logger.error(
-        QuotationProperties.service.create.error,
-        error.stack,
-      );
-
-      return ResponseHelper.error(
-        'Failed to create quotation',
-        error.message,
-      );
+      this.logger.error(QuotationProperties.service.create.error, error.stack);
+      return ResponseHelper.error("Failed to create quotation", error.message);
     }
   }
 
-  async findAll(payload: {
-    limit?: number;
-    page?: number;
-    search?: string;
-    status?: string;
-  }) {
+  async findAll() {
     try {
-      this.logger.log(
-        QuotationProperties.service.findAll.start,
-      );
-
-      const prisma =
-        await this.getSchemaClient();
-
-      const page =
-        !isNaN(Number(payload?.page)) &&
-        Number(payload?.page) > 0
-          ? Number(payload.page)
-          : 1;
-
-      const limit =
-        !isNaN(Number(payload?.limit)) &&
-        Number(payload?.limit) > 0
-          ? Number(payload.limit)
-          : 10;
-
-      const offset = (page - 1) * limit;
-
-      const whereClause: any = {};
-
-      if (payload.search) {
-        whereClause.OR = [
-          {
-            rfq_no: {
-              contains: payload.search,
-              mode: 'insensitive',
+      this.logger.log(QuotationProperties.service.findAll.start);
+      const quotations = await this.prisma.tbl_quotation.findMany({
+        include: {
+          vendor: {
+            select: {
+              pk_vendor_id: true,
+              company_legal_name: true,
+              email: true,
             },
           },
-          {
-            rfq_title: {
-              contains: payload.search,
-              mode: 'insensitive',
+          rfq: {
+            select: {
+              pk_rfq_id: true,
+              rfq_code: true,
+              rfq_title: true,
             },
           },
-        ];
-      }
+          category: true,
+          buyer: {
+            select: {
+              pk_user_id: true,
+              user_name: true,
+              user_email: true,
+            },
+          },
+          // quotation_items removed
+        },
+        orderBy: { created: 'desc' },
+      });
 
-      if (payload.status) {
-        const statusKey =
-          payload.status.toUpperCase() as keyof typeof Quotation_status;
-
-        const statusValue =
-          Quotation_status[statusKey];
-
-        if (!statusValue) {
-          throw new Error(
-            'Invalid quotation status',
-          );
-        }
-
-        whereClause.status = statusValue;
-      }
-
-      const quotations =
-        await prisma.tbl_quotation.findMany({
-          where: whereClause,
-          skip: offset,
-          take: limit,
-        });
-
-      this.logger.log(
-        QuotationProperties.service.findAll.success,
-      );
-
-      return ResponseHelper.success(
-        quotations,
-        'Quotations fetched successfully',
-      );
+      this.logger.log(QuotationProperties.service.findAll.success);
+      return ResponseHelper.success(quotations, "Quotations fetched successfully");
     } catch (error) {
-      this.logger.error(
-        QuotationProperties.service.findAll.error,
-        error.stack,
-      );
-
-      return ResponseHelper.error(
-        'Failed to fetch quotations',
-        error.message,
-      );
+      this.logger.error(QuotationProperties.service.findAll.error, error.stack);
+      return ResponseHelper.error("Failed to fetch quotations", error.message);
     }
   }
 
-  async findOne(
-    quotation_id: string,
-  ) {
+  async findOne(strId: string) {
     try {
-      this.logger.log(
-        `${QuotationProperties.service.findOne.start}: ${quotation_id}`,
-      );
-
-      const prisma =
-        await this.getSchemaClient();
-
-      const quotation =
-        await prisma.tbl_quotation.findUnique({
-          where: {
-            pk_quotation_id:
-              quotation_id,
+      this.logger.log(`${QuotationProperties.service.findOne.start}: ${strId}`);
+      const quotation = await this.prisma.tbl_quotation.findUnique({
+        where: { pk_quotation_id: strId },
+        include: {
+          vendor: {
+            select: {
+              pk_vendor_id: true,
+              company_legal_name: true,
+              email: true,
+            },
           },
-        });
+          rfq: {
+            select: {
+              pk_rfq_id: true,
+              rfq_code: true,
+              rfq_title: true,
+            },
+          },
+          category: true,
+          buyer: {
+            select: {
+              pk_user_id: true,
+              user_name: true,
+              user_email: true,
+            },
+          },
+          // quotation_items removed
+        },
+      });
 
       if (!quotation) {
-        throw new NotFoundException(
-          'Quotation not found',
-        );
+        throw new NotFoundException("Quotation not found");
       }
 
-      this.logger.log(
-        `${QuotationProperties.service.findOne.success}: ${quotation_id}`,
-      );
-
-      return ResponseHelper.success(
-        quotation,
-        'Quotation fetched successfully',
-      );
+      this.logger.log(`${QuotationProperties.service.findOne.success}: ${strId}`);
+      return ResponseHelper.success(quotation, "Quotation fetched successfully");
     } catch (error) {
-      this.logger.error(
-        `${QuotationProperties.service.findOne.error}: ${quotation_id}`,
-        error.stack,
-      );
-
+      this.logger.error(`${QuotationProperties.service.findOne.error}: ${strId}`, error.stack);
       throw error;
     }
   }
 
-  async generateRfqNo(): Promise<string> {
+  async update(strId: string, objData: UpdateQuotationDto) {
     try {
-      this.logger.log(
-        QuotationProperties.service
-          .generateRfqNo.start,
-      );
+      this.logger.log(`${QuotationProperties.service.update.start}: ${strId}`);
+      const quotation = await this.prisma.tbl_quotation.findUnique({
+        where: { pk_quotation_id: strId },
+      });
 
-      const prisma = await this.getSchemaClient();
-
-      const now = new Date();
-
-      const year = now.getFullYear();
-
-      const month = now
-        .toLocaleString('en-US', {
-          month: 'short',
-        })
-        .toUpperCase();
-
-      const lastQuotation =
-        await prisma.tbl_request_for_quotation.findFirst({
-          orderBy: {
-            created: 'desc',
-          },
-          select: {
-            pk_rfq_id: true,
-          },
-        });
-
-      let nextNumber = 1;
-
-      if (lastQuotation?.pk_rfq_id) {
-        const parts =
-          lastQuotation.pk_rfq_id.split(
-            '-',
-          );
-
-        const lastSequence =
-          parseInt(parts[3], 10);
-
-        nextNumber =
-          lastSequence + 1;
+      if (!quotation) {
+        throw new NotFoundException("Quotation not found");
       }
 
-      const sequence = String(
-        nextNumber,
-      ).padStart(3, '0');
+      const { arrItems, ...updateData } = objData;
 
-      const rfqNo = `RFQ-${year}-${month}-${sequence}`;
+      const updatedQuotation = await this.prisma.tbl_quotation.update({
+        where: { pk_quotation_id: strId },
+        data: {
+          ...(updateData.strVendorId !== undefined && {
+            vendor: { connect: { pk_vendor_id: updateData.strVendorId } },
+          }),
+          ...(updateData.strCategoryId !== undefined && {
+            category: { connect: { pk_category_id: updateData.strCategoryId } },
+          }),
+          ...(updateData.strBuyerId !== undefined && {
+            buyer: { connect: { pk_user_id: updateData.strBuyerId } },
+          }),
+          ...(updateData.strBuyerDetails !== undefined && { buyer_details: updateData.strBuyerDetails }),
+          ...(updateData.strSellerDetails !== undefined && { seller_details: updateData.strSellerDetails }),
+          ...(updateData.strStatus !== undefined && { status: updateData.strStatus }),
+          ...(updateData.intTotalAmount !== undefined && { total_amount: updateData.intTotalAmount }),
+          ...(updateData.strCurrency !== undefined && { currency: updateData.strCurrency }),
+          ...(updateData.strIssueDate !== undefined && { issue_date: new Date(updateData.strIssueDate) }),
+          ...(updateData.strDueDate !== undefined && { due_date: new Date(updateData.strDueDate) }),
+          ...(updateData.strNotes !== undefined && { notes: updateData.strNotes }),
+          ...(updateData.strModifiedId !== undefined && {
+            modified_by: { connect: { pk_user_id: updateData.strModifiedId } },
+          }),
+          modified: new Date(),
+          ...(arrItems && {
+            quotation_items_disabled: {
+              deleteMany: {},
+              create: arrItems.map(item => ({
+                fk_item_id: item.strItemId,
+                item_description: item.strItemDescription,
+                quantity: item.intQuantity,
+                unit_of_measure: item.strUnitOfMeasure,
+                unit_price: item.intUnitPrice,
+                tax_percentage: item.intTaxPercentage || 0,
+                tax_amount: item.intTaxAmount || 0,
+                total_price: item.intTotalPrice,
+                currency: item.strCurrency || 'USD',
+                notes: item.strNotes,
+              })) as any,
+            },
+          }),
+        },
+        include: {
+          vendor: true,
+          rfq: true,
+          category: true,
+          buyer: true,
+          // quotation_items removed
+        },
+      });
 
-      this.logger.log(
-        `${QuotationProperties.service.generateRfqNo.success}: ${rfqNo}`,
-      );
-
-      return rfqNo;
+      this.logger.log(`${QuotationProperties.service.update.success}: ${strId}`);
+      return ResponseHelper.success(updatedQuotation, "Quotation updated successfully");
     } catch (error) {
-      this.logger.error(
-        QuotationProperties.service
-          .generateRfqNo.error,
-        error.stack,
-      );
+      this.logger.error(`${QuotationProperties.service.update.error}: ${strId}`, error.stack);
+      throw error;
+    }
+  }
 
+  async delete(strId: string) {
+    try {
+      this.logger.log(`${QuotationProperties.service.delete.start}: ${strId}`);
+      const quotation = await this.prisma.tbl_quotation.findUnique({
+        where: { pk_quotation_id: strId },
+      });
+
+      if (!quotation) {
+        throw new NotFoundException("Quotation not found");
+      }
+
+      const deletedQuotation = await this.prisma.tbl_quotation.delete({
+        where: { pk_quotation_id: strId },
+      });
+
+      this.logger.log(`${QuotationProperties.service.delete.success}: ${strId}`);
+      return ResponseHelper.success(deletedQuotation, "Quotation deleted successfully");
+    } catch (error) {
+      this.logger.error(`${QuotationProperties.service.delete.error}: ${strId}`, error.stack);
       throw error;
     }
   }

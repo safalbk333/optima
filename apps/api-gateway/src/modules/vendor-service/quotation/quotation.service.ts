@@ -11,7 +11,7 @@ import { QUOTATION_PATTERN } from './quotation.pattern';
 export class QuotationGatewayService {
   private readonly logger: Logger;
   constructor(
-    @Inject('REQUEST_SERVICE')
+    @Inject('VENDOR_SERVICE')
     private readonly client: ClientProxy,
   ) {
     this.logger = new Logger(QuotationGatewayService.name);
@@ -19,7 +19,6 @@ export class QuotationGatewayService {
 
   async create(data: any) {
     try{
-      console.log("qqqqqq",QUOTATION_PATTERN.CREATE);
       return await firstValueFrom(
         this.client.send(
           QUOTATION_PATTERN.CREATE,

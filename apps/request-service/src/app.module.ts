@@ -22,7 +22,6 @@ import { ApprovalModule } from './modules/approval/approval.module';
     PurchaseRequestModule,
     EoiModule,
     RequestForQuotationModule,
-    QuotationModule,
     PurchaseOrderModule,
     GoodsReceiptModule,
     RateCardModule,

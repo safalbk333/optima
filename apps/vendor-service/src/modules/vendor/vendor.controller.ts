@@ -63,8 +63,25 @@ export class VendorController {
     return this.vendorService.bulkUpload(payload);
   }
 
+  @MessagePattern('vendor.documentById.view')
+  async viewVendorDocument(
+    @Payload() data: { documentId: string },
+  ) {
+    return this.vendorService.viewVendorDocument(
+      data.documentId,
+    );
+  }
+
   @MessagePattern('vendor.documentUpload')
   async uploadVendorDocument(payload: any) {
     return this.vendorService.uploadVendorDocument(payload);
+  }
+
+  @MessagePattern('view.vendor.document')
+  async viewVendorDocumentByVendorId() {
+    const result =
+      await this.vendorService.viewVendorDocumentByVendorId();
+
+    return result;
   }
 }

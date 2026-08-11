@@ -37,7 +37,7 @@ export class ContractController {
   ) { }
 
   @Get()
-  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  // @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions(
     HOME_READ,
   )

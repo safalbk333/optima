@@ -13,18 +13,21 @@ export class QuotationItemDto {
   @IsString()
   strItemId?: string;
 
+  @IsOptional()
   @IsString()
-  strItemDescription: string;
+  strItemDescription?: string;
 
+  @IsOptional()
   @IsNumber()
-  intQuantity: number;
+  intQuantity?: number;
 
   @IsOptional()
   @IsString()
   strUnitOfMeasure?: string;
 
+  @IsOptional()
   @IsNumber()
-  intUnitPrice: number;
+  intUnitPrice?: number;
 
   @IsOptional()
   @IsNumber()
@@ -34,27 +37,27 @@ export class QuotationItemDto {
   @IsNumber()
   intTaxAmount?: number;
 
+  @IsOptional()
   @IsNumber()
-  intTotalPrice: number;
+  intTotalPrice?: number;
 
   @IsOptional()
   @IsString()
   strCurrency?: string;
 
   @IsOptional()
+  @IsDateString()
+  dtDeliveryLeadTime?: string;
+
+  @IsOptional()
   @IsString()
   strNotes?: string;
 }
 
-export class CreateQuotationDto {
+export class UpdateQuotationDto {
+  @IsOptional()
   @IsString()
-  strVendorId: string;
-
-  @IsString()
-  strRfqId: string;
-
-  @IsString()
-  strRequestId: string;
+  strVendorId?: string;
 
   @IsOptional()
   @IsString()
@@ -84,11 +87,13 @@ export class CreateQuotationDto {
   @IsString()
   strCurrency?: string;
 
+  @IsOptional()
   @IsDateString()
-  strIssueDate: string;
+  strIssueDate?: string;
 
+  @IsOptional()
   @IsDateString()
-  strDueDate: string;
+  strDueDate?: string;
 
   @IsOptional()
   @IsString()
@@ -96,7 +101,7 @@ export class CreateQuotationDto {
 
   @IsOptional()
   @IsString()
-  strHtmlContent?: string;
+  strModifiedId?: string;
 
   @IsOptional()
   @IsArray()
