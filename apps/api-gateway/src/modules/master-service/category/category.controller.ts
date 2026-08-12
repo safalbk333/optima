@@ -74,7 +74,7 @@ export class CategoryController {
   @ApiParam({ name: 'id', description: 'Category UUID', type: String })
   @ApiResponse({ status: 200, description: 'Category fetched successfully' })
   @ApiResponse({ status: 404, description: 'Category not found' })
-  findOne(@Param('id', ParseUUIDPipe) strId: string) {
+  findOne(@Param('id') strId: string) {
     return this.categoryService.findOne(strId);
   }
 
@@ -88,7 +88,7 @@ export class CategoryController {
   @ApiParam({ name: 'id', description: 'Category UUID', type: String })
   @ApiResponse({ status: 200, description: 'Subtree fetched successfully' })
   @ApiResponse({ status: 404, description: 'Category not found' })
-  findSubtree(@Param('id', ParseUUIDPipe) strId: string) {
+  findSubtree(@Param('id') strId: string) {
     return this.categoryService.findSubtree(strId);
   }
 
@@ -102,7 +102,7 @@ export class CategoryController {
   @ApiParam({ name: 'id', description: 'Category UUID', type: String })
   @ApiResponse({ status: 200, description: 'Ancestors fetched successfully' })
   @ApiResponse({ status: 404, description: 'Category not found' })
-  findAncestors(@Param('id', ParseUUIDPipe) strId: string) {
+  findAncestors(@Param('id') strId: string) {
     return this.categoryService.findAncestors(strId);
   }
 
@@ -151,7 +151,7 @@ export class CategoryController {
   @ApiResponse({ status: 200, description: 'Category updated successfully' })
   @ApiResponse({ status: 404, description: 'Category not found' })
   update(
-    @Param('id', ParseUUIDPipe) strId: string,
+    @Param('id') strId: string,
     @Body() data: UpdateCategoryDto,
     @Query('modifiedById') strModifiedById?: string,
   ) {
@@ -178,7 +178,7 @@ export class CategoryController {
   @ApiResponse({ status: 400, description: 'Circular reference or no-op move' })
   @ApiResponse({ status: 404, description: 'Category or new parent not found' })
   move(
-    @Param('id', ParseUUIDPipe) strId: string,
+    @Param('id') strId: string,
     @Body() data: MoveCategoryDto,
     @Query('modifiedById') strModifiedById?: string,
   ) {
@@ -202,7 +202,7 @@ export class CategoryController {
   @ApiResponse({ status: 200, description: 'Category deleted successfully' })
   @ApiResponse({ status: 404, description: 'Category not found' })
   delete(
-    @Param('id', ParseUUIDPipe) strId: string,
+    @Param('id') strId: string,
     @Query('cascade', new DefaultValuePipe(false), ParseBoolPipe)
     blnCascade: boolean,
   ) {

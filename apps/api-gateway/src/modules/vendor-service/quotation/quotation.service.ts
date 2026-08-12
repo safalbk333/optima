@@ -11,7 +11,7 @@ import { QUOTATION_PATTERN } from './quotation.pattern';
 export class QuotationGatewayService {
   private readonly logger: Logger;
   constructor(
-    @Inject('REQUEST_SERVICE')
+    @Inject('VENDOR_SERVICE')
     private readonly client: ClientProxy,
   ) {
     this.logger = new Logger(QuotationGatewayService.name);

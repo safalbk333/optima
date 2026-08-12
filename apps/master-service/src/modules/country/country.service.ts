@@ -18,8 +18,8 @@ export class CountryService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cache: CacheService,
-  ) {}
+    // private readonly cache: CacheService,
+  ) { }
 
   private async getSchemaClient() {
     if (!this.objSchemaClient) {
@@ -41,7 +41,7 @@ export class CountryService {
       });
 
       this.logger.log(`${CountryProperties.service.create.success}: ${objCountry.pk_country_id}`);
-      await this.cache.del(CACHE_KEYS.all(strSchemaId));
+      // await this.cache.del(CACHE_KEYS.all(strSchemaId));
       return ResponseHelper.success(objCountry, 'Country created successfully');
     } catch (error) {
       this.logger.error(CountryProperties.service.create.error, error.stack);
@@ -64,21 +64,17 @@ export class CountryService {
         ];
       }
 
-      const arrCountries = await this.cache.getOrSet(
-        CACHE_KEYS.all(strSchemaId),
-        async () => {
-          this.logger.log('[DB Fallback] Fetching all countries from database');
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_country.findMany({
-            where: whereClause,
-            skip: (page - 1) * limit,
-            take: limit,
-            orderBy: { country_name: 'asc' },
-          });
-        },
-      );
-
       const objPrisma = await this.getSchemaClient();
+
+      const arrCountries = await objPrisma.tbl_country.findMany({
+        where: whereClause,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: {
+          country_name: 'asc',
+        },
+      });
+
       const total = await objPrisma.tbl_country.count({ where: whereClause });
 
       this.logger.log(CountryProperties.service.findAll.success);
@@ -96,17 +92,23 @@ export class CountryService {
     try {
       this.logger.log(`${CountryProperties.service.findOne.start}: ${strId}`);
 
-      const objCountry = await this.cache.getOrSet(
-        CACHE_KEYS.one(strSchemaId, strId),
-        async () => {
-          this.logger.log(`[DB Fallback] Fetching country ${strId} from database`);
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_country.findUnique({
-            where: { pk_country_id: strId, is_active: true, is_delete: false },
-            include: { cities: { where: { is_active: true, is_delete: false } } },
-          });
+      const objPrisma = await this.getSchemaClient();
+
+      const objCountry = await objPrisma.tbl_country.findFirst({
+        where: {
+          pk_country_id: strId,
+          is_active: true,
+          is_delete: false,
         },
-      );
+        include: {
+          cities: {
+            where: {
+              is_active: true,
+              is_delete: false,
+            },
+          },
+        },
+      });
 
       if (!objCountry) throw new NotFoundException('Country not found');
 
@@ -140,11 +142,11 @@ export class CountryService {
       });
 
       this.logger.log(`${CountryProperties.service.update.success}: ${strId}`);
-      await this.cache.update(
-        CACHE_KEYS.one(strSchemaId, strId),
-        objUpdatedCountry,
-        CACHE_KEYS.all(strSchemaId),
-      );
+      // await this.cache.update(
+      //   CACHE_KEYS.one(strSchemaId, strId),
+      //   objUpdatedCountry,
+      //   CACHE_KEYS.all(strSchemaId),
+      // );
       return ResponseHelper.success(objUpdatedCountry, 'Country updated successfully');
     } catch (error) {
       this.logger.error(`${CountryProperties.service.update.error}: ${strId}`, error.stack);

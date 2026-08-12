@@ -4,7 +4,7 @@ import { DepartmentController } from './department.controller';
 import { CacheModule } from 'libs/database/cache.module';
 
 @Module({
-  imports: [CacheModule],
+  // imports: [CacheModule],
   controllers: [DepartmentController],
   providers: [DepartmentService],
 })

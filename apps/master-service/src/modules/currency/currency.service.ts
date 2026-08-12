@@ -27,8 +27,8 @@ export class CurrencyService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cache: CacheService,
-  ) {}
+    // private readonly cache: CacheService,
+  ) { }
 
   // ─── Private Helpers ──────────────────────────────────────────────────────
 
@@ -60,7 +60,7 @@ export class CurrencyService {
       this.logger.log(`${CurrencyProperties.service.create.success}: ${strCreatedId}`);
 
       // Invalidate the tenant-scoped "all" list so next findAll re-fetches from DB
-      await this.cache.del(CACHE_KEYS.all(strSchemaId));
+      // await this.cache.del(CACHE_KEYS.all(strSchemaId));
 
       return ResponseHelper.success(objCurrency, 'Currency created successfully');
     } catch (error) {
@@ -81,14 +81,13 @@ export class CurrencyService {
        *  2. On miss → run DB callback, store result (no expiry), return it
        *  3. If Redis is down → callback runs directly, no error thrown
        */
-      const arrCurrencies = await this.cache.getOrSet(
-        CACHE_KEYS.all(strSchemaId),
-        async () => {
-          this.logger.log('[DB Fallback] Fetching all currencies from database');
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_currency.findMany({ where: { is_active: true } });
+      const objPrisma = await this.getSchemaClient();
+
+      const arrCurrencies = await objPrisma.tbl_currency.findMany({
+        where: {
+          is_active: true,
         },
-      );
+      });
 
       this.logger.log(CurrencyProperties.service.findAll.success);
       return ResponseHelper.success(arrCurrencies, 'Currencies fetched successfully');
@@ -110,16 +109,14 @@ export class CurrencyService {
        *  2. On miss → fetch from DB, store in cache (no expiry)
        *  3. If DB returns null → throw NotFoundException
        */
-      const objCurrency = await this.cache.getOrSet(
-        CACHE_KEYS.one(strSchemaId, strId),
-        async () => {
-          this.logger.log(`[DB Fallback] Fetching currency ${strId} from database`);
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_currency.findUnique({
-            where: { pk_currency_id: strId, is_active: true },
-          });
+      const objPrisma = await this.getSchemaClient();
+
+      const objCurrency = await objPrisma.tbl_currency.findFirst({
+        where: {
+          pk_currency_id: strId,
+          is_active: true,
         },
-      );
+      });
 
       if (!objCurrency) {
         throw new NotFoundException('Currency not found');
@@ -170,11 +167,11 @@ export class CurrencyService {
        *  - Overwrite '{strSchemaId}:currency:{strId}' with the fresh record
        *  - Invalidate '{strSchemaId}:currency:all' so next findAll re-fetches
        */
-      await this.cache.update(
-        CACHE_KEYS.one(strSchemaId, strId),
-        objUpdatedCurrency,
-        CACHE_KEYS.all(strSchemaId), // invalidate tenant list cache
-      );
+      // await this.cache.update(
+      //   CACHE_KEYS.one(strSchemaId, strId),
+      //   objUpdatedCurrency,
+      //   CACHE_KEYS.all(strSchemaId), // invalidate tenant list cache
+      // );
 
       return ResponseHelper.success(objUpdatedCurrency, 'Currency updated successfully');
     } catch (error) {

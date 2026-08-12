@@ -132,7 +132,7 @@ export class PurchaseRequestService {
           request_number: objData.strRequestNumber,
           title: objData.strTitle,
           description: objData.strDescription,
-          status: objData.strCurrentStatusId,
+          status: objData.status,
           estimated_value: objData.intEstimatedValue,
           currency: objData.strCurrency || 'USD',
           fk_requested_by_id: objData.strRequestedById,

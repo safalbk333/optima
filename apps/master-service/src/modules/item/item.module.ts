@@ -4,7 +4,7 @@ import { ItemService } from './item.service';
 import { CacheModule } from 'libs/database/cache.module';
 
 @Module({
-  imports: [CacheModule],
+  // imports: [CacheModule],
   controllers: [ItemController],
   providers: [ItemService],
   exports: [ItemService],

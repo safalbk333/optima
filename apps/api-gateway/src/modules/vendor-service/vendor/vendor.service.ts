@@ -97,6 +97,17 @@ export class VendorGatewayService {
     }
   }
 
+  async viewVendorDocument(documentId: string) {
+    return await firstValueFrom(
+      this.client.send(
+        'vendor.documentById.view',
+        {
+          documentId,
+        },
+      ),
+    );
+  }
+
   async uploadVendorDocument(
     vendorId: string,
     dto: UploadVendorDocumentDto,
@@ -117,5 +128,16 @@ export class VendorGatewayService {
         },
       ),
     );
+  }
+
+  async viewVendorDocumentByVendorId() {
+    const result = await firstValueFrom(
+      this.client.send(
+        'view.vendor.document',
+        {},
+      ),
+    );
+
+    return result;
   }
 }

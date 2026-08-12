@@ -22,7 +22,7 @@ export class VendorService {
 
   constructor(
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
 
   private async getSchemaClient() {
     if (!this.schemaClient) {
@@ -691,6 +691,45 @@ export class VendorService {
     }
   }
 
+  async viewVendorDocument(documentId: string) {
+    try {
+      const prisma = await this.getSchemaClient();
+
+      // Get document metadata
+      const document = await prisma.tbl_vendor_document.findUnique({
+        where: {
+          pk_document_id: documentId,
+        },
+      });
+
+      if (!document) {
+        throw new NotFoundException('Document not found');
+      }
+
+      const filePath = document.file_url;
+
+      // Check if file exists
+      if (!fs.existsSync(filePath)) {
+        throw new NotFoundException('Uploaded file not found');
+      }
+
+      // Read file
+      const fileBuffer = fs.readFileSync(filePath);
+
+      return {
+        success: true,
+        fileName: document.original_file_name,
+        mimeType: document.mime_type,
+        fileSize: document.file_size,
+        buffer: fileBuffer,
+      };
+    } catch (error) {
+      return ResponseHelper.error(
+        error.message,
+      );
+    }
+  }
+
   async uploadVendorDocument(payload: any) {
     const prisma = await this.getSchemaClient();
 
@@ -779,5 +818,47 @@ export class VendorService {
         uploadedAt: document.uploaded_at,
       },
     };
+  }
+  
+  async viewVendorDocumentByVendorId() {
+    try {
+      const prisma = await this.getSchemaClient();
+
+      const documents = await prisma.tbl_vendor_document.findMany({
+        orderBy: {
+          uploaded_at: 'desc',
+        },
+      });
+
+      if (!documents.length) {
+        throw new NotFoundException('No documents found');
+      }
+
+      const result = documents.map((document) => {
+        const filePath = document.file_url;
+
+        return {
+          documentId: document.pk_document_id,
+          vendorId: document.fk_vendor_id,
+          documentType: document.document_type,
+          fileName: document.original_file_name,
+          mimeType: document.mime_type,
+          fileSize: document.file_size,
+          fileURL: filePath,
+          fileExists: !!filePath && fs.existsSync(filePath),
+          uploadedAt: document.uploaded_at,
+        };
+      });
+
+      return {
+        success: true,
+        count: result.length,
+        data: result,
+      };
+    } catch (error) {
+      return ResponseHelper.error(
+        error.message,
+      );
+    }
   }
 }

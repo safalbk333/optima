@@ -4,10 +4,12 @@ import {
   Controller,
   Get,
   Header,
+  NotFoundException,
   Param,
   Post,
   Put,
   Query,
+  Res,
   StreamableFile,
   UploadedFile,
   UseInterceptors,
@@ -148,6 +150,30 @@ export class VendorController {
     });
   }
 
+  @Get('documents/:documentId/view')
+  @ApiProduces(
+    'application/pdf',
+    'image/jpeg',
+    'image/png',
+  )
+  async viewVendorDocument(
+    @Param('documentId') documentId: string,
+  ): Promise<StreamableFile> {
+
+    const result =
+      await this.vendorService.viewVendorDocument(documentId);
+
+    const buffer = Buffer.isBuffer(result.buffer)
+      ? result.buffer
+      : Buffer.from(result.buffer.data);
+
+    return new StreamableFile(buffer, {
+      type: `application/pdf`,
+      disposition: `inline; filename="${result.fileName}"`,
+      length: buffer.length,
+    });
+  }
+
   @Post(':vendorId/documents')
   @ApiOperation({ summary: 'Upload Vendor Document' })
   @ApiParam({
@@ -216,5 +242,11 @@ export class VendorController {
       dto,
       file,
     );
+  }
+
+  @Get('documents/view')
+  @ApiProduces('application/json')
+  async viewVendorDocuments() {
+    return this.vendorService.viewVendorDocumentByVendorId();
   }
 }

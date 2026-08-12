@@ -4,30 +4,34 @@ export const QuotationProperties = {
     findAll: 'Received request to find all quotations',
     findOne: 'Received request to find quotation with id',
     create: 'Received request to create quotation',
+    update: 'Received request to update quotation',
+    delete: 'Received request to delete quotation',
   },
   service: {
     findAll: {
       start: 'Fetching all quotations',
       success: 'Quotations fetched successfully',
-      notFound: 'No quotations found',
-      error: 'Failed to fetch quotations',
+      error: 'Error fetching quotations',
     },
     findOne: {
       start: 'Fetching quotation with id',
-      success: 'Quotation found with id',
-      notFound: 'Quotation not found with id',
-      error: 'Failed to fetch quotation with ID',
+      success: 'Quotation fetched successfully',
+      error: 'Error fetching quotation',
     },
     create: {
-      start: 'Creating new quotation',
-      success: 'Quotation created with id',
-      error: 'Failed to create quotation',
-      invalidStatus: 'Invalid quotation status',
+      start: 'Creating quotation',
+      success: 'Quotation created successfully',
+      error: 'Error creating quotation',
     },
-    generateRfqNo: {
-      start: 'Generating RFQ number',
-      success: 'RFQ number generated',
-      error: 'Failed to generate RFQ number',
+    update: {
+      start: 'Updating quotation',
+      success: 'Quotation updated successfully',
+      error: 'Error updating quotation',
+    },
+    delete: {
+      start: 'Deleting quotation',
+      success: 'Quotation deleted successfully',
+      error: 'Error deleting quotation',
     },
   },
 };

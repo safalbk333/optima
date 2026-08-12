@@ -19,8 +19,8 @@ export class ItemService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cache: CacheService,
-  ) {}
+    // private readonly cache: CacheService,
+  ) { }
 
   private async getSchemaClient() {
     if (!this.objSchemaClient) {
@@ -48,7 +48,7 @@ export class ItemService {
       });
 
       this.logger.log(`${ItemProperties.service.create.success}: ${objItem.pk_item_id}`);
-      await this.cache.del(CACHE_KEYS.all(strSchemaId));
+      // await this.cache.del(CACHE_KEYS.all(strSchemaId));
       return ResponseHelper.success(objItem, 'Item created successfully');
     } catch (error) {
       this.logger.error(ItemProperties.service.create.error, error.stack);
@@ -82,21 +82,25 @@ export class ItemService {
         };
       }
 
-      const arrItems = await this.cache.getOrSet(
-        CACHE_KEYS.all(strSchemaId),
-        async () => {
-          this.logger.log('[DB Fallback] Fetching all items from database');
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_item.findMany({
-            where: { ...whereClause, is_active: true },
-            include: { category: { include: { parent_category: true } } },
-            skip: offset,
-            take: limit,
-          });
-        },
-      );
-
       const objPrisma = await this.getSchemaClient();
+
+      const arrItems = await objPrisma.tbl_item.findMany({
+        where: {
+          ...whereClause,
+          is_active: true,
+        },
+        include: {
+          category: {
+            include: {
+              parent_category: true,
+            },
+          },
+        },
+        skip: offset,
+        take: limit,
+      });
+
+      // const objPrisma = await this.getSchemaClient();
       const total = await objPrisma.tbl_item.count({ where: { ...whereClause, is_active: true } });
 
       this.logger.log(ItemProperties.service.findAll.success);
@@ -114,17 +118,17 @@ export class ItemService {
     try {
       this.logger.log(`${ItemProperties.service.findOne.start}: ${strId}`);
 
-      const objItem = await this.cache.getOrSet(
-        CACHE_KEYS.one(strSchemaId, strId),
-        async () => {
-          this.logger.log(`[DB Fallback] Fetching item ${strId} from database`);
-          const objPrisma = await this.getSchemaClient();
-          return objPrisma.tbl_item.findUnique({
-            where: { pk_item_id: strId, is_active: true },
-            include: { category: true },
-          });
+      const objPrisma = await this.getSchemaClient();
+
+      const objItem = await objPrisma.tbl_item.findFirst({
+        where: {
+          pk_item_id: strId,
+          is_active: true,
         },
-      );
+        include: {
+          category: true,
+        },
+      });
 
       if (!objItem) throw new NotFoundException('Item not found');
 
@@ -160,7 +164,7 @@ export class ItemService {
       });
 
       this.logger.log(`${ItemProperties.service.update.success}: ${strId}`);
-      await this.cache.update(CACHE_KEYS.one(strSchemaId, strId), objUpdatedItem, CACHE_KEYS.all(strSchemaId));
+      // await this.cache.update(CACHE_KEYS.one(strSchemaId, strId), objUpdatedItem, CACHE_KEYS.all(strSchemaId));
       return ResponseHelper.success(objUpdatedItem, 'Item updated successfully');
     } catch (error) {
       this.logger.error(`${ItemProperties.service.findOne.error}: ${strId}`, error.stack);
