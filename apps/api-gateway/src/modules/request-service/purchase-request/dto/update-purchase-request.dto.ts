@@ -19,6 +19,11 @@ export class PurchaseRequestItemDto {
 }
 
 export class UpdatePurchaseRequestDto {
+  @ApiProperty({ example: 'Purchase request type', description: 'Request type', required: false })
+  @IsOptional()
+  @IsString()
+  request_type?: string;
+
   @ApiProperty({ example: 'Updated Office Supplies Purchase', description: 'Request title', required: false })
   @IsOptional()
   @IsString()

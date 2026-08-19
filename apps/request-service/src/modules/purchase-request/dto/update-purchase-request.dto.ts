@@ -22,6 +22,10 @@ export class UpdatePurchaseRequestDto {
 
   @IsOptional()
   @IsString()
+  request_type?: string;
+
+  @IsOptional()
+  @IsString()
   strDescription?: string;
 
   @IsOptional()

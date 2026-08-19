@@ -389,6 +389,7 @@ model tbl_item {
 model tbl_purchase_request {
   pk_request_id        String                              @id @default(uuid())
   request_number       String                              @unique
+  request_type         String
   title                String
   description          String?
   status               String

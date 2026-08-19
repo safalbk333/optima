@@ -135,6 +135,30 @@ export class VendorService {
       const prisma =
         await this.getSchemaClient();
 
+      const gstNumber =
+        createVendorDto.GST_number.trim().toUpperCase();
+
+      const panNumber =
+        createVendorDto.PAN_number.trim().toUpperCase();
+
+      const gstRegex =
+        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+
+      const panRegex =
+        /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+
+      if (!gstRegex.test(gstNumber)) {
+        throw new BadRequestException(
+          'Invalid GST Number format.',
+        );
+      }
+
+      if (!panRegex.test(panNumber)) {
+        throw new BadRequestException(
+          'Invalid PAN Number format.',
+        );
+      }
+
       const existingVendor = await prisma.tbl_vendor.findFirst({
         where: {
           OR: [{
@@ -819,7 +843,7 @@ export class VendorService {
       },
     };
   }
-  
+
   async viewVendorDocumentByVendorId() {
     try {
       const prisma = await this.getSchemaClient();

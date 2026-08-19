@@ -17,7 +17,10 @@ export class PurchaseRequestItemDto {
 
 export class CreatePurchaseRequestDto {
   @IsString()
-  strRequestNumber: string;
+  strRequestNumber: string; 
+
+  @IsString()
+  request_type: string;
 
   @IsString()
   strTitle: string;

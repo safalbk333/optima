@@ -23,6 +23,10 @@ export class CreatePurchaseRequestDto {
   @IsString()
   strRequestNumber: string;
 
+  @ApiProperty({ example: 'Rate Contract/Non-PO', description: 'Request type' })
+  @IsString()
+  request_type: string;
+
   @ApiProperty({ example: 'Office Supplies Purchase', description: 'Request title' })
   @IsString()
   strTitle: string;
@@ -35,10 +39,6 @@ export class CreatePurchaseRequestDto {
   @ApiProperty({ description: 'Current status', default: 'Pending' })
   @IsString()
   status: string;
-
-  // @ApiProperty({ example: 'priority-id-123', description: 'Priority ID' })
-  // @IsString()
-  // strPriorityId: string;
 
   @ApiProperty({ example: 5000.00, description: 'Estimated value', required: false })
   @IsOptional()

@@ -130,6 +130,7 @@ export class PurchaseRequestService {
       const purchaseRequest = await this.prisma.tbl_purchase_request.create({
         data: {
           request_number: objData.strRequestNumber,
+          request_type: objData.request_type,
           title: objData.strTitle,
           description: objData.strDescription,
           status: objData.status,

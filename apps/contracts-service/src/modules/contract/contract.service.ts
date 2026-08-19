@@ -2,37 +2,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-
 import { PrismaService } from 'libs/database/prisma-service';
-
 import { CreateContractDto } from './dto/create-contract.dto';
 import { UpdateContractDto } from './dto/update-contract.dto';
-
 import { AppLogger } from '../../common/logger/app.logger';
 import { ContractProperties } from '../../common/properties/contract.properties';
-
 import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
-
-const vendorInclude = {
-  vendor: {
-    select: {
-      pk_vendor_id: true,
-      vendor_name: true,
-      vendor_email: true,
-      vendor_phone: true,
-      company: {
-        select: {
-          pk_company_id: true,
-          company_name: true,
-          company_code: true,
-          company_email: true,
-          company_phone: true,
-          company_address: true,
-        },
-      },
-    },
-  },
-};
 
 @Injectable()
 export class ContractService {
@@ -41,7 +16,7 @@ export class ContractService {
 
   constructor(
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
 
   async findAll() {
     try {
@@ -51,7 +26,22 @@ export class ContractService {
 
       const arrContracts =
         await this.prisma.tbl_contract.findMany({
-          include: vendorInclude,
+          include: {
+            vendor: {
+              include: {
+                company: {
+                  select: {
+                    pk_company_id: true,
+                    company_name: true,
+                    company_code: true,
+                    company_email: true,
+                    company_phone: true,
+                    company_address: true,
+                  },
+                },
+              }
+            }
+          }
         });
 
       this.logger.log(
@@ -86,7 +76,22 @@ export class ContractService {
           where: {
             pk_contract_id: strId,
           },
-          include: vendorInclude,
+          include: {
+            vendor: {
+              include: {
+                company: {
+                  select: {
+                    pk_company_id: true,
+                    company_name: true,
+                    company_code: true,
+                    company_email: true,
+                    company_phone: true,
+                    company_address: true,
+                  },
+                },
+              }
+            }
+          }
         });
 
       if (!objContract) {
@@ -134,7 +139,22 @@ export class ContractService {
             fk_vendor_id: objData.vendorId,
             ...(objData.strHtmlContent && { rendered_html: objData.strHtmlContent }),
           },
-          include: vendorInclude,
+          include: {
+            vendor: {
+              include: {
+                company: {
+                  select: {
+                    pk_company_id: true,
+                    company_name: true,
+                    company_code: true,
+                    company_email: true,
+                    company_phone: true,
+                    company_address: true,
+                  },
+                },
+              }
+            }
+          }
         });
 
       this.logger.log(
@@ -175,7 +195,22 @@ export class ContractService {
       const arrContracts =
         await this.prisma.tbl_contract.findMany({
           where: { fk_vendor_id: strVendorId },
-          include: vendorInclude,
+          include: {
+            vendor: {
+              include: {
+                company: {
+                  select: {
+                    pk_company_id: true,
+                    company_name: true,
+                    company_code: true,
+                    company_email: true,
+                    company_phone: true,
+                    company_address: true,
+                  },
+                },
+              }
+            }
+          },
           orderBy: { created: 'desc' },
         });
 
@@ -241,7 +276,22 @@ export class ContractService {
               fk_vendor_id: objData.vendorId,
             }),
           },
-          include: vendorInclude,
+          include: {
+            vendor: {
+              include: {
+                company: {
+                  select: {
+                    pk_company_id: true,
+                    company_name: true,
+                    company_code: true,
+                    company_email: true,
+                    company_phone: true,
+                    company_address: true,
+                  },
+                },
+              }
+            }
+          },
         });
 
       this.logger.log(
