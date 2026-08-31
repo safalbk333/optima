@@ -13,6 +13,7 @@ import { CountryModule } from './modules/country/country.module';
 import { CityModule } from './modules/city/city.module';
 import { CompanyModule } from './modules/company/company.module';
 import { BudgetModule } from './modules/budget/budget.module';
+import { StateModule } from './modules/state/state.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { BudgetModule } from './modules/budget/budget.module';
     CountryModule,
     CityModule,
     CompanyModule,
-    BudgetModule
+    BudgetModule,
+    StateModule,
   ],
 
   controllers: [AppController],

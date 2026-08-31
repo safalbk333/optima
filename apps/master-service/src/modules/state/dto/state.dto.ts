@@ -1,24 +1,17 @@
 import { IsString, IsOptional, IsBoolean } from 'class-validator';
 
-export class CreateCityDto {
+export class CreateStateDto {
   @IsString()
-  cityName: string;
-
-  @IsString()
-  stateId: string;
+  stateName: string;
 
   @IsString()
   countryId: string;
 }
 
-export class UpdateCityDto {
+export class UpdateStateDto {
   @IsOptional()
   @IsString()
-  cityName?: string;
-
-  @IsOptional()
-  @IsString()
-  stateId?: string;
+  stateName?: string;
 
   @IsOptional()
   @IsString()

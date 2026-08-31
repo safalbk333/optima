@@ -25,7 +25,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { VendorGatewayService } from './vendor.service';
-import { CreateVendorDto, UpdateVendorDto } from './dto/create-vendor.dto';
+import { CreateVendorAddressDto, CreateVendorBankAccountDto, CreateVendorContactDto, CreateVendorDto, CreateVendorTaxDto, UpdateVendorDto } from './dto/create-vendor.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Multer } from 'multer';
 import { UploadVendorDocumentDto } from './dto/upload-document.dto';
@@ -36,19 +36,6 @@ export class VendorController {
   constructor(
     private readonly vendorService: VendorGatewayService,
   ) { }
-
-  @Post()
-  @ApiOperation({
-    summary: 'Create a new vendor',
-  })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Vendor created successfully',
-  })
-  create(@Body() data: CreateVendorDto) {
-    return this.vendorService.create(data);
-  }
 
   @Get()
   @ApiOperation({
@@ -249,4 +236,105 @@ export class VendorController {
   async viewVendorDocuments() {
     return this.vendorService.viewVendorDocumentByVendorId();
   }
+
+  @Post('createVendor')
+  @ApiOperation({
+    summary: 'Create a new vendor',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Vendor created successfully',
+  })
+  createVendor(@Body() data: CreateVendorDto) {
+    return this.vendorService.createVendor(data);
+  }
+
+  @Post('saveVendorAddress')
+  @ApiOperation({
+    summary: 'Save vendor address',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Vendor address saved successfully',
+  })
+  saveVendorAddress(
+    @Body() data: CreateVendorAddressDto) {
+    return this.vendorService.saveVendorAddress(data);
+  }
+
+  @Post('contact')
+  @ApiOperation({
+    summary: 'Create vendor contact',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Vendor contact created successfully',
+  })
+  async createVendorContact(
+    @Body() data: CreateVendorContactDto,
+  ) {
+    return this.vendorService.createVendorContact(
+      data,
+    );
+  }
+
+  @Post('createTaxRegistration')
+  @ApiOperation({
+    summary: 'Create tax registration for vendor',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Vendor tax registration created successfully',
+  })
+  createTaxRegistration(
+    @Body() data: CreateVendorTaxDto) {
+    return this.vendorService.createTaxRegistration(data);
+  }
+
+  @Post('createBankAccount')
+  @ApiOperation({
+    summary: 'Create bank account for vendor',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Vendor bank account created successfully',
+  })
+  createBankAccount(
+    @Body() data: CreateVendorBankAccountDto) {
+    return this.vendorService.createBankAccount(data);
+  }
+
+  @Post('submitVendor/:vendorId')
+  @ApiOperation({
+    summary: 'Submit vendor',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Vendor submitted successfully',
+  })
+  @ApiParam({
+    name: 'vendorId',
+  })
+  submitVendor(@Param('vendorId') vendorId: string) {
+    return this.vendorService.submitVendor(vendorId);
+  }
+
+  //  @Post()
+  // @ApiOperation({
+  //   summary: 'Create a new vendor',
+  // })
+  // @ApiResponse({
+  //   status: 200,
+  //   description:
+  //     'Vendor created successfully',
+  // })
+  // create(@Body() data: CreateVendorDto) {
+  //   return this.vendorService.create(data);
+  // }
 }

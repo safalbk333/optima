@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { CreateVendorDto, UpdateVendorDto } from './dto/create-vendor.dto';
+import { CreateVendorAddressDto, CreateVendorBankAccountDto, CreateVendorContactDto, CreateVendorDto, CreateVendorTaxDto, UpdateVendorDto } from './dto/create-vendor.dto';
 import { VENDOR_PATTERN } from './vendor.pattern';
 import { Multer } from 'multer';
 import { UploadVendorDocumentDto } from './dto/upload-document.dto';
@@ -26,20 +26,6 @@ export class VendorGatewayService {
         this.client.send(
           'vendor.findAll',
           payload,
-        ),
-      );
-    } catch (error) {
-      this.logger.error(error.message, error);
-      throw error;
-    }
-  }
-
-  async create(data: CreateVendorDto) {
-    try {
-      return await firstValueFrom(
-        this.client.send(
-          'vendor.create',
-          data,
         ),
       );
     } catch (error) {
@@ -140,4 +126,99 @@ export class VendorGatewayService {
 
     return result;
   }
+
+  async createVendor(data: CreateVendorDto) {
+    try {
+      return await firstValueFrom(
+        this.client.send(
+          'vendor.createVendor',
+          data,
+        ),
+      );
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
+    }
+  }
+
+  async saveVendorAddress(data: CreateVendorAddressDto) {
+    try {
+      return await firstValueFrom(
+        this.client.send(
+          'vendor.saveVendorAddress',
+          data,
+        ),
+      );
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
+    }
+  }
+
+  async createVendorContact(
+    data: CreateVendorContactDto,
+  ) {
+    return firstValueFrom(
+      this.client.send(
+        'vendor.createContact',
+        data,
+      ),
+    );
+  }
+  async createTaxRegistration(data: CreateVendorTaxDto) {
+    try {
+      return await firstValueFrom(
+        this.client.send(
+          'vendor.createTaxRegistration',
+          data,
+        ),
+      );
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
+    }
+  }
+
+  async createBankAccount(data: CreateVendorBankAccountDto) {
+    try {
+      return await firstValueFrom(
+        this.client.send(
+          'vendor.createBankAccount',
+          data,
+        ),
+      );
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
+    }
+  }
+
+  async submitVendor(vendorId: string) {
+    try {
+      return await firstValueFrom(
+        this.client.send(
+          'vendor.submitVendor',
+          {vendorId},
+        ),
+      );
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
+    }
+  }
+
+
+  // async create(data: CreateVendorDto) {
+  //   try {
+  //     return await firstValueFrom(
+  //       this.client.send(
+  //         'vendor.create',
+  //         data,
+  //       ),
+  //     );
+  //   } catch (error) {
+  //     this.logger.error(error.message, error);
+  //     throw error;
+  //   }
+  // }
 }

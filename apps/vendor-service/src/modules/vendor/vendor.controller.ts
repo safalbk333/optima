@@ -4,7 +4,7 @@ import {
   Payload,
 } from '@nestjs/microservices';
 import { VendorService } from './vendor.service';
-import { CreateVendorDto, UpdateVendorDto } from './dto/create-vendor.dto';
+import { CreateVendorAddressDto, CreateVendorBankAccountDto, CreateVendorContactDto, CreateVendorDto, CreateVendorTaxDto, UpdateVendorDto } from './dto/create-vendor.dto';
 import { AppLogger } from '../../common/logger/app.logger';
 import { VendorProperties } from '../../common/properties/vendor.properties';
 
@@ -36,11 +36,11 @@ export class VendorController {
     return this.vendorService.findOne(data.id);
   }
 
-  @MessagePattern('vendor.create')
-  create(@Payload() createVendorDto: CreateVendorDto) {
-    this.logger.log(VendorProperties.controller.create);
-    return this.vendorService.create(createVendorDto);
-  }
+  // @MessagePattern('vendor.create')
+  // create(@Payload() createVendorDto: CreateVendorDto) {
+  //   this.logger.log(VendorProperties.controller.create);
+  //   return this.vendorService.create(createVendorDto); 
+  // }
 
   @MessagePattern('vendor.update')
   update(@Payload()
@@ -83,5 +83,47 @@ export class VendorController {
       await this.vendorService.viewVendorDocumentByVendorId();
 
     return result;
+  }
+
+  @MessagePattern('vendor.createVendor')
+  createVendor(@Payload() createVendorDto: CreateVendorDto) {
+    this.logger.log(VendorProperties.controller.create);
+    return this.vendorService.createVendor(createVendorDto);
+  }
+
+  @MessagePattern('vendor.saveVendorAddress')
+  saveVendorAddress(@Payload() data: CreateVendorAddressDto) {
+    this.logger.log(VendorProperties.controller.create);
+    return this.vendorService.saveVendorAddress(data);
+  }
+
+  @MessagePattern('vendor.createContact')
+  async createVendorContact(
+    @Payload() createVendorContactDto: CreateVendorContactDto,
+  ) {
+    return this.vendorService.createVendorContact(
+      createVendorContactDto,
+    );
+  }
+
+  @MessagePattern('vendor.createTaxRegistration')
+  createTaxRegistration(
+    @Payload() data: CreateVendorTaxDto) {
+    this.logger.log(VendorProperties.controller.create);
+    return this.vendorService.createTaxRegistration(data);
+  }
+
+  @MessagePattern('vendor.createBankAccount')
+  createBankAccount(
+    @Payload() data: CreateVendorBankAccountDto) {
+    this.logger.log(VendorProperties.controller.create);
+    return this.vendorService.createBankAccount(data);
+  }
+
+  @MessagePattern('vendor.submitVendor')
+  submitVendor(
+    @Payload() data: { vendorId: string },) {
+    this.logger.log(VendorProperties.controller.create);
+    return this.vendorService.submitVendor(data.vendorId);
   }
 }

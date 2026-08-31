@@ -37,6 +37,8 @@ model tbl_user {
   chat_room_members            tbl_chat_room_member[]              @relation("chat_room_member_user")
   cities_created               tbl_city[]                          @relation("city_created_by")
   cities_modified              tbl_city[]                          @relation("city_modified_by")
+  states_created               tbl_state[]                         @relation("state_created_by")
+  states_modified              tbl_state[]                         @relation("state_modified_by")
   contracts_created            tbl_contract[]                      @relation("contract_created_by")
   contracts_modified           tbl_contract[]                      @relation("contract_modified_by")
   countries_created            tbl_country[]                       @relation("country_created_by")
@@ -88,21 +90,28 @@ model tbl_user {
   roles                        tbl_user_role                       @relation(fields: [fk_role_id], references: [pk_role_id])
   user_roles_created           tbl_user_role[]                     @relation("user_role_created_by")
   user_roles_modified          tbl_user_role[]                     @relation("user_role_modified_by")
-  vendors_created              tbl_vendor[]                        @relation("vendor_created_by")
-  vendors_modified             tbl_vendor[]                        @relation("vendor_modified_by")
+  vendor_created               tbl_vendor[]                        @relation("vendor_created_by")
+  vendor_modified              tbl_vendor[]                        @relation("vendor_modified_by")
   company                      tbl_company?                        @relation("user_company", fields: [fk_company_id], references: [pk_company_id]) 
+  budgets_created              tbl_budget[]                        @relation("budget_created_by")
+  budgets_modified             tbl_budget[]                        @relation("budget_modified_by")
+  budget_validations           tbl_budget_validation[]             @relation("budget_validator")
+  rate_cards_created           tbl_rate_card[]                     @relation("rate_card_created_by")
+  rate_cards_modified          tbl_rate_card[]                     @relation("rate_card_modified_by")
+  rate_card_items_created      tbl_rate_card_item[]                @relation("rate_card_item_created_by")
+  rate_card_items_modified     tbl_rate_card_item[]                @relation("rate_card_item_modified_by")
  
-  budgets_created        tbl_budget[] @relation("budget_created_by")
+  address_created             tbl_vendor_address[]              @relation("address_created_by")
+  address_modified            tbl_vendor_address[]              @relation("address_modified_by")
+  tax_created                 tbl_vendor_tax_registrations[]    @relation("tax_created_by")
+  tax_modified                tbl_vendor_tax_registrations[]    @relation("tax_modified_by")
+  bank_created                tbl_vendor_bank_accounts[]        @relation("bank_created_by")
+  bank_modified               tbl_vendor_bank_accounts[]        @relation("bank_modified_by")
+  contact_created             tbl_vendor_contact[]              @relation("contact_created_by")
+  contact_modified            tbl_vendor_contact[]              @relation("contact_modified_by")
+  document_created            tbl_vendor_document[]             @relation("document_created_by")
+  document_modified           tbl_vendor_document[]             @relation("document_modified_by")
 
-  budgets_modified       tbl_budget[] @relation("budget_modified_by")
-
-  budget_validations     tbl_budget_validation[] @relation("budget_validator")
- 
-  rate_cards_created       tbl_rate_card[] @relation("rate_card_created_by")
-  rate_cards_modified      tbl_rate_card[] @relation("rate_card_modified_by")
-
-  rate_card_items_created  tbl_rate_card_item[] @relation("rate_card_item_created_by")
-  rate_card_items_modified tbl_rate_card_item[] @relation("rate_card_item_modified_by")
   @@map("tbl_user")
 }
 
@@ -157,17 +166,44 @@ model tbl_country {
   fk_modified_id  String?
   is_delete       Boolean       @default(false)
   cities              tbl_city[]
+  states              tbl_state[]
   created_by          tbl_user?    @relation("country_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?    @relation("country_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
-  vendors             tbl_vendor[]
+
+  bank                tbl_vendor_bank_accounts[]
+  tax                 tbl_vendor_tax_registrations[]
+  address             tbl_vendor_address[]
+  
 
   @@map("tbl_country")
+}
+
+model tbl_state {
+  pk_state_id      String       @id @default(uuid())
+  state_name       String
+  fk_country_id    String
+  is_active        Boolean      @default(true)
+  created          DateTime     @default(now())
+  modified         DateTime?
+  fk_created_id    String?
+  fk_modified_id   String?
+  is_delete        Boolean       @default(false)
+  country             tbl_country  @relation(fields: [fk_country_id], references: [pk_country_id])
+  created_by          tbl_user?    @relation("state_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
+  modified_by         tbl_user?    @relation("state_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
+ 
+  vendor_addresses    tbl_vendor_address[]
+  city                tbl_city[]
+
+  @@index([fk_country_id])
+  @@map("tbl_state")
 }
 
 model tbl_city {
   pk_city_id      String       @id @default(uuid())
   city_name       String
   fk_country_id   String
+  fk_state_id     String
   is_active       Boolean      @default(true)
   created         DateTime     @default(now())
   modified        DateTime?
@@ -175,9 +211,11 @@ model tbl_city {
   fk_modified_id  String?
   is_delete       Boolean       @default(false)
   country             tbl_country  @relation(fields: [fk_country_id], references: [pk_country_id])
+  state               tbl_state    @relation(fields: [fk_state_id], references: [pk_state_id])
   created_by          tbl_user?    @relation("city_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by         tbl_user?    @relation("city_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
-  vendors             tbl_vendor[]
+
+  address             tbl_vendor_address[]
 
   @@index([fk_country_id])
   @@map("tbl_city")
@@ -235,7 +273,6 @@ model tbl_category {
   @@index([is_active])
   @@map("tbl_category")
 }
-
 
 model tbl_request_phase {
   pk_request_phase_id String                          @id @default(uuid())
@@ -301,24 +338,22 @@ model tbl_sla_policy {
   @@map("tbl_sla_policy")
 }
 
+
+
 model tbl_vendor {
   pk_vendor_id              String            @id @default(uuid())
   company_legal_name        String
   trading_name              String?
-  contact_person            String
-  email                     String              @unique
-  phone                     String
   company_type              String
+  registration_number       String
+  website                   String?
+  business_description      String?
+  industry                  String
+  number_of_employees       Int?
   year_of_establishment     Int
-  office_address            String
-  GST_number                String              @unique
-  PAN_number                String              @unique
-  MSME_status               String
-  bank                      String
+  msme_status               String
   nature_of_business        String
   categories_of_supply      String
-  fk_country_id             String
-  fk_city_id                String
   status                    String  
   notes                     String?          
   created                   DateTime            @default(now())
@@ -333,17 +368,118 @@ model tbl_vendor {
   invoices                  tbl_invoice[]
   purchase_orders           tbl_purchase_order[]
   quotations                tbl_quotation[]
-  city                      tbl_city?                 @relation(fields: [fk_city_id], references: [pk_city_id])
-  country                   tbl_country?              @relation(fields: [fk_country_id], references: [pk_country_id])
   created_by                tbl_user?                 @relation("vendor_created_by", fields: [fk_created_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   modified_by               tbl_user?                 @relation("vendor_modified_by", fields: [fk_modified_id], references: [pk_user_id], onDelete: NoAction, onUpdate: NoAction)
   shipments                 tbl_shipment[]
-  company                   tbl_company?              @relation("vendor_company", fields: [fk_company_id], references: [pk_company_id])           
+  company                   tbl_company?              @relation("vendor_company", fields: [fk_company_id], references: [pk_company_id])          
   rate_cards                tbl_rate_card[]
   vendor_item_prices        tbl_vendor_item_price[]
-  vendor_document           tbl_vendor_document[] 
+  vendor_document           tbl_vendor_document[]
+  addresses                 tbl_vendor_address[]
+  tax_registrations         tbl_vendor_tax_registrations[]
+  bank_accounts             tbl_vendor_bank_accounts[] 
+  contacts                  tbl_vendor_contact[]
 
   @@map("tbl_vendor")
+}
+
+model tbl_vendor_contact {
+  pk_vendor_contact_id       String      @id @default(uuid())
+  fk_vendor_id               String
+  first_name                 String
+  last_name                  String
+  designation                String?
+  business_email             String      @unique
+  mobile_number              String
+  preferred_contact_method   String?
+  department                 String?
+  alternate_email            String?
+  is_primary                 Boolean        @default(false)
+  is_delete                  Boolean        @default(false)
+  created                    DateTime       @default(now())
+  modified                   DateTime?
+  fk_created_id              String?
+  fk_modified_id             String?
+  created_by                 tbl_user?      @relation("contact_created_by",fields: [fk_created_id],references: [pk_user_id],map: "fk_vendor_contact_created_by")
+  modified_by                tbl_user?      @relation("contact_modified_by",fields: [fk_modified_id],references: [pk_user_id],map: "fk_vendor_contact_modified_by")
+  vendor                     tbl_vendor      @relation(fields: [fk_vendor_id],references: [pk_vendor_id],onDelete: Cascade)
+
+  @@map("tbl_vendor_contact")
+}
+
+model tbl_vendor_address {
+  pk_vendor_address_id        String            @id @default(uuid())
+  fk_vendor_id                String                
+  address_type                String
+  address_line_1              String
+  address_line_2              String?
+  fk_city_id                  String
+  fk_state_id                 String
+  postal_code                 String
+  fk_country_id               String         
+  created                   DateTime            @default(now())
+  modified                  DateTime?
+  fk_created_id             String?
+  fk_modified_id            String?
+  is_delete                 Boolean                  @default(false)
+  vendor                    tbl_vendor               @relation(fields: [fk_vendor_id], references: [pk_vendor_id])
+  city                      tbl_city?                 @relation(fields: [fk_city_id], references: [pk_city_id])
+  state                     tbl_state?                @relation(fields: [fk_state_id], references: [pk_state_id])
+  country                   tbl_country?              @relation(fields: [fk_country_id], references: [pk_country_id])
+  created_by                tbl_user?                 @relation("address_created_by",fields: [fk_created_id],references: [pk_user_id],map: "fk_vendor_address_created_by")
+  modified_by               tbl_user?                 @relation("address_modified_by",fields: [fk_modified_id],references: [pk_user_id],map: "fk_vendor_address_modified_by")
+
+  @@map("tbl_vendor_address")
+}
+
+model tbl_vendor_tax_registrations {
+  pk_vendor_tax_id          String            @id @default(uuid())
+  fk_vendor_id              String                
+  fk_country_id             String
+  tax_type                  String
+  tax_number                String
+  registration_name         String
+  registration_status       String
+  registration_date         DateTime
+  expiry_date               DateTime         
+  created                   DateTime            @default(now())
+  modified                  DateTime?
+  fk_created_id             String?
+  fk_modified_id            String?
+  is_delete                 Boolean                   @default(false)
+  vendor                    tbl_vendor                @relation(fields: [fk_vendor_id], references: [pk_vendor_id])
+  country                   tbl_country?              @relation(fields: [fk_country_id], references: [pk_country_id])
+  created_by                tbl_user?                 @relation("tax_created_by",fields: [fk_created_id],references: [pk_user_id],map: "fk_vendor_tax_created_by")
+  modified_by               tbl_user?                 @relation("tax_modified_by",fields: [fk_modified_id],references: [pk_user_id],map: "fk_vendor_tax_modified_by")
+
+  @@map("tbl_vendor_tax_registrations")
+}
+
+model tbl_vendor_bank_accounts {
+  pk_vendor_bank_account_id String            @id @default(uuid())
+  fk_vendor_id              String                
+  beneficiary_name          String
+  bank_name                 String
+  bank_country_id           String
+  account_number            String
+  account_type              String
+  currency                  String
+  identifier_type           String       
+  identifier_value          String
+  branch_name               String
+  payment_method            String
+  remittance_email          String  
+  created                   DateTime            @default(now())
+  modified                  DateTime?
+  fk_created_id             String?
+  fk_modified_id            String?
+  is_delete                 Boolean                   @default(false)
+  vendor                    tbl_vendor                @relation(fields: [fk_vendor_id], references: [pk_vendor_id])
+  country                   tbl_country?              @relation(fields: [bank_country_id], references: [pk_country_id])
+  created_by                tbl_user?                 @relation("bank_created_by",fields: [fk_created_id],references: [pk_user_id],map: "fk_vendor_bank_created_by")
+  modified_by               tbl_user?                 @relation("bank_modified_by",fields: [fk_modified_id],references: [pk_user_id],map: "fk_vendor_bank_modified_by")
+
+  @@map("tbl_vendor_bank_accounts")
 }
 
 model tbl_vendor_document {
@@ -355,9 +491,18 @@ model tbl_vendor_document {
   file_size           Int
   mime_type           String
   file_url            String
-  uploaded_at         DateTime @default(now())
+  uploaded_at         DateTime    @default(now())
+  is_delete           Boolean     @default(false)
+  created             DateTime    @default(now())
+  modified            DateTime?
+  fk_created_id       String?
+  fk_modified_id      String?
+  created_by          tbl_user?    @relation("document_created_by",fields: [fk_created_id],references: [pk_user_id],map: "fk_vendor_bank_created_by")
+  modified_by         tbl_user?    @relation("document_modified_by",fields: [fk_modified_id],references: [pk_user_id],map: "fk_vendor_bank_modified_by")
 
-  vendor tbl_vendor @relation(fields: [fk_vendor_id], references: [pk_vendor_id])
+  vendor          tbl_vendor          @relation(fields: [fk_vendor_id], references: [pk_vendor_id])
+
+  @@map("tbl_vendor_document")
 }
 
 model tbl_item {

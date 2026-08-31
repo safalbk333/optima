@@ -10,7 +10,6 @@ import { VendorController } from './modules/vendor-service/vendor/vendor.control
 import { VendorGatewayService } from './modules/vendor-service/vendor/vendor.service';
 import { ItemGatewayService } from './modules/master-service/item/item.service';
 import { ItemController } from './modules/master-service/item/item.controller';
-
 import { ContractController } from './modules/contract-service/contract/contract.controller';
 import { ContractGatewayService } from './modules/contract-service/contract/contract.service';
 import { CategoryController } from './modules/master-service/category/category.controller';
@@ -32,7 +31,6 @@ import { GoodsReceiptController } from './modules/request-service/goods-receipt/
 import { GoodsReceiptGatewayService } from './modules/request-service/goods-receipt/goods-receipt.service';
 import { DepartmentController } from './modules/master-service/department/department.controller';
 import { DepartmentGatewayService } from './modules/master-service/department/department.service';
-
 import { TemplateController } from './modules/template/template.controller';
 import { TemplateGatewayService } from './modules/template/template.service';
 import { InvoiceController } from './modules/shipment-service/invoice/invoice.controller';
@@ -61,6 +59,8 @@ import { ApprovalLevelController } from './modules/request-service/approval/appr
 import { ApprovalLevelGatewayService } from './modules/request-service/approval/approval.service';
 import { QuotationController } from './modules/vendor-service/quotation/quotation.controller';
 import { QuotationGatewayService } from './modules/vendor-service/quotation/quotation.service';
+import { StateController } from './modules/master-service/state/state.controller';
+import { StateGatewayService } from './modules/master-service/state/state.service';
 
 console.log('NODE_ENV =>', process.env.NODE_ENV);
 
@@ -157,7 +157,6 @@ console.log('NODE_ENV =>', process.env.NODE_ENV);
     CountryController,
     CityController,
     CompanyController,
-
     FixedPriceGatewayController,
     MilestonePriceGatewayController,
     PricingEngineGatewayController,
@@ -166,6 +165,7 @@ console.log('NODE_ENV =>', process.env.NODE_ENV);
     TierPriceGatewayController,
     BudgetGatewayController,
     ApprovalLevelController,
+    StateController,
   ],
 
   providers: [
@@ -193,6 +193,7 @@ console.log('NODE_ENV =>', process.env.NODE_ENV);
     RateCardGatewayService,
     BudgetGatewayService,
     ApprovalLevelGatewayService,
+    StateGatewayService,
   ],
 })
 export class AppModule {

@@ -36,9 +36,10 @@ export class CityService {
       const objCity = await objPrisma.tbl_city.create({
         data: {
           city_name: dto.cityName,
+          fk_state_id: dto.stateId,
           fk_country_id: dto.countryId,
         },
-        include: { country: true },
+        include: { country: true, state: true },
       });
 
       this.logger.log(`${CityProperties.service.create.success}: ${objCity.pk_city_id}`);
@@ -72,6 +73,7 @@ export class CityService {
         },
         include: {
           country: true,
+          state: true,
         },
       });
 
@@ -103,6 +105,7 @@ export class CityService {
         },
         include: {
           country: true,
+          state: true,
         },
       });
 
@@ -137,6 +140,7 @@ export class CityService {
       where: { pk_city_id: strId },
       data: {
         city_name: dto.cityName,
+        fk_state_id: dto.stateId,
         fk_country_id: dto.countryId,
         is_active: dto.isActive,
         modified: new Date(),

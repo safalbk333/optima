@@ -1,27 +1,23 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsOptional, IsBoolean } from 'class-validator';
 
-export class CreateCityDto {
-  @ApiProperty({ description: 'City name' })
+export class CreateStateDto {
+  @ApiProperty({ description: 'State name' })
   @IsString()
-  cityName: string;
-
-  @ApiProperty({ description: 'State ID the city belongs to' })
-  @IsString()
-  stateId: string;
+  stateName: string;
 
   @ApiProperty({ description: 'Country ID the city belongs to' })
   @IsString()
   countryId: string;
 }
 
-export class UpdateCityDto {
-  @ApiPropertyOptional({ description: 'City name' })
+export class UpdateStateDto {
+  @ApiPropertyOptional({ description: 'State name' })
   @IsOptional()
   @IsString()
-  cityName?: string;
+  stateName?: string;
 
-  @ApiPropertyOptional({ description: 'Country ID the city belongs to' })
+  @ApiPropertyOptional({ description: 'Country ID the state belongs to' })
   @IsOptional()
   @IsString()
   countryId?: string;

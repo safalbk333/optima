@@ -101,7 +101,7 @@ export class RequestForQuotationService {
                 select: {
                   pk_vendor_id: true,
                   company_legal_name: true,
-                  email: true,
+                  // email: true,
                 },
               },
             },

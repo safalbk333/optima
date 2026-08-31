@@ -7,82 +7,239 @@ import {
   IsInt,
   Min,
   Max,
+  IsOptional,
+  IsBoolean,
 } from 'class-validator';
+export enum TaxType {
+  GST = 'GST',
+  PAN = 'PAN',
+}
 
 export class CreateVendorDto {
   @ApiProperty({ description: 'Name of the vendor company name', })
   @IsString()
   company_legal_name: string;
 
-  @ApiPropertyOptional({ description: 'vendor company trading name(if different)', })
+  @ApiPropertyOptional({ description: 'Name of the vendor trading name', })
+  @IsOptional()
   @IsString()
-  trading_name: string;
+  trading_name?: string;
 
-  @ApiProperty({
-    description: 'Vendor company type',
-    example: 'Private Ltd / LLP / Sole Proprietor / Partnership / Foreign Entity'
-  })
+  @ApiProperty({ description: 'Name of the vendor company type', })
   @IsString()
   company_type: string;
+
+  @ApiProperty({ description: 'Registration number', })
+  @IsString()
+  registration_number: string;
+
+  @ApiPropertyOptional({ description: 'Website of the vendor', })
+  @IsOptional()
+  @IsString()
+  website?: string;
+
+  @ApiPropertyOptional({ description: 'Business description of the vendor', })
+  @IsOptional()
+  @IsString()
+  business_description?: string;
+
+  @ApiProperty({ description: 'Industry of the vendor', })
+  @IsString()
+  industry: string;
+
+  @ApiPropertyOptional({ description: 'Number of employees of the vendor', })
+  @IsOptional()
+  @IsInt()
+  number_of_employees?: number;
 
   @ApiProperty({ description: 'Year of establishment', })
   @IsInt()
   year_of_establishment: number;
 
-  @ApiProperty({ description: 'office address', })
+  @ApiProperty({ description: 'Name of the vendor MSME status', })
   @IsString()
-  office_address: string;
+  msme_status: string;
 
-  @ApiProperty({ description: 'office address', })
-  @IsString()
-  GST_number: string;
-
-  @ApiProperty({ description: 'office address', })
-  @IsString()
-  PAN_number: string;
-
-  @ApiProperty({ description: 'office address', })
-  @IsString()
-  MSME_status: string;
-
-  @ApiProperty({ description: 'office address', })
-  @IsString()
-  bank: string;
-
-  @ApiProperty({
-    description: 'Nature of business',
-    example: 'Goods Supplier / Service Provider / Both'
-  })
+  @ApiProperty({ description: 'Nature of business', })
   @IsString()
   nature_of_business: string;
 
-  @ApiProperty({ description: 'category of supply', })
+  @ApiProperty({ description: 'Category of supply', })
   @IsString()
   categories_of_supply: string;
 
-  @ApiProperty({ description: 'Contact person', })
+  @ApiPropertyOptional({ description: 'Status of the vendor', })
+  @IsOptional()
   @IsString()
-  contact_person: string;
+  status?: string;
 
-  @ApiProperty({ description: 'vendor email', })
+  @ApiPropertyOptional({ description: 'Notes of the vendor', })
+  @IsOptional()
   @IsString()
-  email: string;
+  notes?: string;
+}
 
-  @ApiProperty({ description: 'vendor phone', })
+export class CreateVendorAddressDto {
+  @ApiProperty({ description: 'Vendor ID', })
   @IsString()
-  phone: string;
+  vendor_id: string;
 
-  @ApiProperty({ description: 'vendor country', })
+  @ApiProperty({ description: 'Address type', })
   @IsString()
-  fk_country_id: string;
+  address_type: string;
 
-  @ApiProperty({ description: 'vendor city', })
+  @ApiProperty({ description: 'Address line 1', })
   @IsString()
-  fk_city_id: string;
+  address_line_1: string;
 
-  @ApiProperty({ description: 'vendor status', default: 'PENDING' })
+  @ApiPropertyOptional({ description: 'Address line 2', })
   @IsString()
-  status: string;
+  address_line_2?: string;
+
+  @ApiProperty({ description: 'City ID', })
+  @IsString()
+  city_id: string;
+
+  @ApiProperty({ description: 'State ID', })
+  @IsString()
+  state_id: string;
+
+  @ApiProperty({ description: 'Postal code', })
+  @IsString()
+  postal_code: string;
+
+  @ApiProperty({ description: 'Country ID', })
+  @IsString()
+  country_id: string;
+}
+
+export class CreateVendorContactDto {
+  @ApiProperty({ description: 'Vendor ID', })
+  @IsString()
+  vendor_id: string;
+
+  @ApiProperty({ description: 'First name', })
+  @IsString()
+  first_name: string;
+
+  @ApiProperty({ description: 'Last name', })
+  @IsString()
+  last_name: string;
+
+  @ApiPropertyOptional({ description: 'Designation', })
+  @IsString()
+  designation: string;
+
+  @ApiProperty({ description: 'Business email', })
+  @IsEmail()
+  business_email: string;
+
+  @ApiProperty({ description: 'Mobile number', })
+  @IsNumber()
+  mobile_number: string;
+
+  @ApiPropertyOptional({ description: 'Preferred contact method', })
+  @IsString()
+  preferred_contact_method?: string;
+
+  @ApiPropertyOptional({ description: 'Department', })
+  @IsString()
+  department?: string;
+
+  @ApiPropertyOptional({ description: 'Alternate email', })
+  @IsEmail()
+  alternate_email?: string;
+
+  @ApiPropertyOptional({ description: 'Alternate email', })
+  @IsBoolean()
+  is_primary?: boolean;
+}
+
+export class CreateVendorTaxDto {
+  @ApiProperty({ description: 'Vendor ID', })
+  @IsString()
+  vendor_id: string;
+
+  @ApiProperty({ description: 'Country ID', })
+  @IsString()
+  country_id: string;
+
+  @ApiProperty({ description: 'Tax type', })
+  @IsString()
+  tax_type: TaxType;
+
+  @ApiProperty({ description: 'Tax number', })
+  @IsString()
+  tax_number: string;
+
+  @ApiPropertyOptional({ description: 'Registration name', })
+  @IsOptional()
+  @IsString()
+  registration_name?: string;
+
+  @ApiProperty({ description: 'Registration status', })
+  @IsString()
+  registration_status: string;
+
+  @ApiPropertyOptional({ description: 'Registration date', })
+  @IsOptional()
+  @IsString()
+  registration_date?: Date;
+
+  @ApiPropertyOptional({ description: 'Expiry date', })
+  @IsOptional()
+  @IsString()
+  expiry_date?: Date;
+}
+
+export class CreateVendorBankAccountDto {
+  @ApiProperty({ description: 'Vendor ID', })
+  @IsString()
+  vendor_id: string;
+
+  @ApiProperty({ description: 'Beneficiary name', })
+  @IsString()
+  beneficiary_name: string;
+
+  @ApiProperty({ description: 'Bank name', })
+  @IsString()
+  bank_name: string;
+
+  @ApiProperty({ description: 'Country ID', })
+  @IsString()
+  country_id: string;
+
+  @ApiProperty({ description: 'Account number', })
+  @IsString()
+  account_number: string;
+
+  @ApiProperty({ description: 'Account type', })
+  @IsString()
+  account_type: string;
+
+  @ApiProperty({ description: 'Currency', })
+  @IsString()
+  currency: string;
+
+  @ApiProperty({ description: 'Identifier type', })
+  @IsString()
+  identifier_type: string;
+
+  @ApiProperty({ description: 'Identifier value', })
+  @IsString()
+  identifier_value: string;
+
+  @ApiPropertyOptional({ description: 'Branch name', })
+  @IsString()
+  branch_name?: string;
+
+  @ApiProperty({ description: 'Payment method', })
+  @IsString()
+  payment_method: string;
+
+  @ApiPropertyOptional({ description: 'Remittance email', })
+  @IsString()
+  remittance_email?: string; 
 }
 
 export class UpdateVendorDto {

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'libs/database/prisma-service';
-import { CreateVendorDto, UpdateVendorDto } from './dto/create-vendor.dto';
+import { CreateVendorAddressDto, CreateVendorBankAccountDto, CreateVendorContactDto, CreateVendorDto, CreateVendorTaxDto, UpdateVendorDto } from './dto/create-vendor.dto';
 import { AppLogger } from '../../common/logger/app.logger';
 import { VendorProperties } from '../../common/properties/vendor.properties';
 import { ResponseHelper } from 'libs/common/utils/helper/response.helper';
@@ -74,6 +74,33 @@ export class VendorService {
           where,
           skip: offset,
           take: limit,
+          include: {
+            addresses: {
+              where: {
+                is_delete: false,
+              },
+            },
+            tax_registrations: {
+              where: {
+                is_delete: false,
+              },
+            },
+            bank_accounts: {
+              where: {
+                is_delete: false,
+              },
+            },
+            contacts: {
+              where: {
+                is_delete: false,
+              },
+            },
+            vendor_document: {
+              // where: {
+              //   is_delete: false,
+              // },
+            },
+          }
         }),
         prisma.tbl_vendor.count({
           where,
@@ -109,6 +136,33 @@ export class VendorService {
           where: {
             pk_vendor_id: vendor_id,
           },
+          include: {
+            addresses: {
+              where: {
+                is_delete: false,
+              },
+            },
+            tax_registrations: {
+              where: {
+                is_delete: false,
+              },
+            },
+            bank_accounts: {
+              where: {
+                is_delete: false,
+              },
+            },
+            contacts: {
+              where: {
+                is_delete: false,
+              },
+            },
+            vendor_document: {
+              // where: {
+              //   is_delete: false,
+              // },
+            },
+          }
         });
 
       if (!vendor) {
@@ -128,128 +182,128 @@ export class VendorService {
     }
   }
 
-  async create(
-    createVendorDto: CreateVendorDto,
-  ) {
-    try {
-      const prisma =
-        await this.getSchemaClient();
+  // async create(
+  //   createVendorDto: CreateVendorDto,
+  // ) {
+  //   try {
+  //     const prisma =
+  //       await this.getSchemaClient();
 
-      const gstNumber =
-        createVendorDto.GST_number.trim().toUpperCase();
+  //     const gstNumber =
+  //       createVendorDto.GST_number.trim().toUpperCase();
 
-      const panNumber =
-        createVendorDto.PAN_number.trim().toUpperCase();
+  //     const panNumber =
+  //       createVendorDto.PAN_number.trim().toUpperCase();
 
-      const gstRegex =
-        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+  //     const gstRegex =
+  //       /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
 
-      const panRegex =
-        /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+  //     const panRegex =
+  //       /^[A-Z]{5}[0-9]{4}[A-Z]$/;
 
-      if (!gstRegex.test(gstNumber)) {
-        throw new BadRequestException(
-          'Invalid GST Number format.',
-        );
-      }
+  //     if (!gstRegex.test(gstNumber)) {
+  //       throw new BadRequestException(
+  //         'Invalid GST Number format.',
+  //       );
+  //     }
 
-      if (!panRegex.test(panNumber)) {
-        throw new BadRequestException(
-          'Invalid PAN Number format.',
-        );
-      }
+  //     if (!panRegex.test(panNumber)) {
+  //       throw new BadRequestException(
+  //         'Invalid PAN Number format.',
+  //       );
+  //     }
 
-      const existingVendor = await prisma.tbl_vendor.findFirst({
-        where: {
-          OR: [{
-            GST_number: createVendorDto.GST_number,
-          },
-          {
-            PAN_number: createVendorDto.PAN_number,
-          },
-          ],
-        },
-      });
+  //     const existingVendor = await prisma.tbl_vendor.findFirst({
+  //       where: {
+  //         OR: [{
+  //           GST_number: createVendorDto.GST_number,
+  //         },
+  //         {
+  //           PAN_number: createVendorDto.PAN_number,
+  //         },
+  //         ],
+  //       },
+  //     });
 
-      if (existingVendor) {
-        if (
-          existingVendor.GST_number === createVendorDto.GST_number
-        ) {
-          throw new NotFoundException(
-            'Vendor with this GST Number already exists.',
-          );
-        }
+  //     if (existingVendor) {
+  //       if (
+  //         existingVendor.GST_number === createVendorDto.GST_number
+  //       ) {
+  //         throw new NotFoundException(
+  //           'Vendor with this GST Number already exists.',
+  //         );
+  //       }
 
-        if (
-          existingVendor.PAN_number === createVendorDto.PAN_number
-        ) {
-          throw new NotFoundException(
-            'Vendor with this PAN Number already exists.',
-          );
-        }
-      }
+  //       if (
+  //         existingVendor.PAN_number === createVendorDto.PAN_number
+  //       ) {
+  //         throw new NotFoundException(
+  //           'Vendor with this PAN Number already exists.',
+  //         );
+  //       }
+  //     }
 
-      const currentYear = new Date().getFullYear();
+  //     const currentYear = new Date().getFullYear();
 
-      if (
-        createVendorDto.year_of_establishment < 1800 ||
-        createVendorDto.year_of_establishment > currentYear
-      ) {
-        throw new BadRequestException(
-          `Year of establishment must be a year`,
-        );
-      }
+  //     if (
+  //       createVendorDto.year_of_establishment < 1800 ||
+  //       createVendorDto.year_of_establishment > currentYear
+  //     ) {
+  //       throw new BadRequestException(
+  //         `Year of establishment must be a year`,
+  //       );
+  //     }
 
-      const vendor =
-        await prisma.tbl_vendor.create({
-          data: {
-            company_legal_name:
-              createVendorDto.company_legal_name,
-            trading_name:
-              createVendorDto.trading_name,
-            company_type:
-              createVendorDto.company_type,
-            year_of_establishment:
-              createVendorDto.year_of_establishment,
-            office_address:
-              createVendorDto.office_address,
-            GST_number:
-              createVendorDto.GST_number,
-            PAN_number:
-              createVendorDto.PAN_number,
-            MSME_status:
-              createVendorDto.MSME_status,
-            bank:
-              createVendorDto.bank,
-            nature_of_business:
-              createVendorDto.nature_of_business,
-            categories_of_supply:
-              createVendorDto.categories_of_supply,
-            contact_person:
-              createVendorDto.contact_person,
-            email:
-              createVendorDto.email,
-            phone:
-              createVendorDto.phone,
-            fk_country_id:
-              createVendorDto.fk_country_id,
-            fk_city_id:
-              createVendorDto.fk_city_id,
-            status:
-              createVendorDto.status,
-          },
-        });
+  //     const vendor =
+  //       await prisma.tbl_vendor.create({
+  //         data: {
+  //           company_legal_name:
+  //             createVendorDto.company_legal_name,
+  //           trading_name:
+  //             createVendorDto.trading_name,
+  //           company_type:
+  //             createVendorDto.company_type,
+  //           year_of_establishment:
+  //             createVendorDto.year_of_establishment,
+  //           office_address:
+  //             createVendorDto.office_address,
+  //           GST_number:
+  //             createVendorDto.GST_number,
+  //           PAN_number:
+  //             createVendorDto.PAN_number,
+  //           MSME_status:
+  //             createVendorDto.MSME_status,
+  //           bank:
+  //             createVendorDto.bank,
+  //           nature_of_business:
+  //             createVendorDto.nature_of_business,
+  //           categories_of_supply:
+  //             createVendorDto.categories_of_supply,
+  //           contact_person:
+  //             createVendorDto.contact_person,
+  //           email:
+  //             createVendorDto.email,
+  //           phone:
+  //             createVendorDto.phone,
+  //           fk_country_id:
+  //             createVendorDto.fk_country_id,
+  //           fk_city_id:
+  //             createVendorDto.fk_city_id,
+  //           status:
+  //             createVendorDto.status,
+  //         },
+  //       });
 
-      return ResponseHelper.success(
-        vendor,
-        'Vendor created successfully',
-      );
-    } catch (error) {
-      return ResponseHelper.error(
-        error.message,
-      );
-    }
-  }
+  //     return ResponseHelper.success(
+  //       vendor,
+  //       'Vendor created successfully',
+  //     );
+  //   } catch (error) {
+  //     return ResponseHelper.error(
+  //       error.message,
+  //     );
+  //   }
+  // }
 
   async update(vendorId: string, dto: UpdateVendorDto) {
     try {
@@ -884,5 +938,509 @@ export class VendorService {
         error.message,
       );
     }
+  }
+
+  async createVendor(
+    createVendorDto: CreateVendorDto,
+  ) {
+    try {
+      const prisma = await this.getSchemaClient();
+
+      const currentYear = new Date().getFullYear();
+
+      if (
+        createVendorDto.year_of_establishment < 1800 ||
+        createVendorDto.year_of_establishment > currentYear
+      ) {
+        throw new BadRequestException(
+          `Invalid year of establishment`,
+        );
+      }
+
+      const vendor = await prisma.tbl_vendor.create({
+        data: {
+          company_legal_name: createVendorDto.company_legal_name,
+          trading_name: createVendorDto.trading_name,
+          company_type: createVendorDto.company_type,
+          registration_number: createVendorDto.registration_number,
+          website: createVendorDto.website,
+          business_description: createVendorDto.business_description,
+          industry: createVendorDto.industry,
+          number_of_employees: createVendorDto.number_of_employees,
+          year_of_establishment: createVendorDto.year_of_establishment,
+          msme_status: createVendorDto.msme_status,
+          nature_of_business: createVendorDto.nature_of_business,
+          categories_of_supply: createVendorDto.categories_of_supply,
+          notes: createVendorDto.notes,
+          status: 'DRAFT',
+        },
+      });
+
+      return ResponseHelper.success(
+        vendor,
+        'Vendor basic details saved successfully',
+      );
+    } catch (error) {
+      return ResponseHelper.error(
+        error.message,
+      );
+    }
+  }
+
+  async saveVendorAddress(
+    dto: CreateVendorAddressDto,
+  ) {
+    try {
+      const prisma = await this.getSchemaClient();
+
+      const vendor = await prisma.tbl_vendor.findFirst({
+        where: {
+          pk_vendor_id: dto.vendor_id,
+          is_delete: false,
+        },
+      });
+
+      if (!vendor) {
+        throw new NotFoundException(
+          'Vendor not found',
+        );
+      }
+
+      const address =
+        await prisma.tbl_vendor_address.create({
+          data: {
+            fk_vendor_id: dto.vendor_id,
+            address_type: dto.address_type,
+            address_line_1: dto.address_line_1,
+            address_line_2: dto.address_line_2,
+            fk_city_id: dto.city_id,
+            fk_state_id: dto.state_id,
+            fk_country_id: dto.country_id,
+            postal_code: dto.postal_code,
+          },
+        });
+
+      return ResponseHelper.success(
+        address,
+        'Vendor address saved successfully',
+      );
+    } catch (error) {
+      return ResponseHelper.error(error.message,);
+    }
+  }
+
+  async createVendorContact(
+    createVendorContactDto: CreateVendorContactDto,
+  ) {
+    try {
+      const prisma = await this.getSchemaClient();
+
+      // Check vendor exists
+      const vendor = await prisma.tbl_vendor.findFirst({
+        where: {
+          pk_vendor_id: createVendorContactDto.vendor_id,
+          is_delete: false,
+        },
+      });
+
+      if (!vendor) {
+        throw new NotFoundException('Vendor not found');
+      }
+
+      // Check duplicate email for the same vendor
+      const existingContact = await prisma.tbl_vendor_contact.findFirst({
+        where: {
+          fk_vendor_id: createVendorContactDto.vendor_id,
+          business_email: createVendorContactDto.business_email,
+          is_delete: false,
+        },
+      });
+
+      if (existingContact) {
+        throw new BadRequestException(
+          'Vendor contact with this business email already exists',
+        );
+      }
+
+      if (createVendorContactDto.is_primary) {
+        await prisma.tbl_vendor_contact.updateMany({
+          where: {
+            fk_vendor_id: createVendorContactDto.vendor_id,
+            is_primary: true,
+          },
+          data: {
+            is_primary: false,
+          },
+        });
+      }
+
+      const contact = await prisma.tbl_vendor_contact.create({
+        data: {
+          fk_vendor_id: createVendorContactDto.vendor_id,
+          first_name: createVendorContactDto.first_name,
+          last_name: createVendorContactDto.last_name,
+          designation: createVendorContactDto.designation,
+          business_email: createVendorContactDto.business_email,
+          mobile_number: createVendorContactDto.mobile_number,
+          preferred_contact_method: createVendorContactDto.preferred_contact_method,
+          department: createVendorContactDto.department,
+          alternate_email: createVendorContactDto.alternate_email,
+          is_primary: createVendorContactDto.is_primary ?? true,
+        },
+      });
+
+      return {
+        success: true,
+        message: 'Vendor contact created successfully',
+        data: contact,
+      };
+    } catch (error) {
+      return ResponseHelper.error(
+        error.message,
+      );
+    }
+  }
+
+  async createTaxRegistration(
+    dto: CreateVendorTaxDto,
+  ) {
+    try {
+      const prisma = await this.getSchemaClient();
+
+      const taxNumber =
+        dto.tax_number.trim().toUpperCase();
+
+      // ---------------------------------
+      // CHECK VENDOR
+      // ---------------------------------
+
+      const vendor =
+        await prisma.tbl_vendor.findFirst({
+          where: {
+            pk_vendor_id: dto.vendor_id,
+            is_delete: false,
+          },
+        });
+
+      if (!vendor) {
+        throw new NotFoundException(
+          'Vendor not found',
+        );
+      }
+
+      // ---------------------------------
+      // CHECK DUPLICATE
+      // ---------------------------------
+
+      const existingTax =
+        await prisma.tbl_vendor_tax_registrations.findFirst({
+          where: {
+            tax_type: dto.tax_type,
+            tax_number: taxNumber,
+            is_delete: false,
+          },
+        });
+
+      if (existingTax) {
+        throw new BadRequestException(
+          `${dto.tax_type} number already registered`,
+        );
+      }
+
+      // ---------------------------------
+      // VERIFY WITH GST/PAN PROVIDER
+      // ---------------------------------
+
+      let verificationResult;
+
+      if (dto.tax_type.toUpperCase() === 'GST') {
+        verificationResult = await this.verifyGST(
+          dto.tax_number,
+        );
+      } else if (dto.tax_type.toUpperCase() === 'PAN') {
+        verificationResult = await this.verifyPAN(
+          dto.tax_number,
+        );
+      } else {
+        throw new BadRequestException(
+          'Unsupported tax type',
+        );
+      }
+
+      if (!verificationResult.verified) {
+        throw new BadRequestException(
+          `${dto.tax_type} verification failed`,
+        );
+      }
+
+      // ---------------------------------
+      // SAVE ONLY AFTER VERIFICATION
+      // ---------------------------------
+
+      const taxRegistration =
+        await prisma.tbl_vendor_tax_registrations.create({
+          data: {
+            tax_type: dto.tax_type.toUpperCase(),
+            tax_number: taxNumber,
+            registration_name: dto.registration_name,
+            registration_status: dto.registration_status,
+            registration_date: dto.registration_date
+              ? new Date(dto.registration_date)
+              : null,
+            expiry_date: dto.expiry_date
+              ? new Date(dto.expiry_date)
+              : null,
+            // verification_status: 'VERIFIED',
+            // verified_at: new Date(),
+            vendor: {
+              connect: {
+                pk_vendor_id: dto.vendor_id,
+              },
+            },
+            country: {
+              connect: {
+                pk_country_id: dto.country_id,
+              },
+            },
+          },
+        });
+
+      return ResponseHelper.success(
+        taxRegistration,
+        `${dto.tax_type} verified and saved successfully`,
+      );
+    } catch (error) {
+      return ResponseHelper.error(error.message);
+    }
+  }
+
+  async createBankAccount(
+    dto: CreateVendorBankAccountDto,
+  ) {
+    try {
+      const prisma = await this.getSchemaClient();
+
+      const bankAccount =
+        await prisma.tbl_vendor_bank_accounts.create({
+          data: {
+            beneficiary_name: dto.beneficiary_name,
+            bank_name: dto.bank_name,
+            account_number: dto.account_number,
+            account_type: dto.account_type,
+            currency: dto.currency,
+            identifier_type: dto.identifier_type,
+            identifier_value: dto.identifier_value,
+            branch_name: dto.branch_name,
+            payment_method: dto.payment_method,
+            remittance_email: dto.remittance_email,
+            vendor: {
+              connect: {
+                pk_vendor_id: dto.vendor_id,
+              },
+            },
+            country: {
+              connect: {
+                pk_country_id: dto.country_id,
+              },
+            },
+          },
+        });
+
+      return ResponseHelper.success(
+        bankAccount,
+        'Bank account saved successfully',
+      );
+    } catch (error) {
+      return ResponseHelper.error(error.message);
+    }
+  }
+
+  async submitVendor(vendorId: string) {
+    try {
+      const prisma = await this.getSchemaClient();
+      const vendor =
+        await prisma.tbl_vendor.findUnique({
+          where: {
+            pk_vendor_id: vendorId,
+          },
+          include: {
+            addresses: {
+              where: {
+                is_delete: false,
+              },
+            },
+            tax_registrations: {
+              where: {
+                is_delete: false,
+              },
+            },
+            bank_accounts: {
+              where: {
+                is_delete: false,
+              },
+            },
+            contacts: {
+              where: {
+                is_delete: false,
+              },
+            },
+            vendor_document: {},
+            // vendor_document: {
+            //   where: {
+            //     is_delete: false,
+            //   },
+            // },
+          },
+        });
+
+      if (!vendor) {
+        throw new NotFoundException(
+          'Vendor not found',
+        );
+      }
+
+      // Validate required tabs
+      if (!vendor.addresses.length) {
+        throw new BadRequestException(
+          'Vendor address is required',
+        );
+      }
+
+      if (!vendor.tax_registrations.length) {
+        throw new BadRequestException(
+          'GST/PAN registration is required',
+        );
+      }
+
+      // const gstVerified =
+      //   vendor.tax_registrations.some(
+      //     (tax) =>
+      //       tax.tax_type === 'GST' &&
+      //       tax.verification_status === 'VERIFIED',
+      //   );
+
+      // const panVerified =
+      //   vendor.tax_registrations.some(
+      //     (tax) =>
+      //       tax.tax_type === 'PAN' &&
+      //       tax.verification_status === 'VERIFIED',
+      //   );
+
+      // if (!gstVerified) {
+      //   throw new BadRequestException(
+      //     'Valid GST verification is required',
+      //   );
+      // }
+
+      // if (!panVerified) {
+      //   throw new BadRequestException(
+      //     'Valid PAN verification is required',
+      //   );
+      // }
+
+      if (!vendor.bank_accounts.length) {
+        throw new BadRequestException(
+          'At least one bank account is required',
+        );
+      }
+
+      // Finally change status
+      const updatedVendor =
+        await prisma.tbl_vendor.update({
+          where: {
+            pk_vendor_id: vendorId,
+          },
+          data: {
+            status: 'PENDING_APPROVAL',
+            modified: new Date(),
+          },
+        });
+
+      return ResponseHelper.success(
+        updatedVendor,
+        'Vendor registration submitted successfully',
+      );
+    } catch (error) {
+      return ResponseHelper.error(error.message);
+    }
+  }
+
+  async verifyTax(
+    taxType: string,
+    taxNumber: string,
+  ) {
+    switch (taxType.toUpperCase()) {
+      case 'GST':
+        return this.verifyGST(taxNumber);
+
+      case 'PAN':
+        return this.verifyPAN(taxNumber);
+
+      default:
+        throw new BadRequestException(
+          `Unsupported tax type: ${taxType}`,
+        );
+    }
+  }
+
+  async verifyGST(gstNumber: string) {
+    const normalizedGST =
+      gstNumber.trim().toUpperCase();
+
+    const gstRegex =
+      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+
+    if (!gstRegex.test(normalizedGST)) {
+      throw new BadRequestException(
+        'Invalid GST number format',
+      );
+    }
+
+    // Call your third-party GST verification API here
+
+    // Example:
+    /*
+    const response = await firstValueFrom(
+      this.httpService.post(
+        GST_API_URL,
+        {
+          gst_number: normalizedGST,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${GST_API_KEY}`,
+          },
+        },
+      ),
+    );
+
+    return response.data;
+    */
+
+    return {
+      verified: true,
+      taxNumber: normalizedGST,
+    };
+  }
+
+  async verifyPAN(panNumber: string) {
+    const normalizedPAN =
+      panNumber.trim().toUpperCase();
+
+    const panRegex =
+      /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+
+    if (!panRegex.test(normalizedPAN)) {
+      throw new BadRequestException(
+        'Invalid PAN number format',
+      );
+    }
+
+    // Call your third-party PAN verification API here
+
+    return {
+      verified: true,
+      taxNumber: normalizedPAN,
+    };
   }
 }
